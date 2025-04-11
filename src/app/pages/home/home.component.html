@@ -1,5 +1,6 @@
 <div class="home-container">
   <!-- NAVBAR -->
+   <div class="home-container">
   <nav class="navbar">
     <div class="logo">🐶</div>
     <ul class="nav-links">
@@ -86,16 +87,23 @@
 
   <!-- ARTICLE SECTIONS -->
   <section
-  *ngFor="let article of articles"
-  [id]="article.id"
-  class="article-section page-wrapper"
->
-  <h2 class="article-title">{{ article.title.text }}</h2>
-  <ul class="article-list">
-    <li *ngFor="let paragraph of article.content.paragraphs">🐾 {{ paragraph }}</li>
-  </ul>
+>  <ul class="article-list">
+    <section
+    *ngFor="let article of articles"
+    [id]="article.id"
+    class="article-section page-wrapper"
+  >
+    <div class="article-box">
+      <img *ngIf="article.imageUrl" [src]="article.imageUrl" alt="Article Image" class="article-image" />
+      <h2 class="article-title">{{ article.title.text }}</h2>
+      <ul class="article-list">
+        <li *ngFor="let text of article.content.textList">{{ text }}</li>
+      </ul>
+    </div>
+  </section>
+  
+  
+   </ul>
 </section>
-
-
-
+</div>
 </div>

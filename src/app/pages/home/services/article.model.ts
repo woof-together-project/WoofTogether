@@ -2,5 +2,8 @@
 export interface Article {
     id: string;
     title: { text: string };
-    content: { paragraphs: string[] };
+    content: {
+      textList: string[];
+    };
+    imageUrl?: string;
   }

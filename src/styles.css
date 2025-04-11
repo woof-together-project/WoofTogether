@@ -3,10 +3,10 @@ html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  background-image: url('/assets/images/dogsPark.jpg');
+  /* background-image: url('/assets/images/dogsPark.jpg'); 
   overflow-x: hidden;
   background-repeat: repeat-y;
   background-position: center top;
   background-size: cover;
-  background-attachment: scroll;
+  background-attachment: scroll; */
 }
