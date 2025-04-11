@@ -1,0 +1,101 @@
+<div class="home-container">
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="logo">🐶</div>
+    <ul class="nav-links">
+      <li><a (click)="goToRoute('')">Home</a></li>
+      <li><a (click)="goToRoute('sitters')">Sitters</a></li>
+      <li><a (click)="goToRoute('dog-match')">Dog Match</a></li>
+      <li><a (click)="goToRoute('ask-us')">Ask Us</a></li>
+    </ul>
+    
+    <!-- SEARCH + LOGIN BUTTON -->
+    <div class="nav-actions">
+      <input type="text" placeholder="Search..." />
+      <button class="login-btn" (click)="goToLogin()">Log In</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <!-- <section class="carousel-container"> -->
+    <section class="carousel-container page-wrapper">
+    <!-- LEFT: WOOF TOGETHER TEXT with vertical line -->
+    <div class="side-text">
+      <div class="title-with-line">
+        <!-- Decorative vertical line -->
+        <div class="vertical-line"></div>
+
+        <!-- Title and description -->
+        <div class="text-content">
+          <h1>
+            <span class="light">WOOF</span><br />
+            <span class="bold">TOGETHER</span>
+          </h1>
+          <p>
+            Find trusted dog sitters and walking partners tailored to your pet’s needs.
+            With smart search tools, seamless booking, and AI-powered advice, we make
+            caring for your furry friend easy and stress-free!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: CAROUSEL -->
+    <div class="carousel-wrapper">
+      <button class="arrow-btn left" (click)="prevCard()">&#10094;</button>
+
+      <div class="carousel">
+        <div
+          class="card"
+          *ngFor="let card of cards; let i = index"
+          [ngClass]="getCardClass(i)"
+        >
+          <img [src]="card.image" [alt]="card.title" />
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.description }}</p>
+          <!-- <button>{{ card.button }}</button> -->
+          <button (click)="scrollToArticle(getArticleId(card.title))">{{ card.button }}</button>
+        </div>
+      </div>
+
+      <button class="arrow-btn right" (click)="nextCard()">&#10095;</button>
+    </div>
+  </section>
+
+  <!-- DOTTED DECORATION -->
+  <div class="corner-dots"></div>
+
+  <!-- FAQ SECTION -->
+<section class="faq-section page-wrapper">
+  <h2 class="faq-title"> Common Questions ❓</h2>
+
+  <div *ngFor="let faq of faqList; let i = index"
+  class="faq-item"
+  [class.open]="faq.isOpen"
+>
+  <div class="faq-question" (click)="toggleFAQ(i)">
+    {{ faq.question }}
+    <span class="faq-toggle">{{ faq.isOpen ? '−' : '+' }}</span>
+  </div>
+  <div class="faq-answer">
+    {{ faq.answer }}
+  </div>
+</div>
+
+</section>
+
+  <!-- ARTICLE SECTIONS -->
+  <section
+  *ngFor="let article of articles"
+  [id]="article.id"
+  class="article-section page-wrapper"
+>
+  <h2 class="article-title">{{ article.title.text }}</h2>
+  <ul class="article-list">
+    <li *ngFor="let paragraph of article.content.paragraphs">🐾 {{ paragraph }}</li>
+  </ul>
+</section>
+
+
+
+</div>

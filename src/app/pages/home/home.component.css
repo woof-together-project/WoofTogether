@@ -1,0 +1,427 @@
+/* === PAGE BACKGROUND === */
+
+ /* .home-container {
+  position: relative;
+  background: url('/assets/images/dogsPark.jpg');
+  min-height: 100vh;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+  overflow: hidden;
+  width: 100%;
+  max-width: 100vw;
+  background-repeat: repeat-y;  
+  background-attachment: scroll;  
+}  */
+
+.home-container {
+  background: transparent;
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.page-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Bright overlay */
+.home-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 1;
+}
+
+.home-container > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* === NAVBAR === */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.logo {
+  font-size: 30px;
+}
+
+.nav-links {
+  display: flex;
+  list-style: none;
+  gap: 30px;
+  font-size: 18px;
+}
+
+.nav-links li {
+  cursor: pointer;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 5; /* ✅ Keeps login and search clickable */
+}
+
+.nav-actions input {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: none;
+}
+
+.login-btn {
+  background: white;
+  color: black;
+  padding: 6px 16px;
+  border-radius: 20px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  z-index: 5; /* ✅ Ensures button is clickable */
+}
+
+/* === MAIN CONTENT === */
+.carousel-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+/* === SIDE TEXT === */
+.side-text {
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Title and line wrapper */
+.title-with-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0px;
+}
+
+/* Line to the left of the title */
+.vertical-line {
+  width: 10px;
+  height: 120px;
+  background-color: white;
+  border-radius: 2px;
+  transform: translateX(-200px) translateY(40px); /* ✅ moves far left & down */
+}
+
+/* Title styling */
+.text-content h1 {
+  font-size: 60px;
+  line-height: 1;
+  margin-bottom: 1rem;
+  margin-left: -180px;
+}
+
+.text-content .light {
+  font-weight: 300;
+  color: #f8e3c3;
+}
+
+.text-content .bold {
+  font-weight: 900;
+  color: #5c2b29;
+}
+
+/* the text under WOOF TOGETHER title*/
+.text-content p {
+  font-size: 18px;
+  color: rgba(19, 18, 18, 0.945);
+  line-height: 1.8;
+  max-width: 420px;
+  margin-left: -180px;
+}
+
+/* === CAROUSEL === */
+.carousel-wrapper {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* .arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  color: black;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+} */
+
+
+.arrow-btn {
+  background: transparent;
+  color: black;
+  font-size: 24px;
+  border: 2px solid #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.arrow-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+  transform: scale(1.1);
+}
+
+.arrow-btn.left {
+  left: -18px;
+}
+
+.arrow-btn.right {
+  right: -18px;
+}
+
+.carousel {
+  display: flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-wrapper {
+  position: relative;
+  width: 600px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin-top: 100px; /*Downward shift*/
+  margin-left: 60px;  /*Rightward shift*/
+}
+
+.card {
+  position: absolute;
+  width: 200px;
+  height: 530px;
+  background: white;
+  color: black;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s ease;
+  opacity: 0;
+  z-index: 0;
+}
+
+.card img {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.card p {
+  font-size: 16px;
+  color: #333;
+  margin: 10px 0 16px;
+}
+
+.card button {
+  font-size: 14px;
+  padding: 6px 12px;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.card-center {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  z-index: 2;
+}
+
+.card-left {
+  transform: translateX(-180px) scale(0.9);
+  opacity: 0.5;
+  z-index: 1;
+  filter: blur(0.3px);
+}
+
+.card-right {
+  transform: translateX(180px) scale(0.9);
+  opacity: 0.5;
+  z-index: 1;
+  filter: blur(0.3px);
+}
+
+.card-hidden {
+  display: none;
+}
+
+/* === CORNER DOTS === */
+.corner-dots {
+  position: absolute;
+  bottom: 10px; /* moved down */
+  left: 30px;
+  width: 80px;
+  height: 60px;
+  background-image: radial-gradient(white 2px, transparent 2px);
+  background-size: 10px 10px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-links a.active {
+  border-bottom: 2px solid white;
+}
+
+.article-section {
+  background: white;
+  color: #333;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 900px;
+  margin: 140px auto 80px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.article-title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #5c2b29;
+  margin-bottom: 1.2rem;
+}
+
+.article-list {
+  padding-left: 1.2rem;
+  list-style: none;
+}
+
+.article-list li {
+  margin-bottom: 12px;
+  line-height: 1.7;
+  font-size: 16px;
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.article-list li::before {
+  content: "🐶";
+  position: absolute;
+  left: 0;
+}
+
+.faq-section {
+  position: relative;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  margin: 60px auto;
+  max-width: 900px;
+  backdrop-filter: blur(4px);
+}
+
+
+.faq-title {
+  font-size: 30px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #5c2b29;
+  text-align: center;
+}
+
+.faq-item {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1rem;
+}
+
+.faq-question {
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.3s ease;
+  padding: 12px 0;
+}
+
+.faq-question:hover {
+  color: #5c2b29;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.faq-toggle {
+  font-size: 22px;
+  font-weight: bold;
+  width: 30px;
+  text-align: center;
+  color: #5c2b29;
+}
+
+.faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.3s ease;
+  font-size: 16px;
+  color: #333;
+  padding: 0 0;
+}
+
+.faq-item.open .faq-answer {
+  max-height: 300px; /* enough for most answers */
+  padding-top: 10px;
+}
+
