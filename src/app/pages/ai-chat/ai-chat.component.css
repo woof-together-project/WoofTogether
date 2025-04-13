@@ -1,0 +1,110 @@
+.chat-page {
+  background-color: #c1d5b7;
+  min-height: 100vh;
+  padding: 6rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  overflow-x: hidden;
+}
+
+.welcome {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.chat-box {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 0 14px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow-y: auto;
+  z-index: 1;
+}
+
+.messages {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.messages div {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  max-width: 75%;
+  word-break: break-word;
+  clear: both;
+}
+
+.user {
+  background-color: #c1d5b7;
+  align-self: flex-end;
+  text-align: right;
+  margin-left: auto;
+}
+
+.bot {
+  background-color: #f2f2f2;
+  align-self: flex-start;
+  text-align: left;
+  margin-right: auto;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+}
+
+input[type="text"], input[name="chatInput"] {
+  flex-grow: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #365020;
+  color: white;
+  font-weight: bold;
+  padding: 0.75rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #608f39;
+}
+
+.paw {
+  position: fixed;
+  opacity: 1;
+  width: 80px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.p1  { top: 8%;   left: 5%;   width: 60px;  transform: rotate(-20deg); }
+.p2  { top: 20%;  right: 10%; width: 90px;  transform: rotate(15deg); }
+.p3  { top: 35%;  left: 15%;  width: 50px;  transform: rotate(-10deg); }
+.p4  { bottom: 25%; right: 5%; width: 70px; transform: rotate(30deg); }
+.p5  { bottom: 10%; left: 10%; width: 100px; transform: rotate(-35deg); }
+
+.p6  { top: 60%; left: 25%;  width: 40px; transform: rotate(5deg); }
+.p7  { top: 65%; right: 40%; width: 80px; transform: rotate(45deg); }
+.p8  { bottom: 15%; right: 15%; width: 55px; transform: rotate(-15deg); }
+.p9  { top: 5%; right: 30%; width: 65px; transform: rotate(10deg); }
+.p10 { bottom: 5%; left: 40%; width: 70px; transform: rotate(-5deg); }

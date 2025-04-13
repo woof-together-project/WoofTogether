@@ -1,0 +1,38 @@
+<div class="chat-page">
+
+  <!-- Background Paws -->
+  <img src="assets/images/dogPaw.png" class="paw p1" />
+  <img src="assets/images/dogPaw.png" class="paw p2" />
+  <img src="assets/images/dogPaw.png" class="paw p3" />
+  <img src="assets/images/dogPaw.png" class="paw p4" />
+  <img src="assets/images/dogPaw.png" class="paw p5" />
+  <img src="assets/images/dogPaw.png" class="paw p6" />
+  <img src="assets/images/dogPaw.png" class="paw p7" />
+  <img src="assets/images/dogPaw.png" class="paw p8" />
+  <img src="assets/images/dogPaw.png" class="paw p9" />
+  <img src="assets/images/dogPaw.png" class="paw p10" />
+
+  <h2 class="welcome">Hey there, how can I help you?</h2>
+
+  <!-- Chat Messages -->
+  <div class="chat-box">
+    <div class="messages">
+      <div *ngFor="let msg of messages" [class.user]="msg.role === 'user'" [class.bot]="msg.role === 'assistant'">
+        {{ msg.content }}
+      </div>
+    </div>
+
+    <!-- Input -->
+    <form (ngSubmit)="sendMessage()" class="input-area">
+      <input
+        type="text"
+        [(ngModel)]="userInput"
+        name="chatInput"
+        placeholder="Type your message..."
+        required
+        (keydown.enter)="sendMessage()"
+      />
+      <button type="submit">Send</button>
+    </form>
+  </div>
+</div>

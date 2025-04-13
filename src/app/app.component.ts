@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './shared/navbar/navbar.component'; // ✅ correct path
+
 
 @Component({
   standalone: true,
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: `<router-outlet></router-outlet>`,
+  imports: [RouterOutlet, NavbarComponent],
+  templateUrl: './app.component.html',
 })
 export class AppComponent {}

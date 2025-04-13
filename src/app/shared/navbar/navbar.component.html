@@ -1,0 +1,15 @@
+<nav class="navbar">
+  <div class="logo">🐶</div>
+  <ul class="nav-links">
+    <li><a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
+    <li><a routerLink="/sitters" routerLinkActive="active-link">Sitters</a></li>
+    <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li>
+    <li><a routerLink="/ask-us" routerLinkActive="active-link">Ask Us</a></li>
+  </ul>
+  
+  <div class="nav-actions">
+    <input type="text" placeholder="Search..." />
+    <button class="login-btn" (click)="goToLogin()">Log In</button>
+  </div>
+</nav>
+  

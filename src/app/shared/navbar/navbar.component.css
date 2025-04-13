@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Nunito', sans-serif;
+  background-color: rgba(204, 255, 204, 0.4); /* light green with transparency */
+}
+
+/* === NAVIGATION BAR === */
+nav.navbar {
+  position: absolute;
+  background-color: transparent;
+  backdrop-filter: blur(10px);               /* subtle blur effect */
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: none; /* Remove shadow if not needed */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 1.5rem;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 2rem;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  padding: 0.4rem 1rem;
+  color: #333;
+  font-weight: 500;
+  border-radius: 20px;
+  transition: background 0.3s;
+}
+
+.nav-links li a:hover {
+  /* background-color: rgba(102, 187, 106, 0.2); */
+  background-color: #90b774b9;
+}
+
+.nav-links li a.active-link {
+  font-weight: 800;
+  background-color: #365020;
+  color: white;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-actions input[type="text"] {
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+}
+
+.nav-actions .login-btn {
+  background: #365020;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.nav-actions .login-btn:hover {
+  background: #608f39;
+}

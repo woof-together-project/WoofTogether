@@ -33,6 +33,15 @@
   box-sizing: border-box;
 }
 
+/* :host {
+  display: block;
+  min-height: 100vh;
+  background: url('/assets/images/dogsPark.jpg') no-repeat center top;
+  background-size: cover;
+  position: relative;
+  z-index: 0;
+} */
+
 .page-wrapper {
   max-width: 1200px;
   margin: 0 auto;
@@ -53,7 +62,7 @@
 }
 
 /* === NAVBAR === */
-.navbar {
+/* .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,8 +91,8 @@
   align-items: center;
   gap: 10px;
   position: relative;
-  z-index: 5; /* ✅ Keeps login and search clickable */
-}
+  z-index: 5; /* ✅ Keeps login and search clickable
+} 
 
 .nav-actions input {
   padding: 6px 14px;
@@ -100,8 +109,8 @@
   font-weight: bold;
   cursor: pointer;
   position: relative;
-  z-index: 5; /* ✅ Ensures button is clickable */
-}
+  z-index: 5; /* ✅ Ensures button is clickable 
+} */
 
 /* === MAIN CONTENT === */
 .carousel-container {
@@ -109,8 +118,9 @@
   align-items: flex-start;
   justify-content: center;
   gap: 3rem;
-  margin-top: 3rem;
+  margin-top: 0rem;
   flex-wrap: wrap;
+  padding-top: 100px;
 }
 
 /* === SIDE TEXT === */

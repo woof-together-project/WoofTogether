@@ -4,7 +4,6 @@ import { RouterModule, Router } from '@angular/router';
 import { Article } from './services/article.model'; 
 import { ArticleService } from './services/article.service';
 
-
 @Component({
   selector: 'app-home',
   standalone: true,
