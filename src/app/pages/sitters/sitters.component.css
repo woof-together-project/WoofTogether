@@ -1,0 +1,271 @@
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #ddbea9;
+}
+
+/* CONTAINER */
+.dogsitter-container {
+  height: 85%;
+  padding: 1.5rem;
+  font-family: 'Segoe UI', sans-serif;
+  box-sizing: border-box;
+}
+
+/* HEADER */
+.text-center {
+  text-align: center;
+  margin-bottom: 1rem;
+  margin-top: 4rem;
+}
+
+.centered-title {
+  font-size: 2rem;
+}
+
+.fw-bold {
+  color: #cb997e;
+}
+
+/* MAIN LAYOUT */
+.main-content {
+  display: flex;
+  gap: 2rem;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* LEFT COLUMN (Sitters) */
+.sitter-container {
+  flex: 1;
+  min-width: 300px;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sitter-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: #cb997e transparent;
+  margin-top: -4px;
+}
+
+.sitter-list::-webkit-scrollbar {
+  width: 0;
+}
+.sitter-list:hover::-webkit-scrollbar {
+  width: 8px;
+}
+.sitter-list::-webkit-scrollbar-thumb {
+  background-color: #c4c4c4;
+  border-radius: 8px;
+}
+.sitter-list::-webkit-scrollbar-thumb:hover {
+  background-color: #999;
+}
+
+/* SITTER CARD */
+.sitter-card {
+  background-color: #ffe8d6;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  margin-top: 2px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.sitter-card:hover {
+  transform: translateY(-2px);
+}
+.sitter-card.expanded {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.sitter-summary p,
+.sitter-summary > div p {
+  margin-bottom: 0.3rem;
+}
+
+
+.sitter-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.sitter-info {
+  flex: 1;
+}
+.sitter-name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+.about {
+  margin: 0.3rem 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+.sitter-distance {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #800;
+  margin-top: 0.5rem;
+}
+.sitter-distance.bottom {
+  margin-top: 1rem;
+}
+
+.sitter-expanded {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: expandFade 0.3s ease-in-out;
+}
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* RIGHT COLUMN (Map/Filters) */
+.map-container {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-area {
+  flex: 1;
+  min-height: 550px;
+  background-color: #ffe8d6;
+  border-radius: 12px;
+  padding: 0rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #ffe8d6 !important;
+  color: black !important;
+}
+.nav-tabs .nav-link {
+  background-color: #cb997e;
+  color: #000;
+  font-weight: bold;
+  border-radius: 20px 20px 0 0;
+  margin-left: 0.5rem;
+}
+
+/* Optional animation */
+@keyframes expandFade {
+  from {
+    opacity: 0;
+    transform: scaleY(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+.btn {
+  border-color: #cb997e;
+  background-color: #cb997e;
+  color: black;
+}
+
+.form-check-label {
+  font-size: 1.1rem; /* or try 1.2rem / 18px */
+}
+
+.form-check-input{
+  font-size: 1.1rem;
+}
+
+#rateMax{
+  color: #cb997e;
+}
+
+.form-label {
+  font-size: 1.2rem;
+}
+
+/* Reset default styling */
+input[type="range"] {
+  -webkit-appearance: none; /* Safari/Chrome */
+  width: 100%;
+  height: 8px;
+  background: transparent; /* Remove default background */
+  cursor: pointer;
+}
+
+/* Track - Chrome, Safari */
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background: #cb997e;  /* Line color */
+  border-radius: 5px;
+}
+
+/* Thumb - Chrome, Safari */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  background: #cb997e; /* Thumb color */
+  border-radius: 50%;
+  margin-top: -5px; /* Centers the thumb on the track */
+  border: 2px solid white;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Track - Firefox */
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: #cb997e; /* Line color */
+  border-radius: 5px;
+}
+
+/* Thumb - Firefox */
+input[type="range"]::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  background: #cb997e; /* Thumb color */
+  border-radius: 50%;
+  border: none;
+}
+
+/* Track - Edge */
+input[type="range"]::-ms-track {
+  height: 8px;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+
+input[type="range"]::-ms-fill-lower {
+  background: #cb997e;
+  border-radius: 5px;
+}
+
+input[type="range"]::-ms-fill-upper {
+  background: #cb997e;
+  border-radius: 5px;
+}
+
+input[type="range"]::-ms-thumb {
+  height: 18px;
+  width: 18px;
+  background: #cb997e;
+  border-radius: 50%;
+  border: none;
+}
+

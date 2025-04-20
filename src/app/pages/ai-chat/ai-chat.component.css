@@ -1,3 +1,9 @@
+:host {
+  display: block;
+  height: 100vh; /* ⬅️ Full screen height for this page only */
+  overflow: hidden; /* ⬅️ Prevent scroll outside the page */
+}
+
 .chat-page {
   background-color: #c1d5b7;
   min-height: 100vh;

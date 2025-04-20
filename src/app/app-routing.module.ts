@@ -3,11 +3,16 @@ import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { AiChatComponent } from './pages/ai-chat/ai-chat.component';
+import { SittersComponent } from './pages/sitters/sitters.component';
+import { SignupComponent } from './pages/signup/signup.component';
+
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'ask-us', component: AiChatComponent },
+  { path: 'sitters', component: SittersComponent },
+  { path: 'signup',  component: SignupComponent }
 ];
 
 @NgModule({

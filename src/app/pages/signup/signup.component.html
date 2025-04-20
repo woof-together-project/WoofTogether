@@ -1,0 +1,65 @@
+<div class="container-fluid vh-100 d-flex"> 
+    <!-- Right Form Section (2/3) -->
+    <div class="col-md-7 p-5 overflow-auto">
+      <h2 class="mb-3">Welcome to WoofTogether! We're glad you've decided to join us.</h2>
+      <p>Please note that joining our community requires having at least one dog (the more the merrier) or being a dogsitter.</p>
+  
+      <!-- General User Details -->
+      <form #signupForm="ngForm">
+        <div class="mb-3">
+          <label for="address" class="form-label">Address</label>
+          <input type="text" id="address" class="form-control" name="address" ngModel>
+        </div>
+  
+        <div class="mb-3">
+          <label for="profilePic" class="form-label">Profile Picture</label>
+          <input type="file" id="profilePic" class="form-control" name="profilePic">
+        </div>
+  
+        <!-- Role Checkboxes -->
+        <div class="form-check mb-2">
+          <input type="checkbox" class="form-check-input" id="isSitter" [(ngModel)]="isSitter" name="isSitter">
+          <label class="form-check-label" for="isSitter">I'm joining as a dog sitter</label>
+        </div>
+  
+        <div class="form-check mb-4">
+          <input type="checkbox" class="form-check-input" id="addDog" [(ngModel)]="addDog" name="addDog">
+          <label class="form-check-label" for="addDog">I want to add a dog</label>
+        </div>
+  
+        <!-- Sitter Section -->
+        <div class="card p-3 mb-4" *ngIf="isSitter">
+          <h5>Dogsitter Details</h5>
+          <div class="mb-2">
+            <label for="sitterBio" class="form-label">Bio</label>
+            <textarea class="form-control" id="sitterBio" rows="3" name="sitterBio" ngModel></textarea>
+          </div>
+          <!-- Additional sitter-specific fields here -->
+        </div>
+  
+        <!-- Dog Section -->
+        <div class="card p-3 mb-4" *ngIf="addDog">
+          <h5>Add a Dog</h5>
+          <div class="mb-2">
+            <label for="dogName" class="form-label">Dog's Name</label>
+            <input type="text" class="form-control" id="dogName" name="dogName" ngModel>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Behavioral Traits</label>
+            <input type="text" class="form-control" placeholder="e.g. anxious, reactive" name="traits" ngModel>
+          </div>
+          <!-- Additional dog fields here -->
+        </div>
+  
+        <!-- Submit Button -->
+        <button class="btn btn-success" type="submit" [disabled]="!isSitter && !addDog">Join us!</button>
+      </form>
+    </div>
+
+    <!-- Left Image Section -->
+    <div class="col-5 d-none d-md-block p-0">
+      <img src="assets/images/signupDog.jpg" class="img-fluid h-100 w-100 object-fit-cover" alt="WoofTogether welcome image">
+    </div>
+
+  </div>
+  

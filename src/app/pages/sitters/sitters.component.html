@@ -1,0 +1,186 @@
+<div class="container-fluid px-4 py-3 dogsitter-container">
+  <!-- Header -->
+  <div class="text-center mb-3">
+    <h1 class="fw-bold text">FIND ME A DOGSITTER</h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="row h-100 gx-4">
+    <!-- LEFT: Sitters -->
+    <div class="col-lg-4 d-flex flex-column h-100">
+      <!-- Search bar -->
+      <div class="input-group mb-3">
+        <span class="input-group-text">📍</span>
+        <input type="text" class="form-control" placeholder="Search by city...">
+        <button class="btn btn-success">Search</button>
+      </div>
+
+      <!-- Sitter List -->
+      <div class="sitter-list flex-grow-1 overflow-auto">
+        <div class="sitter-card" *ngFor="let sitter of sitters" (click)="toggleSitterDetails(sitter.user_id)">
+          <!-- Summary View -->
+          <ng-container *ngIf="selectedSitterId !== sitter.user_id; else expandedCard">
+            <div class="d-flex gap-3">
+              <img [src]="sitter.imageUrl" class="sitter-img" />
+              <div class="sitter-info">
+                <h5 class="mb-1">{{ sitter.name }}</h5>
+                <p class="mb-1">{{ sitter.aboutMe }}</p>
+                <p class="text-danger fw-bold mb-0">📍 {{ sitter.distance }} km away</p>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Expanded View -->
+          <ng-template #expandedCard>
+            <div class="sitter-summary">
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <img [src]="sitter.imageUrl" class="sitter-img" />
+                <h5 class="mb-0">{{ sitter.name }}</h5>
+              </div>
+              <p><strong>About Me:</strong> {{ sitter.aboutMe }}</p>
+              <p><strong>Experience:</strong> {{ sitter.experienceYears }}</p>
+              <p><strong>Rate:</strong> ₪{{ sitter.rate }}</p>
+              <p><strong>Availability:</strong> {{ sitter.availability }}</p>
+              <p><strong>Services:</strong> {{ sitter.serviceOptions }}</p>
+              <div>
+                <strong>Reviews:</strong> ⭐⭐⭐⭐⭐
+                <a
+                  class="text-decoration-none text-primary ms-2"
+                  data-bs-toggle="collapse"
+                  [attr.href]="'#collapseReviews' + sitter.user_id"
+                  role="button"
+                  aria-expanded="false"
+                  [attr.aria-controls]="'collapseReviews' + sitter.user_id"
+                  (click)="$event.stopPropagation()"
+                >
+                  ...see more
+                </a>
+                <div class="collapse mt-2" [id]="'collapseReviews' + sitter.user_id">
+                  <div *ngFor="let review of sitter.reviews">
+                    <small class="text-muted d-block">“{{ review }}”</small>
+                  </div>
+                </div>
+              </div>
+              <p><strong>More Info:</strong> {{ sitter.moreDetails }}</p>
+              <div class="d-flex justify-content-between align-items-center mt-2">
+                <span class="text-danger fw-bold mb-0">📍 {{ sitter.distance }} km away</span>
+                <a [href]="'mailto:' + sitter.email" class="btn btn-outline-primary btn-sm d-flex align-items-center gap-1">
+                  <i class="bi bi-envelope"></i> Message Me!
+                </a>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Map / Filters -->
+    <div class="col-lg-8 d-flex flex-column">
+      <!-- Tabs -->
+      <ul class="nav nav-tabs justify-content-end mb-2">
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="selectedTab === 'map'" (click)="selectTab('map')">By Location</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" [class.active]="selectedTab === 'criteria'" (click)="selectTab('criteria')">By Criteria</a>
+        </li>
+      </ul>
+
+      <!-- Map or Filters -->
+      <div class="map-area flex-grow-1">
+        <ng-container *ngIf="selectedTab === 'map'">
+          <div class="map-placeholder">Map goes here</div>
+        </ng-container>
+        <ng-container *ngIf="selectedTab === 'criteria'">
+          <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="w-100">
+            <div class="row px-4">
+
+              <!-- Service Options -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Service Options</label>
+                <div *ngFor="let option of serviceOptions" class="d-flex align-items-center mb-1" style="margin-left: 118px;">
+                  <input
+                    type="checkbox"
+                    [id]="'service-' + option"
+                    [value]="option"
+                    (change)="onServiceOptionChange($event)"
+                    class="form-check-input me-2"
+                    name="serviceOptions"
+                  />
+                  <label [for]="'service-' + option" class="form-check-label mb-0">
+                    {{ option }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Sitter Gender</label>
+                <div *ngFor="let gender of ['any', 'female', 'male']" class="d-flex align-items-center mb-1" style="margin-left: 128px;">
+                  <input
+                    type="radio"
+                    class="form-check-input me-2"
+                    [value]="gender"
+                    [(ngModel)]="selectedGender"
+                    [id]="'gender-' + gender"
+                    name="gender"
+                  />
+                  <label [for]="'gender-' + gender" class="form-check-label mb-0">
+                    {{ gender.charAt(0).toUpperCase() + gender.slice(1) }}
+                  </label>
+                </div>
+              </div>
+        
+              <!-- Experienced With (single vertical list) -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Experienced With</label>
+                <div class="form-check d-flex align-items-center mb-1" style="margin-left: 113px;" *ngFor="let type of experienceWithOptions">
+                  <input
+                    type="checkbox"
+                    class="form-check-input me-2"
+                    [value]="type"
+                    [checked]="filters.experiencedWith.includes(type)"
+                    (change)="onExperienceChange($event)"
+                    id="exp-{{ type }}"
+                  />
+                  <label class="form-check-label" [for]="'exp-' + type" style="margin: 0;">
+                    {{ type }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rate -->
+            <div class="row" style="margin: -80px 400px 10px 0px;">
+              <label class="form-label fw-bold">Max Rate (₪)</label>
+              <input
+                type="range"
+                class="form-range"
+                style="width: 450px; margin-left: 190px;"
+                min="0"
+                max="150"
+                step="5"
+                [(ngModel)]="filters.rateMax"
+                name="rateMax"
+              />
+              <div class="text-center small"  style="margin-top: 10px;">Up to ₪{{ filters.rateMax }}</div>
+            </div>
+
+            <!-- Button -->
+            <div class="text-center mt-6" style="margin-top: 80px; margin-bottom: 0;">
+              <button type="submit" class="btn btn-success">Apply Filters</button>
+            </div>
+        
+            <!-- Filtered Sitters -->
+            <div class="mt-4" *ngIf="filteredSitters.length > 0">
+              <div class="sitter-card" *ngFor="let sitter of filteredSitters">
+                <h5>{{ sitter.name }}</h5>
+                <p>{{ sitter.aboutMe }}</p>
+              </div>
+            </div>
+          </form>
+        </ng-container>       
+      </div>
+    </div>
+  </div>
+</div>
