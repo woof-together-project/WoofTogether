@@ -1,12 +1,14 @@
-<div class="login-container">
-    <h2>Login</h2>
-  
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <input type="text" formControlName="username" placeholder="Username" />
-      <br /><br />
-      <input type="password" formControlName="password" placeholder="Password" />
-      <br /><br />
-      <button type="submit">Log In</button>
-    </form>
+<ng-template #noAuth>
+  <button (click)="login()">Login</button>
+  <hr />
+</ng-template>
+
+  login(): void {
+    this.oidcSecurityService.authorize();
+  }
+  <div *ngIf="isAuthenticated; else noAuth">
+    <p>✅ Is Authenticated: {{ isAuthenticated }}</p>
+    <pre>{{ userData$ | async | json }}</pre>
+    <button (click)="logout()">Logout</button>
   </div>
   
