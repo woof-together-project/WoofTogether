@@ -7,6 +7,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { environment } from './../../../environments/environment'; 
+import { fetchUserAttributes } from '@aws-amplify/auth';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,8 @@ import { environment } from './../../../environments/environment';
 })
 export class HomeComponent{
   
-  username  : string | null = null;
+  username: string | null = null;
+  loading: boolean = true;
   searchText: string = '';
 
   
@@ -28,29 +30,20 @@ export class HomeComponent{
   }
 
   ngOnInit(): void {
-    const code = new URLSearchParams(window.location.search).get('code');
-    
-    if (code) {
-      this.http.post<{ id_token: string; nickname: string }>(
-        `${environment.apiUrl}/api/auth/callback`, { code }
-      ).subscribe({
-        next: (res) => {
-          localStorage.setItem('id_token', res.id_token);
-          this.username = res.nickname;  // Set the nickname directly here
-          window.history.replaceState({}, document.title, window.location.pathname);
-          this.cdr.detectChanges();
-          this.loggedIn = true;  // Mark user as logged in
-        },
-        error: (err) => {
-          console.error('Token exchange failed:', err);
-        }
-      });
-    } else {
-      // If no code, just validate the session based on existing token
-      this.login();  // Validate session (check if user is logged in)
-    }
+   this.checkAuthState();
   }
   
+  async checkAuthState() {
+    try {
+      const user = await fetchUserAttributes(); 
+      this.username = user.nickname ?? null; 
+      this.loading = false;
+    } catch (error) {
+      console.log('User not authenticated:', error);
+      this.loading = false;
+      this.redirectToLogin(); 
+    }
+  }
  
   // ngOnInit(): void {
   //   const code = new URLSearchParams(window.location.search).get('code');
@@ -175,38 +168,39 @@ export class HomeComponent{
     this.currentIndex = (this.currentIndex + 1) % this.cards.length;
   }
     
-      login(): void {
-        const token = localStorage.getItem('id_token');
+      // login(): void {
+      //   const token = localStorage.getItem('id_token');
       
-        if (!token) {
-          this.redirectToLogin();  // If no token, redirect to login
-          return;
-          }
+      //   if (!token) {
+      //     this.redirectToLogin();  // If no token, redirect to login
+      //     return;
+      //     }
 
-          this.http.get('http://localhost:8080/api/auth/session', { withCredentials: true }).subscribe({
-            next: (res: any) => {
-              // Session exists — update UI to show nickname
-              this.username = res.nickname;
-            },
-            error: (err) => {
-              // If no session or user doesn't exist, go to Cognito login
-              const loginUrl = `https://us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com/login` +
-                `?client_id=5s339emasb5u0mf4jej6dvic06` +
-                `&response_type=code&scope=email+openid+profile` +
-                `&redirect_uri=http://localhost:4200/`;
+      //     this.http.get('http://localhost:8080/api/auth/session', { withCredentials: true }).subscribe({
+      //       next: (res: any) => {
+      //         // Session exists — update UI to show nickname
+      //         this.username = res.nickname;
+      //       },
+      //       error: (err) => {
+      //         // If no session or user doesn't exist, go to Cognito login
+      //         const loginUrl = `https://us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com/login` +
+      //           `?client_id=5s339emasb5u0mf4jej6dvic06` +
+      //           `&response_type=code&scope=email+openid+profile` +
+      //           `&redirect_uri=http://localhost:4200/`;
         
-              if (err.status === 401 || err.status === 404) {
-                window.location.href = loginUrl;
-              } else {
-                console.error('Unexpected error:', err);
-              }
-            }
-          });
-        }
+      //         if (err.status === 401 || err.status === 404) {
+      //           window.location.href = loginUrl;
+      //         } else {
+      //           console.error('Unexpected error:', err);
+      //         }
+      //       }
+      //     });
+      //   }
     
 
-  
-
+    login() : void {
+      
+    }
   getCardClass(index: number): string {
     const relative = (index - this.currentIndex + this.cards.length) % this.cards.length;
 
