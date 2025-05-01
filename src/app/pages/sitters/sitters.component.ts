@@ -5,6 +5,7 @@ import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 @Component({
   standalone: true,
   //selector: 'app-login', 
+  selector: 'sitters-view',
   templateUrl: './sitters.component.html',
   styleUrls: ['./sitters.component.css'],
   imports: [CommonModule, ReactiveFormsModule],

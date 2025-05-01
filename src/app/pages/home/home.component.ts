@@ -3,73 +3,109 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Article } from './services/article.model'; 
 import { ArticleService } from './services/article.service';
-import { HttpClient } from '@angular/common/http';
-
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ChangeDetectorRef } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { environment } from './../../../environments/environment'; 
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent{
   
-  nickname: string = '';
+  username  : string | null = null;
+  searchText: string = '';
 
-  constructor(private router: Router, private articleService: ArticleService, private http: HttpClient) 
+  
+  constructor(private router: Router, private articleService: ArticleService, private http: HttpClient, private cdr: ChangeDetectorRef) 
   {
     this.articles = this.articleService.getArticles();
+    this.loggedIn = false; // Initialize loggedIn to false
   }
-
 
   ngOnInit(): void {
     const code = new URLSearchParams(window.location.search).get('code');
-
+    
     if (code) {
-      //Exchange code for tokens
-      this.http
-        .post('http://localhost:8080/api/auth/callback', { code }, { withCredentials: true })
-        .subscribe({
-          next: () => {
-            //Clean the URL (remove ?code=...)
-            window.history.replaceState({}, document.title, window.location.pathname);
-
-            //Wait a moment and check session
-            setTimeout(() => this.checkSession(), 150);
-          },
-          error: (err) => {
-            console.error('Token exchange failed:', err);
-          },
-        });
-    } else {
-      this.checkSession(); // try session directly
-    }
-  }
-
-  checkSession(): void {
-    this.http
-      .get<{ nickname: string }>('http://localhost:8080/api/auth/session', {
-        withCredentials: true,
-      })
-      .subscribe({
+      this.http.post<{ id_token: string; nickname: string }>(
+        `${environment.apiUrl}/api/auth/callback`, { code }
+      ).subscribe({
         next: (res) => {
-          console.log('✅ nickname is', res.nickname);
-          this.nickname = res.nickname;
+          localStorage.setItem('id_token', res.id_token);
+          this.username = res.nickname;  // Set the nickname directly here
+          window.history.replaceState({}, document.title, window.location.pathname);
+          this.cdr.detectChanges();
+          this.loggedIn = true;  // Mark user as logged in
         },
         error: (err) => {
-          console.warn('⚠️ No session found', err);
-          this.nickname = '';
-        },
+          console.error('Token exchange failed:', err);
+        }
       });
+    } else {
+      // If no code, just validate the session based on existing token
+      this.login();  // Validate session (check if user is logged in)
+    }
   }
   
+ 
+  // ngOnInit(): void {
+  //   const code = new URLSearchParams(window.location.search).get('code');
+  
+  //   if (code) {
+  //     this.http.post<{ id_token: string; nickname: string }>(
+  //       `${environment.apiUrl}/api/auth/callback`,
+  //       { code }
+  //     ).subscribe({
+  //       next: (res) => {
+  //         localStorage.setItem('id_token', res.id_token);
+  //         this.username = res.nickname;
+      
+  //        // this.router.navigate(['/']);
+  //        window.history.replaceState({}, document.title, window.location.pathname);
+  //        this.cdr.detectChanges(); // Make sure UI update
+  //       },
+  //       error: (err) => {
+  //         console.error('Token exchange failed:', err);
+  //       }
+  //     });
+  //   } else {
+  //     //this.validateSession(); 
+  //   }
+  // }
+  
+  redirectToLogin(): void {
+    window.location.href = environment.loginUrl;
+  }
+  
+  // validateSession(): void {
+  //   const token = localStorage.getItem('id_token');
+  
+  //   if (!token) {
+  //     this.redirectToLogin();
+  //     return;
+  //   }
+  
+  //   this.http.get<{ nickname: string }>(`${environment.apiUrl}/api/auth/session`, {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`
+  //     }
+  //   }).subscribe({
+  //     next: (res) => {
+  //       this.username = res.nickname;
+  //       this.cdr.detectChanges();
+  //     },
+  //     error: () => {
+  //       this.redirectToLogin();
+  //     }
+  //   });
+  // }
   
 
-  removeQueryParams(): void {
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-
+  loggedIn: boolean = false;
   articles: Article[] = [];
   cards = [
     {
@@ -138,29 +174,37 @@ export class HomeComponent implements OnInit {
   nextCard() {
     this.currentIndex = (this.currentIndex + 1) % this.cards.length;
   }
+    
+      login(): void {
+        const token = localStorage.getItem('id_token');
+      
+        if (!token) {
+          this.redirectToLogin();  // If no token, redirect to login
+          return;
+          }
 
-  login(): void {
-    this.http.get('http://localhost:8080/api/auth/session', { withCredentials: true }).subscribe({
-      next: (res: any) => {
-        // Session exists — update UI to show nickname
-        this.nickname = res.nickname;
-      },
-      error: (err) => {
-        // If no session or user doesn't exist, go to Cognito login
-        const loginUrl = `https://us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com/login` +
-          `?client_id=5s339emasb5u0mf4jej6dvic06` +
-          `&response_type=code&scope=email+openid+profile` +
-          `&redirect_uri=http://localhost:4200/`;
-  
-        if (err.status === 401 || err.status === 404) {
-          window.location.href = loginUrl;
-        } else {
-          console.error('Unexpected error:', err);
+          this.http.get('http://localhost:8080/api/auth/session', { withCredentials: true }).subscribe({
+            next: (res: any) => {
+              // Session exists — update UI to show nickname
+              this.username = res.nickname;
+            },
+            error: (err) => {
+              // If no session or user doesn't exist, go to Cognito login
+              const loginUrl = `https://us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com/login` +
+                `?client_id=5s339emasb5u0mf4jej6dvic06` +
+                `&response_type=code&scope=email+openid+profile` +
+                `&redirect_uri=http://localhost:4200/`;
+        
+              if (err.status === 401 || err.status === 404) {
+                window.location.href = loginUrl;
+              } else {
+                console.error('Unexpected error:', err);
+              }
+            }
+          });
         }
-      }
-    });
-  }
-  
+    
+
   
 
   getCardClass(index: number): string {
@@ -188,5 +232,4 @@ export class HomeComponent implements OnInit {
     const article = this.articles.find(a => a.title.text === title);
     return article ? article.id : '';
   }
-  
 }

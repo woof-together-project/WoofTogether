@@ -1,4 +1,3 @@
-<div class="home-container">
   <!-- NAVBAR -->
    <div class="home-container">
   <nav class="navbar">
@@ -10,20 +9,22 @@
       <li><a (click)="goToRoute('ask-us')">Ask Us</a></li>
     </ul>
     
-    <!-- SEARCH + LOGIN BUTTON -->
+    <!-- SEARCH + LOGIN BUTTON --> 
     <div class="nav-actions">
-      <input type="text" placeholder="Search..." />
-      
-      <div *ngIf="nickname; else showLogin">
-        👋 Hello {{ nickname }}
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search..."
+        class="search-box" 
+        />
+      <div *ngIf="username as name; else showLogin" class="hello-text">
+        Hello {{ name }} 👋
       </div>
-      
-      <ng-template #showLogin>
-        <button (click)="login()">Login</button>
-      </ng-template>
-      
-    </div>
     
+    <ng-template #showLogin>
+      <button class="login-btn" (click)="login()">Login</button>
+    </ng-template>
+  </div>
   </nav>
 
   <!-- MAIN CONTENT -->
@@ -111,8 +112,6 @@
     </div>
   </section>
   
-  
    </ul>
 </section>
-</div>
 </div>
