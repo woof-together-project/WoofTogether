@@ -1,14 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Article } from './services/article.model'; 
 import { ArticleService } from './services/article.service';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { environment } from './../../../environments/environment'; 
-import { fetchUserAttributes } from '@aws-amplify/auth';
-import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-home',
@@ -17,90 +13,71 @@ import { jwtDecode } from 'jwt-decode';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
+
 export class HomeComponent{
   
   username: string | null = null;
   loading: boolean = true;
   searchText: string = '';
 
-  
-  constructor(private router: Router, private articleService: ArticleService, private http: HttpClient, private cdr: ChangeDetectorRef) 
+  constructor(private router: Router, private articleService: ArticleService) 
   {
     this.articles = this.articleService.getArticles();
-    this.loggedIn = false; // Initialize loggedIn to false
   }
 
-  // ngOnInit(): void {
-  //  this.checkAuthState();
-  // }
+  async ngOnInit() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    
+    if (code) {
+      try {
+          const tokens = await this.exchangeCodeForTokens(code);
+          if (tokens && tokens.id_token) {
+            const userDetails = this.parseJwt(tokens.id_token);
+            this.username = userDetails.nickname;
+          }
+        }
+          catch (error) {
+            console.error('Error exchanging code for tokens:', error);
+          }
+      }
+  }
 
-  
-  async checkAuthState() {
+  async exchangeCodeForTokens(code: string) {
+    const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
+    const body = new URLSearchParams({
+        grant_type: environment.grantType,
+        client_id: environment.clientId,
+        redirect_uri: environment.redirectUri,
+        code: code
+    });
     try {
-      const user = await fetchUserAttributes(); 
-      this.username = user.nickname ?? null; 
-      this.loading = false;
-    } catch (error) {
-      console.log('User not authenticated:', error);
-      this.loading = false;
-      this.redirectToLogin(); 
-    }
+      const response = await fetch(tokenUrl, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': 'Basic ' + btoa(`${environment.clientId}:${environment.clientSecret}`)
+          },
+          body
+      });
+      if (response.ok) {
+          const data = await response.json();
+          return data;
+      } else {
+          throw new Error(`Failed to exchange code for tokens. Status: ${response.status}`);
+      }
+  } catch (error) {
+      console.error('Error exchanging code:', error);
+      throw error;
+  }
   }
  
-  // ngOnInit(): void {
-  //   const code = new URLSearchParams(window.location.search).get('code');
-  
-  //   if (code) {
-  //     this.http.post<{ id_token: string; nickname: string }>(
-  //       `${environment.apiUrl}/api/auth/callback`,
-  //       { code }
-  //     ).subscribe({
-  //       next: (res) => {
-  //         localStorage.setItem('id_token', res.id_token);
-  //         this.username = res.nickname;
-      
-  //        // this.router.navigate(['/']);
-  //        window.history.replaceState({}, document.title, window.location.pathname);
-  //        this.cdr.detectChanges(); // Make sure UI update
-  //       },
-  //       error: (err) => {
-  //         console.error('Token exchange failed:', err);
-  //       }
-  //     });
-  //   } else {
-  //     //this.validateSession(); 
-  //   }
-  // }
   
   redirectToLogin(): void {
-    window.location.href = environment.loginUrl;
+   window.location.href = environment.loginUrl; 
   }
   
-  // validateSession(): void {
-  //   const token = localStorage.getItem('id_token');
-  
-  //   if (!token) {
-  //     this.redirectToLogin();
-  //     return;
-  //   }
-  
-  //   this.http.get<{ nickname: string }>(`${environment.apiUrl}/api/auth/session`, {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`
-  //     }
-  //   }).subscribe({
-  //     next: (res) => {
-  //       this.username = res.nickname;
-  //       this.cdr.detectChanges();
-  //     },
-  //     error: () => {
-  //       this.redirectToLogin();
-  //     }
-  //   });
-  // }
-  
 
-  loggedIn: boolean = false;
   articles: Article[] = [];
   cards = [
     {
@@ -168,51 +145,10 @@ export class HomeComponent{
 
   nextCard() {
     this.currentIndex = (this.currentIndex + 1) % this.cards.length;
-  }
-    
-      // login(): void {
-      //   const token = localStorage.getItem('id_token');
-      
-      //   if (!token) {
-      //     this.redirectToLogin();  // If no token, redirect to login
-      //     return;
-      //     }
-
-      //     this.http.get('http://localhost:8080/api/auth/session', { withCredentials: true }).subscribe({
-      //       next: (res: any) => {
-      //         // Session exists — update UI to show nickname
-      //         this.username = res.nickname;
-      //       },
-      //       error: (err) => {
-      //         // If no session or user doesn't exist, go to Cognito login
-      //         const loginUrl = `https://us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com/login` +
-      //           `?client_id=5s339emasb5u0mf4jej6dvic06` +
-      //           `&response_type=code&scope=email+openid+profile` +
-      //           `&redirect_uri=http://localhost:4200/`;
-        
-      //         if (err.status === 401 || err.status === 404) {
-      //           window.location.href = loginUrl;
-      //         } else {
-      //           console.error('Unexpected error:', err);
-      //         }
-      //       }
-      //     });
-      //   }
-    
+  }  
 
     login() : void {
-      const token = localStorage.getItem('id_token');
-      if (token) {
-        try {
-          const decodedToken = jwtDecode(token);
-          const info = this.parseJwt(token);
-          this.username = info.nickname; // Assuming the token contains a 'nickname' field
-          console.log(decodedToken);  // This will print the user data contained in the token
-        } catch (error) {
-          console.error('Error decoding token:', error);
-          //this.redirectToLogin(); 
-        }
-    }
+    this.redirectToLogin();
   }
   
    parseJwt(token: string): any {
