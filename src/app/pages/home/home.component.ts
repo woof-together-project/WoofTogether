@@ -8,6 +8,7 @@ import { ChangeDetectorRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { environment } from './../../../environments/environment'; 
 import { fetchUserAttributes } from '@aws-amplify/auth';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-home',
@@ -29,9 +30,10 @@ export class HomeComponent{
     this.loggedIn = false; // Initialize loggedIn to false
   }
 
-  ngOnInit(): void {
-   this.checkAuthState();
-  }
+  // ngOnInit(): void {
+  //  this.checkAuthState();
+  // }
+
   
   async checkAuthState() {
     try {
@@ -199,8 +201,29 @@ export class HomeComponent{
     
 
     login() : void {
-      
+      const token = localStorage.getItem('id_token');
+      if (token) {
+        try {
+          const decodedToken = jwtDecode(token);
+          const info = this.parseJwt(token);
+          this.username = info.nickname; // Assuming the token contains a 'nickname' field
+          console.log(decodedToken);  // This will print the user data contained in the token
+        } catch (error) {
+          console.error('Error decoding token:', error);
+          //this.redirectToLogin(); 
+        }
     }
+  }
+  
+   parseJwt(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+    }
+
   getCardClass(index: number): string {
     const relative = (index - this.currentIndex + this.cards.length) % this.cards.length;
 
