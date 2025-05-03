@@ -1,0 +1,37 @@
+.scrollable-card {
+  max-height: 500px;  /* adjust how "tall" your notebook page is */
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+  border-radius: 12px;
+  background-color: #fefefe;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+}
+
+.notebook-card {
+  height: 500px;
+  overflow: hidden;
+  position: relative;
+  background: #fdfdfd;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  border-radius: 12px;
+}
+.page {
+  width: 100%;
+  height: 100%;
+  transition: all 0.3s ease-in-out;
+}
+.page.active {
+  display: block;
+}
+.page:not(.active) {
+  display: none;
+}
+
+.rotate-180 {
+  display: inline-block;
+  transform: rotate(90deg);
+  transition: transform 0.3s ease;
+}
+
+
+

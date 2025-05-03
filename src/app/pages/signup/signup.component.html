@@ -1,58 +1,323 @@
-<div class="container-fluid vh-100 d-flex"> 
+<div class="container-fluid vh-100 d-flex">
     <!-- Right Form Section (2/3) -->
     <div class="col-md-7 p-5 overflow-auto">
       <h2 class="mb-3">Welcome to WoofTogether! We're glad you've decided to join us.</h2>
       <p>Please note that joining our community requires having at least one dog (the more the merrier) or being a dogsitter.</p>
-  
+
       <!-- General User Details -->
-      <form #signupForm="ngForm">
-        <div class="mb-3">
-          <label for="address" class="form-label">Address</label>
-          <input type="text" id="address" class="form-control" name="address" ngModel>
+      <form #signupForm="ngForm" (ngSubmit)="submitForm()">
+        <div class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center" (click)="showGeneralInfo = !showGeneralInfo" style="cursor: pointer;">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi" [ngClass]="{'bi-chevron-down': showGeneralInfo, 'bi-chevron-right': !showGeneralInfo}"></i>
+              <h5 class="mb-0">General Information</h5>
+            </div>
+          </div>
+          <div class="card-body" *ngIf="showGeneralInfo">
+            <div class="mb-3">
+              <label for="phone" class="form-label">Phone number</label>
+              <input type="text" id="phone" class="form-control" name="phone" [(ngModel)]="phone" required #phone="ngModel">
+              <div *ngIf="signupForm.submitted && phone.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                Phone number is required
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="city" class="form-label">City</label>
+              <input type="text" id="city" class="form-control" name="city" [(ngModel)]="city" required #city="ngModel">
+              <div *ngIf="signupForm.submitted && city.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                City is required
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="street" class="form-label">Street</label>
+              <input type="text" id="street" class="form-control" name="street" [(ngModel)]="street">
+            </div>
+
+            <div class="mb-3">
+              <label for="profilePic" class="form-label">Profile Picture</label>
+              <input type="file" id="profilePic" class="form-control" name="profilePic" [(ngModel)]="profilePic" required #profilePic="ngModel">
+              <div *ngIf="signupForm.submitted && profilePic.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                Profile picture is required
+              </div>
+            </div>
+          </div>
         </div>
-  
-        <div class="mb-3">
-          <label for="profilePic" class="form-label">Profile Picture</label>
-          <input type="file" id="profilePic" class="form-control" name="profilePic">
-        </div>
-  
+
         <!-- Role Checkboxes -->
         <div class="form-check mb-2">
-          <input type="checkbox" class="form-check-input" id="isSitter" [(ngModel)]="isSitter" name="isSitter">
+          <input type="checkbox" class="form-check-input" id="isSitter"
+                 [(ngModel)]="isSitter" name="isSitter"
+                 (change)="showGeneralInfo = false; showSitterSection = isSitter">
           <label class="form-check-label" for="isSitter">I'm joining as a dog sitter</label>
         </div>
-  
+
         <div class="form-check mb-4">
-          <input type="checkbox" class="form-check-input" id="addDog" [(ngModel)]="addDog" name="addDog">
+          <input type="checkbox" class="form-check-input" id="addDog"
+                 [(ngModel)]="addDog" name="addDog"
+                 (change)="onCheckboxChange()">
           <label class="form-check-label" for="addDog">I want to add a dog</label>
         </div>
-  
+
+
         <!-- Sitter Section -->
-        <div class="card p-3 mb-4" *ngIf="isSitter">
-          <h5>Dogsitter Details</h5>
-          <div class="mb-2">
-            <label for="sitterBio" class="form-label">Bio</label>
-            <textarea class="form-control" id="sitterBio" rows="3" name="sitterBio" ngModel></textarea>
+        <!-- Sitter Card Header -->
+        <div *ngIf="isSitter && showSitterSection" class="card p-0 mb-4 notebook-card">
+          <div class="card-header d-flex justify-content-between align-items-center"
+               (click)="showSitterSection = false" style="cursor: pointer;">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-chevron-down"></i>
+              <h5 class="mb-0">Dogsitter Details</h5>
+            </div>
           </div>
-          <!-- Additional sitter-specific fields here -->
+          <div class="card-body">
+          <ng-container [ngSwitch]="currentSitterPage">
+            <div *ngSwitchCase="0" class="page" [class.active]="currentSitterPage === 0">
+              <div class="mb-3">
+                <label for="gender" class="form-label">Gender</label>
+                <select id="gender" class="form-select" name="gender" [(ngModel)]="gender" required>
+                  <option value="" disabled selected>Select your gender</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                </select>
+                <div *ngIf="signupForm.submitted && !gender" class="text-danger small mb-1 text-end fade-in-error">
+                  Please select your gender, some dogs might be picky!
+                </div>
+              </div>
+              <div class="mb-2">
+                <label for="sitterBio" class="form-label">About Me</label>
+                <textarea class="form-control" id="sitterBio" rows="3" placeholder="Let us know about yourself.." name="sitterBio" ngModel #sitterBio="ngModel"></textarea>
+              </div>
+              <div class="mb-2">
+                <label for="experience" class="form-label">Experience</label>
+                <textarea class="form-control" id="experience" rows="3" placeholder="Let us know what about your work experience.." name="experience" [(ngModel)]="experience" #experience="ngModel"></textarea>
+                <div *ngIf="signupForm.submitted && experience.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                  Experience is required
+                </div>
+              </div>
+              <div class="d-flex justify-content-end mt-3">
+                <button class="btn btn-primary" (click)="nextSitterPage()" [disabled]="!sitterBio">Next ➡️</button>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="1" class="page" [class.active]="currentSitterPage === 1">
+
+              <div class="mb-2">
+                <label for="rate" class="form-label">Hourly rate</label>
+                <input type="number" id="rate" class="form-control" placeholder="Enter a number" name="rate" [(ngModel)]="rate" required #rate="ngModel">
+                <div *ngIf="signupForm.submitted && rate.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                  Rate is required
+                </div>
+              </div>
+              <div class="mb-2">
+                <label for="availability" class="form-label">Availability</label>
+                <textarea class="form-control" id="availability" rows="3" placeholder="Working hours and days, unavailable dates" name="availability" [(ngModel)]="availability" #availability="ngModel"></textarea>
+              </div>
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
+                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="2" class="page" [class.active]="currentSitterPage === 2">
+              <div class="mb-3">
+                <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
+                <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                  <div *ngFor="let type of experienceWithOptions">
+                    <input
+                      type="checkbox"
+                      [value]="type"
+                      (change)="onSitterExperienceChange($event)"
+                      class="form-check-input me-1">
+                    {{ type }}
+                  </div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-bold">Service Options</label>
+                <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                  <div *ngFor="let service of serviceOptions">
+                    <input
+                      type="checkbox"
+                      [value]="service"
+                      (change)="onSitterServiceChange($event)"
+                      class="form-check-input me-1">
+                    {{ service }}
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between mt-3">
+                <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
+              </div>
+            </div>
+          </ng-container>
         </div>
-  
+      </div>
+
+      <div *ngIf="isSitter && !showSitterSection" class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center"
+             (click)="showSitterSection = true" style="cursor: pointer;">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-chevron-right"></i>
+            <h5 class="mb-0">Dogsitter Details</h5>
+          </div>
+        </div>
+      </div>
+
         <!-- Dog Section -->
-        <div class="card p-3 mb-4" *ngIf="addDog">
-          <h5>Add a Dog</h5>
-          <div class="mb-2">
-            <label for="dogName" class="form-label">Dog's Name</label>
-            <input type="text" class="form-control" id="dogName" name="dogName" ngModel>
+        <div *ngIf="addDog">
+          <ng-container *ngFor="let dog of dogs; let i = index">
+
+        <!-- Collapsed View (only header visible) -->
+        <div *ngIf="!showDogSections[i]" class="card mb-4">
+          <div class="card-header d-flex justify-content-between align-items-center"
+               (click)="showDogSections[i] = true" style="cursor: pointer;">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-chevron-right"></i>
+              <h5 class="mb-0">Dog #{{ i + 1 }}</h5>
+            </div>
           </div>
-          <div class="mb-2">
-            <label class="form-label">Behavioral Traits</label>
-            <input type="text" class="form-control" placeholder="e.g. anxious, reactive" name="traits" ngModel>
-          </div>
-          <!-- Additional dog fields here -->
         </div>
-  
+
+        <!-- Expanded View (full form visible) -->
+        <div *ngIf="showDogSections[i]" class="card p-0 mb-4 notebook-card">
+          <div class="card-header d-flex justify-content-between align-items-center"
+               (click)="showDogSections[i] = false" style="cursor: pointer;">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-chevron-down"></i>
+              <h5 class="mb-0">Dog #{{ i + 1 }}</h5>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <ng-container [ngSwitch]="currentDogPage[i]">
+              <div *ngSwitchCase="0" class="page" [class.active]="currentDogPage[i] === 0">
+                <div class="mb-2">
+                  <label class="form-label">Dog's Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required>
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Dog's Breed</label>
+                  <input type="text" class="form-control" [(ngModel)]="dog.breed" name="dogBreed-{{i}}">
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Gender</label>
+                  <select class="form-select" [(ngModel)]="dog.gender" name="dogGender-{{i}}" required>
+                    <option value="" disabled selected>Select Gender</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                  </select>
+                </div>
+
+                <div *ngIf="dog.gender">
+                  <div class="mb-2">
+                    <label class="form-label">
+                      {{ dog.gender === 'male' ? 'Is your dog Castrated?' : 'Is your dog Sterilized?' }}
+                    </label>
+                    <select class="form-select" [(ngModel)]="dog.fixed" name="dogFixed-{{i}}" required>
+                      <option value="" disabled selected>Select</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end mt-3">
+                  <button class="btn btn-primary" (click)="nextDogPage(i)">Next ➡️</button>
+                </div>
+              </div>
+
+              <div *ngSwitchCase="1" class="page" [class.active]="currentDogPage[i] === 1">
+                <div class="mb-2">
+                  <label class="form-label">Dog's Size</label>
+                  <select class="form-select" [(ngModel)]="dog.size" name="dogSize-{{i}}" required>
+                    <option value="" disabled selected>Select Size</option>
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
+                    <option value="giant">Giant</option>
+                  </select>
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Weight (kg)</label>
+                  <input type="number" class="form-control" [(ngModel)]="dog.weight" name="dogWeight-{{i}}" required>
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Vaccinated Against Rabies?</label>
+                  <select class="form-select" [(ngModel)]="dog.rabiesVaccinated" name="dogVaccinated-{{i}}" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Health Conditions</label>
+                    <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
+                  </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
+                    <button class="btn btn-primary" (click)="nextDogPage(i)">Next ➡️</button>
+                </div>
+              </div>
+
+
+              <div *ngSwitchCase="2" class="page" [class.active]="currentDogPage[i] === 2">
+                <!-- Behavioral Traits -->
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Behavioral Traits</label>
+                  <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                    <div *ngFor="let trait of behavioralTraitsList">
+                      <input type="checkbox" class="form-check-input me-1" [value]="trait" (change)="onBehavioralTraitChange($event, i)">
+                      {{ trait }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-3">
+                  <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
+                  <button class="btn btn-primary" (click)="nextDogPage(i)">Next ➡️</button>
+                </div>
+              </div>
+
+                <div *ngSwitchCase="3" class="page" [class.active]="currentDogPage[i] === 3">
+                  <div class="mb-3">
+                    <label class="form-label fw-bold">Favorite Activities</label>
+                    <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                      <div *ngFor="let activity of favoriteActivitiesList">
+                        <input type="checkbox" class="form-check-input me-1" [value]="activity" (change)="onFavoriteActivityChange($event, i)">
+                        {{ activity }}
+                      </div>
+                    </div>
+                  </div>
+
+
+
+                  <div class="mb-2">
+                    <label class="form-label">Anything Else?</label>
+                    <input type="text" class="form-control" [(ngModel)]="dog.moreDetails" name="dogMoreDetails-{{i}}">
+                  </div>
+                  <div class="d-flex justify-content-between mt-3">
+                    <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
+                  </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        </ng-container>
+
+          <!-- Add Another Dog Button -->
+          <div class="text-center mb-4">
+            <button type="button" class="btn btn-outline-primary" (click)="addAnotherDog()">➕ Add Another Dog</button>
+          </div>
+        </div>
+
         <!-- Submit Button -->
-        <button class="btn btn-success" type="submit" [disabled]="!isSitter && !addDog">Join us!</button>
+        <button class="btn btn-success" type="submit" [disabled]="(!isSitter && !addDog)">Join us!</button>
       </form>
     </div>
 
@@ -62,4 +327,3 @@
     </div>
 
   </div>
-  

@@ -4,10 +4,31 @@ html, body {
   margin: 0;
   padding: 0;
   overflow-x: hidden;
-  /* background-image: url('/assets/images/dogsPark.jpg'); 
+  /* background-image: url('/assets/images/dogsPark.jpg');
   overflow-x: hidden;
   background-repeat: repeat-y;
   background-position: center top;
   background-size: cover;
   background-attachment: scroll; */
+}
+
+:root {
+  --bs-primary: #4a5a32;
+  --bs-secondary: #7c5e3c;
+}
+
+.fade-in-error {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-in forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
