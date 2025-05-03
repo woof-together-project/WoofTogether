@@ -9,4 +9,7 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
   imports: [RouterOutlet, NavbarComponent],
   templateUrl: './app.component.html',
 })
-export class AppComponent {}
+export class AppComponent {
+  ngOnInit(): void {
+  }
+}

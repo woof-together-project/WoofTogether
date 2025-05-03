@@ -1,5 +1,5 @@
 // amplify.config.ts
-import { Amplify } from 'aws-amplify';
+//import { Amplify } from 'aws-amplify';
 
 export const amplifyCognitoConfig = {
   Auth: {
@@ -12,12 +12,12 @@ export const amplifyCognitoConfig = {
           scopes: ['openid', 'email', 'profile'],
           redirectSignIn: ['http://localhost:4200/'],
           redirectSignOut: ['http://localhost:4200/'],
-          responseType: 'code' as const 
+          responseType: 'code' as const
         }
       }
     }
   }
 };
 
-Amplify.configure(amplifyCognitoConfig);
+// Amplify.configure(amplifyCognitoConfig);
 console.log('✅ Amplify configured!');

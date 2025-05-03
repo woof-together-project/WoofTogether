@@ -6,10 +6,20 @@
     <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li>
     <li><a routerLink="/ask-us" routerLinkActive="active-link">Ask Us</a></li>
   </ul>
-  
-  <div class="nav-actions">
-    <input type="text" placeholder="Search..." />
-    <button class="login-btn" (click)="goToLogin()">Log In</button>
+
+   <div class="nav-actions">
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        placeholder="Search..."
+        class="search-box"
+        />
+      <div *ngIf="username as name; else showLogin" class="hello-text">
+        Hello {{ name }} 👋
+      </div>
+
+    <ng-template #showLogin>
+      <button class="login-btn" (click)="login()">Login</button>
+    </ng-template>
   </div>
 </nav>
-  
