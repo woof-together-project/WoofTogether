@@ -12,8 +12,8 @@
   overflow: hidden;
   width: 100%;
   max-width: 100vw;
-  background-repeat: repeat-y;  
-  background-attachment: scroll;  
+  background-repeat: repeat-y;
+  background-attachment: scroll;
 }  */
 
 .home-container {
@@ -92,7 +92,7 @@
   gap: 10px;
   position: relative;
   z-index: 5; /* ✅ Keeps login and search clickable
-} 
+}
 
 .nav-actions input {
   padding: 6px 14px;
@@ -109,7 +109,7 @@
   font-weight: bold;
   cursor: pointer;
   position: relative;
-  z-index: 5; /* ✅ Ensures button is clickable 
+  z-index: 5; /* ✅ Ensures button is clickable
 } */
 
 /* === MAIN CONTENT === */
@@ -246,7 +246,7 @@
   height: 400px;
   display: flex;
   align-items: center;
-  justify-content: center; 
+  justify-content: center;
   margin-top: 100px; /*Downward shift*/
   margin-left: 60px;  /*Rightward shift*/
 }

@@ -1,6 +1,5 @@
 <div class="home-container">
-  <!-- NAVBAR -->
-    
+
     <!-- SEARCH + LOGIN BUTTON -->
     <!-- <div class="nav-actions">
       <input type="text" placeholder="Search..." />
@@ -45,7 +44,7 @@
           <h3>{{ card.title }}</h3>
           <p>{{ card.description }}</p>
           <!-- <button>{{ card.button }}</button> -->
-          <button (click)="scrollToArticle(getArticleId(card.title))">{{ card.button }}</button>
+          <button (click)="scrollToArticle(card.articleId)">{{ card.button }}</button>
         </div>
       </div>
 
@@ -91,8 +90,8 @@
       </ul>
     </div>
   </section>
-  
-  
+
    </ul>
 </section>
+</div>
 </div>

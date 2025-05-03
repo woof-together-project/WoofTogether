@@ -3,7 +3,7 @@ import { Article } from '../article.model';
 export const AboutUsArticle: Article = {
   id: 'about-us',
   title: { text: 'About Us' },
-  imageUrl: '/assets/images/chilyAndSammy.jpg', 
+  imageUrl: '/assets/images/chilyAndSammy.png', 
   content: {
     textList: [
          'At WoofTogether, we’re not just a pet care service - we’re a community of dog lovers on a mission to make pet care simple, safe, and stress-free.',

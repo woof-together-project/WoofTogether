@@ -3,16 +3,16 @@ import { Article } from './article.model';
 
 import { DogHappyArticle } from './articles/dog-happy.article';
 import { AboutUsArticle } from './articles/about-us.article';
-//import { HowItWorksArticle } from './articles/how-it-works.article';
-//import { JoinUsArticle } from './articles/join-us.article';
+import { DogsAndChildrenArticle } from './articles/dogs-and-children-growing-up-together.article';
+import { TrainDogArticle } from './articles/how-to-train-a-dog.article';
 
 @Injectable({ providedIn: 'root' })
 export class ArticleService {
   private articles: Article[] = [
     DogHappyArticle,
-    //JoinUsArticle,
-   // HowItWorksArticle,
-    AboutUsArticle
+    AboutUsArticle,
+    TrainDogArticle,
+    DogsAndChildrenArticle,
   ];
 
   getArticles(): Article[] {

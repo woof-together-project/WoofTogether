@@ -5,8 +5,8 @@ import { Sitter } from './sitter.model';
 
 @Component({
   selector: 'app-sitters',
-  standalone: true, 
-  imports: [CommonModule, FormsModule], 
+  standalone: true,
+  imports: [CommonModule, FormsModule],
   templateUrl: './sitters.component.html',
   styleUrls: ['./sitters.component.css']
 })
@@ -116,7 +116,7 @@ export class SittersComponent implements OnInit {
           availability: "Weekdays 10:00–15:00. Not available Fridays or mornings with classes.",
           imageUrl: "assets/images/male_dogsitter.png",
           email: "roi@example.com"
-        }      
+        }
     ];
 
     // Simulate fetch from backend
@@ -126,7 +126,7 @@ export class SittersComponent implements OnInit {
       'aggressive to people', 'anxious dogs',
       'big dogs', 'small dogs'
     ];
-  
+
     this.serviceOptions = ['dog-sitting', 'dog-walking', 'dog-boarding'];
     // Later: fetch from real API
     // this.sitterService.getFilterOptions().subscribe(data => {
@@ -134,7 +134,7 @@ export class SittersComponent implements OnInit {
     //   this.serviceOptions = data.serviceOptions;
     // });
   }
-  
+
 
   selectedSitter: Sitter | null = null;
 
@@ -147,7 +147,7 @@ export class SittersComponent implements OnInit {
       this.selectedSitter = sitter;
     }
   }
-  
+
   selectedSitterId: number | null = null;
 
   toggleSitterDetails(sitterId: number) {
@@ -195,7 +195,7 @@ export class SittersComponent implements OnInit {
   onExperienceChange(event: Event) {
     const checkbox = event.target as HTMLInputElement;
     const value = checkbox.value;
-  
+
     if (checkbox.checked) {
       if (!this.filters.experiencedWith.includes(value)) {
         this.filters.experiencedWith.push(value);
@@ -206,7 +206,7 @@ export class SittersComponent implements OnInit {
       );
     }
   }
-  
+
   //need to send this to the backend and bring the data
   applyFilters() {
     this.filteredSitters = this.sitters.filter(sitter => {

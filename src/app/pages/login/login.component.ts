@@ -1,46 +1,40 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
-import { LoginService } from './login.service';
+import { amplifyCognitoConfig  } from '../../amplify.config';
 
 @Component({
-  standalone: true,
   selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css'],
-  imports: [CommonModule, ReactiveFormsModule],
-  providers: [LoginService] 
+  standalone: true,
+  template: `<button (click)="login()">Login with Cognito</button>`,
 })
 export class LoginComponent {
-  loginForm = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl('')
-  });
+  login() {
+    const cognito = amplifyCognitoConfig.Auth?.Cognito;
 
-  constructor(private loginService: LoginService) {}
-
-  onSubmit() {
-    const { username, password } = this.loginForm.value;
-  
-    if (!username || !password) {
-      alert('Please enter both username and password.');
+    if (!cognito || !cognito.loginWith?.oauth) {
+      console.error('❌ Missing Cognito OAuth configuration');
       return;
     }
   
-    this.loginService.login(username, password).subscribe({
-      next: (res: string) => {
-        console.log('✅ Server responded with:', res);
-        if (res.trim() === 'OK') {
-          alert('✅ Login successful!');
-        } else {
-          alert('❌ Invalid credentials');
+    const {
+      userPoolClientId,
+      loginWith: {
+        oauth: {
+          domain,
+          redirectSignIn,
+          scopes,
+          responseType
         }
-      },
-      error: (err) => {
-        console.error('❌ Request failed with error:', err);
-        alert('❌ Login failed: Server error or wrong input.');
       }
-    });
-  }  
+    } = cognito;
   
+    const oauthUrl = `https://${domain}/oauth2/authorize` +
+      `?response_type=${responseType}` +
+      `&client_id=${userPoolClientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectSignIn[0])}` +
+      `&scope=${encodeURIComponent(scopes.join(' '))}` +
+      `&prompt=login`;
+  
+    console.log('🔗 Redirecting to Cognito UI:', oauthUrl);
+    window.location.href = oauthUrl;
+  }
 }

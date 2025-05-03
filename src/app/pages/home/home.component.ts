@@ -1,42 +1,112 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
-import { Article } from './services/article.model'; 
+import { Router } from '@angular/router';
+import { Article } from './services/article.model';
 import { ArticleService } from './services/article.service';
+import { FormsModule } from '@angular/forms';
+import { environment } from './../../../environments/environment';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+
+export class HomeComponent{
+
+  username: string | null = null;
+  loading: boolean = true;
+  searchText: string = '';
+
+  constructor(private router: Router, private articleService: ArticleService)
+  {
+    this.articles = this.articleService.getArticles();
+  }
+
+  async ngOnInit() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+
+    if (code) {
+      try {
+          const tokens = await this.exchangeCodeForTokens(code);
+          if (tokens && tokens.id_token) {
+            const userDetails = this.parseJwt(tokens.id_token);
+            this.username = userDetails.nickname;
+          }
+        }
+          catch (error) {
+            console.error('Error exchanging code for tokens:', error);
+          }
+      }
+  }
+
+  async exchangeCodeForTokens(code: string) {
+    const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
+    const body = new URLSearchParams({
+        grant_type: environment.grantType,
+        client_id: environment.clientId,
+        redirect_uri: environment.redirectUri,
+        code: code
+    });
+    try {
+      const response = await fetch(tokenUrl, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Authorization': 'Basic ' + btoa(`${environment.clientId}:${environment.clientSecret}`)
+          },
+          body
+      });
+      if (response.ok) {
+          const data = await response.json();
+          return data;
+      } else {
+          throw new Error(`Failed to exchange code for tokens. Status: ${response.status}`);
+      }
+  } catch (error) {
+      console.error('Error exchanging code:', error);
+      throw error;
+  }
+  }
+
+
+  redirectToLogin(): void {
+   window.location.href = environment.loginUrl;
+  }
+
+
   articles: Article[] = [];
   cards = [
     {
       title: 'How Do I Know If My Dog Is Happy?',
       description: 'Want to know if your dog is happy? Exhibiting these behaviors on a regular basis is a good thing!',
-      image: 'assets/images/dogHappy.jpg',
+      image: 'assets/images/dogHappy.png',
       button: 'Read More',
+      articleId: 'dog-happy',
     },
     {
-      title: 'Join Us',
-      description: 'Join our community to become a trusted dogsitter and connect with loving dog owners in your area. Start making tails wag today!',
-      image: 'assets/images/people.jpg',
+      title: 'How to Train a Dog: A Simple Guide to Positive and Effective Methods',
+      description: 'A practical guide that teaches dog owners how to train their dogs using positive reinforcement and consistency',
+      image: 'assets/images/people.png',
       button: 'Read More',
+      articleId: 'how-to-train-a-dog',
     },
     {
-      title: 'How It Works',
-      description: 'Woof Together connects dog owners with trusted sitters and partners, matching them by location, preferences, and their dog’s needs for stress-free care.',
-      image: 'assets/images/dogDeveloper.jpg',
-      button: 'Let’s Get Started',
+      title: 'Why Kids and Dogs Make the Perfect Team',
+      description: 'Discover how growing up with a dog can positively influence a children development, from emotional growth to physical health',
+      image: 'assets/images/dogDeveloper.png',
+      button: 'Read More',
+      articleId: 'dogs-and-children-growing-up-together',
     },
     {
       title: 'About Us',
       description: 'It began with a passion for helping dog owners connect and build a community, and it has grown significantly since then.',
-      image: 'assets/images/toys.jpg',
+      image: 'assets/images/toys.png',
       button: 'Read More',
+      articleId: 'about-us',
     }
   ];
   currentIndex = 1;
@@ -57,16 +127,18 @@ export class HomeComponent {
       answer: 'Sign up, complete your profile, and get verified. You’ll be matched with nearby dog owners.',
       isOpen: false,
     },
+    {
+      question: 'How can I find a sitter?',
+      answer: 'Go to Sitter page and use our search feature to find sitters in your area. You can filter by availability and services offered.',
+      isOpen: false,
+    },
   ];
-  
+
   toggleFAQ(index: number) {
     this.faqList[index].isOpen = !this.faqList[index].isOpen;
   }
 
-  constructor(private router: Router, private articleService: ArticleService) 
-  {
-    this.articles = this.articleService.getArticles();
-  }
+
   prevCard() {
     this.currentIndex = (this.currentIndex - 1 + this.cards.length) % this.cards.length;
   }
@@ -74,9 +146,19 @@ export class HomeComponent {
   nextCard() {
     this.currentIndex = (this.currentIndex + 1) % this.cards.length;
   }
-  goToLogin() {
-    this.router.navigate(['/login']);
+
+    login() : void {
+    this.redirectToLogin();
   }
+
+   parseJwt(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+    }
 
   getCardClass(index: number): string {
     const relative = (index - this.currentIndex + this.cards.length) % this.cards.length;
@@ -99,24 +181,8 @@ export class HomeComponent {
     }
   }
 
-  
-  // getArticleId(title: string): string {
-  //   switch (title) {
-  //     case 'How Do I Know If My Dog Is Happy?':
-  //       return 'dog-happy';
-  //     case 'Join Us':
-  //       return 'join-us';
-  //     case 'How It Works':
-  //       return 'how-it-works';
-  //     case 'About Us':
-  //       return 'about-us';
-  //     default:
-  //       return '';
-  //   }
-  // }  
   getArticleId(title: string): string {
     const article = this.articles.find(a => a.title.text === title);
     return article ? article.id : '';
   }
-  
 }
