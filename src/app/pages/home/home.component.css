@@ -33,15 +33,6 @@
   box-sizing: border-box;
 }
 
-/* :host {
-  display: block;
-  min-height: 100vh;
-  background: url('/assets/images/dogsPark.jpg') no-repeat center top;
-  background-size: cover;
-  position: relative;
-  z-index: 0;
-} */
-
 .page-wrapper {
   max-width: 1200px;
   margin: 0 auto;
@@ -60,6 +51,7 @@
   position: relative;
   z-index: 2;
 }
+
 
 /* === NAVBAR === */
 /* .navbar {
