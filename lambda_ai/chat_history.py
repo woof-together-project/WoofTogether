@@ -15,7 +15,7 @@ class ChatHistory(Base):
     @classmethod
     def get_chat_history(cls, user_id):
         with SessionLocal() as db_session:
-            return db_session.query(cls).filter_by(user_id=user_id)\
+            return db_session.query(cls).filter_by(user_id=user_id) \
                 .order_by(ChatHistory.timestamp.desc()).limit(6).all()
 
     @classmethod

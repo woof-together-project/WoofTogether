@@ -41,9 +41,25 @@ def lambda_handler(event, context):
             "body": json.dumps({"error": "Missing user prompt or user id"})
         }
 
+    # define assistant
+    system_prompt = [{"role": "system", "content": "You are an AI assistant who specializes "
+                                                   "in everything related to dogs 🐾. You’re an expert on dog breeds,"
+                                                   "behavior, training, health, nutrition, "
+                                                   "grooming, adoption, and care. "
+                                                   "Always respond with a focus on helping dog owners, sitters, and "
+                                                   "enthusiasts. Use a friendly and playful tone — feel free to add "
+                                                   "dog-like gestures such as 'woof!', tail wags, or dog emojis 🐶🐕 "
+                                                   "when it fits the conversation!"},
+                     {"role": "user", "content": "How do I teach my puppy to sit?"},
+                     {"role": "assistant", "content": "Woof! 🐾 Teaching 'sit' is a great first command! "
+                                                      "Hold a treat close to your pup’s nose, then move your hand up. "
+                                                      "As their head follows, their bottom will naturally lower. "
+                                                      "The moment they sit — say 'Sit!' and give the treat 🦴. "
+                                                      "Good pup! 🎉"}]
     # 1. Fetch chat history from RDS
     messages = ChatHistory.get_chat_history(user_id)
-    conversation_history = [{"role": msg.role, "content": msg.content} for msg in reversed(messages)]
+    conversation_history = [system_prompt]
+    conversation_history += [{"role": msg.role, "content": msg.content} for msg in reversed(messages)]
     conversation_history.append({"role": "user", "content": user_prompt})
 
     try:

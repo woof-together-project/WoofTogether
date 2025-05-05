@@ -11,8 +11,6 @@ def get_engine():
     db_endpoint = os.getenv("DB_HOST")
     db_name = os.getenv("DB_NAME")
 
-    print("Connecting to DB...")
-
     return create_engine(
         f"mssql+pyodbc://{db_user}:{db_password}@{db_endpoint}:1433/{db_name}"
         "?driver=ODBC+Driver+18+for+SQL+Server&TrustServerCertificate=yes"
