@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,10 +11,40 @@ import { Sitter } from './sitter.model';
   templateUrl: './sitters.component.html',
   styleUrls: ['./sitters.component.css']
 })
+
 export class SittersComponent implements OnInit {
-  selectedTab: 'map' | 'criteria' | null = null;
+  constructor(private http: HttpClient) {}
+
+  selectedTab: 'map' | 'criteria' | null = 'map';
   sitters: Sitter[] = [];
   loading = false;
+  location = {
+    latitude: 32.0853,     // example: Tel Aviv
+    longitude: 34.7818,
+    radius: 10             // in km (default radius)
+  };
+
+  selectedServiceOptions: string[] = [];
+  selectedDogTypes: string[] = [];
+  selectedGender: string = "any";
+  minRate: number = 0;
+  maxRate: number = 150; //define according to the data that exists in the backend
+  filteredSitters: Sitter[] = [];
+  selectedSitter: Sitter | null = null;
+  selectedSitterId: number | null = null;
+
+  // Replace hardcoded filter options with dynamic arrays
+  experienceWithOptions: string[] = [];
+  serviceOptions: string[] = [];
+  genderOptions: string[] = ['Any', 'Female', 'Male']; // Still static for now
+
+  // Filters model
+  filters = {
+    servicesSelected: [] as string[],
+    gender: 'Any',
+    rateMax: 150,
+    experiencedWith: [] as string[]
+  };
 
   ngOnInit(): void {
     this.sitters = [
@@ -119,24 +150,19 @@ export class SittersComponent implements OnInit {
         }
     ];
 
+    //TODO - see if its relevant to the backend
+    //this.loadSittersByLocation();
+
     // Simulate fetch from backend
     this.experienceWithOptions = [
-      'elder dogs', 'young dogs', 'cubs',
-      'reactive dogs', 'aggressive to other animals',
-      'aggressive to people', 'anxious dogs',
-      'big dogs', 'small dogs'
+      'Elder Dogs', 'Young Dogs', 'Cubs',
+      'Reactive Dogs', 'Aggressive to Other Animals',
+      'Aggressive to People', 'Anxious Dogs',
+      'Big Dogs', 'Small Dogs'
     ];
 
-    this.serviceOptions = ['dog-sitting', 'dog-walking', 'dog-boarding'];
-    // Later: fetch from real API
-    // this.sitterService.getFilterOptions().subscribe(data => {
-    //   this.experienceWithOptions = data.experienceWith;
-    //   this.serviceOptions = data.serviceOptions;
-    // });
+    this.serviceOptions = ['Dog-Sitting', 'Dog-Walking', 'Dog-Boarding'];
   }
-
-
-  selectedSitter: Sitter | null = null;
 
   onSelectSitter(sitter: Sitter) {
     if (this.selectedSitter?.user_id === sitter.user_id) {
@@ -147,8 +173,6 @@ export class SittersComponent implements OnInit {
       this.selectedSitter = sitter;
     }
   }
-
-  selectedSitterId: number | null = null;
 
   toggleSitterDetails(sitterId: number) {
     this.selectedSitterId = this.selectedSitterId === sitterId ? null : sitterId;
@@ -161,27 +185,6 @@ export class SittersComponent implements OnInit {
   selectTab(tab: 'map' | 'criteria') {
     this.selectedTab = tab;
   }
-
-  // Replace hardcoded filter options with dynamic arrays
-  experienceWithOptions: string[] = [];
-  serviceOptions: string[] = [];
-  genderOptions: string[] = ['Any', 'Female', 'Male']; // Still static for now
-
-  // Filters model
-  filters = {
-    servicesSelected: [] as string[],
-    gender: 'Any',
-    rateMax: 150,
-    experiencedWith: [] as string[]
-  };
-
-  selectedServiceOptions: string[] = [];
-  selectedDogTypes: string[] = [];
-  selectedGender: string = "any";
-  minRate: number = 0;
-  maxRate: number = 150; //define according to the data that exists in the backend
-
-  filteredSitters: Sitter[] = [];
 
   onServiceOptionChange(event: any) {
     const value = event.target.value;
@@ -207,16 +210,81 @@ export class SittersComponent implements OnInit {
     }
   }
 
-  //need to send this to the backend and bring the data
-  applyFilters() {
-    this.filteredSitters = this.sitters.filter(sitter => {
-      const matchesServices = this.selectedServiceOptions.every(opt => sitter.serviceOptions.includes(opt));
-      const matchesExperience = this.selectedDogTypes.every(type => sitter.experiencedWith.includes(type));
-      const matchesGender = this.selectedGender === 'any' || sitter.gender === this.selectedGender;
-      const matchesRate = sitter.rate >= this.minRate && sitter.rate <= this.maxRate;
+  clearFilters(): void {
+    // Reset filter form values
+    this.filters = {
+      servicesSelected: [],
+      gender: 'Any',
+      rateMax: 150,
+      experiencedWith: []
+    };
+    this.selectedServiceOptions = [];
+    this.selectedDogTypes = [];
+    this.selectedGender = 'any';
+    this.minRate = 0;
+    this.maxRate = 150;
 
-      return matchesServices && matchesExperience && matchesGender && matchesRate;
+    // Fetch all sitters again (reset results)
+    this.loadSittersByLocation();
+    this.filteredSitters = [];
+  }
+
+
+  //need to send this to the backend and bring the data
+  applyFilters(): void {
+    const url = 'https://your-backend-url/sitters/filter';
+
+    const payload = {
+      ...this.filters,
+      latitude: this.location.latitude,
+      longitude: this.location.longitude,
+      radius: this.location.radius
+    };
+
+    this.http.post<Sitter[]>(url, payload).subscribe({
+      next: (data) => this.filteredSitters = data,
+      error: () => console.error('Filter request failed')
     });
   }
+
+ // TODO: TEMPORARY! REPLACE THIS
+  currentUserEmail = 'daniella@gmail.com'; // Temporary until user context is ready
+
+  getSmartEmailLink(userEmail: string, sitterEmail: string, sitterName: string): string {
+    const subject = encodeURIComponent('Looking for a dog sitter');
+    const body = encodeURIComponent(`Hi ${sitterName}, I saw your profile and would love to connect!`);
+
+    const domain = userEmail.split('@')[1].toLowerCase();
+
+    if (domain.includes('gmail.com')) {
+      return `https://mail.google.com/mail/?view=cm&fs=1&to=${sitterEmail}&su=${subject}&body=${body}`;
+    }
+
+    if (domain.includes('outlook.com') || domain.includes('hotmail.com') || domain.includes('live.com')) {
+      return `https://outlook.live.com/mail/deeplink/compose?to=${sitterEmail}&subject=${subject}&body=${body}`;
+    }
+
+    if (domain.includes('yahoo.com')) {
+      return `https://compose.mail.yahoo.com/?to=${sitterEmail}&subject=${subject}&body=${body}`;
+    }
+
+    return `https://mail.google.com/mail/?view=cm&fs=1&to=${sitterEmail}&su=${subject}&body=${body}`;
+  }
+
+  loadSittersByLocation(): void {
+    const url = 'https://your-backend-url/sitters/nearby';
+    const body = {
+      latitude: this.location.latitude,
+      longitude: this.location.longitude,
+      radius: this.location.radius
+    };
+
+    this.http.post<Sitter[]>(url, body).subscribe({
+      next: (data) => this.sitters = data,
+      error: () => console.error('Failed to load sitters by location')
+    });
+}
+
+
 
 }

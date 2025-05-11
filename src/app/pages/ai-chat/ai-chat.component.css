@@ -1,7 +1,13 @@
 :host {
   display: block;
   height: 100vh; /* ⬅️ Full screen height for this page only */
-  overflow: hidden; /* ⬅️ Prevent scroll outside the page */
+  overflow: hidden; /* ⬅️ Prevent scrolling on the host element */
+}
+
+.scroll-container {
+  height: 100%;
+  overflow-y: auto; /* this gets the scrollbar */
+  box-sizing: border-box;
 }
 
 .chat-page {
@@ -14,6 +20,7 @@
   position: relative;
   z-index: 1;
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .welcome {
@@ -27,17 +34,15 @@
   background: white;
   border-radius: 16px;
   padding: 2rem;
-  max-width: 700px;
+  max-width: 1000px;
   width: 100%;
   box-shadow: 0 0 14px rgba(0, 0, 0, 0.15);
   position: relative;
-  overflow-y: auto;
   z-index: 1;
 }
 
 .messages {
-  max-height: 400px;
-  overflow-y: auto;
+  flex-grow: 1;
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
@@ -102,6 +107,7 @@ button:hover {
   z-index: 0;
   pointer-events: none;
 }
+
 
 .p1  { top: 8%;   left: 5%;   width: 60px;  transform: rotate(-20deg); }
 .p2  { top: 20%;  right: 10%; width: 90px;  transform: rotate(15deg); }

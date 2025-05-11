@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -41,12 +41,21 @@ export class AiChatComponent implements OnInit{
   }
 
   ngOnInit() {
-    this.http.get<any>('https://fgqmlufb663hbl2gzc77fvfa6a0szvmz.lambda-url.us-east-1.on.aws/?user_id=1').subscribe({
+    this.http.get<any>('https://<your-lambda-url>?user_id=1').subscribe({
       next: (res) => {
-        this.messages = res.messages || [];
+        // Only assign messages if they're not empty
+        this.messages = Array.isArray(res.messages) ? res.messages : [];
       },
-      error: () => {
-        this.messages.push({ role: 'assistant', content: 'Could not load previous messages 🐾' });
+      error: (err) => {
+        console.error('Failed to load history:', err);
+
+        // Only show an error message if it's a true HTTP failure (not just empty history)
+        if (err.status !== 404 && err.status !== 204) {
+          this.messages.push({
+            role: 'assistant',
+            content: 'Something went wrong while loading chat history 🐾',
+          });
+        }
       }
     });
   }
