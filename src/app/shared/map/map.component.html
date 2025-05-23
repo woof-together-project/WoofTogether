@@ -1,0 +1,15 @@
+<google-map
+  #mapElement
+  [center]="center"
+  [zoom]="zoom"
+>
+
+<map-marker
+    *ngFor="let marker of markers"
+    [position]="{ lat: marker.lat, lng: marker.lng }"
+    [label]="marker.label || ''"
+    (mapClick)="onMarkerClick(marker.id)"
+  ></map-marker>
+
+
+</google-map>

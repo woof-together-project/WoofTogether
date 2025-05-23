@@ -1,0 +1,8 @@
+#mapElement {
+  width: 100%;
+  height: 100%;
+  display: block;
+  
+  position: center;
+  background-color: #f1f7ee;
+}

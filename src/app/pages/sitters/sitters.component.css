@@ -269,3 +269,34 @@ input[type="range"]::-ms-thumb {
   border: none;
 }
 
+.map-area-wrapper {
+   height: 100vh;
+  min-height: 600px; /* or calc(100vh - headerHeight) */
+  width: 100%;
+  display: flex;
+}
+
+.col-lg-8 {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* ADDED/EMPHASIZED: Crucial for this column to occupy its parent's height */
+}
+
+.flex-grow-1 {
+  flex-grow: 1;
+  display: flex; /* ADDED: To make it a flex container for its children */
+  flex-direction: column; /* ADDED: To stack children vertically */
+  overflow: hidden; /* ADDED/RECOMMENDED: To prevent scrollbars if content overflows */
+}
+
+.flex-grow-1 > .h-100 { /* Targeting the h-100 div specifically within flex-grow-1 */
+  height: 100%; /* Ensure this div truly takes 100% of the flex-grow-1 space */
+  display: flex; /* ADDED: To make it a flex container for its child (app-map) */
+  flex-direction: column; /* ADDED: To stack children if needed */
+}
+
+app-map, #mapElement {
+  width: 100%;
+  height: 100%;
+  background-color: #f1f7ee;
+}

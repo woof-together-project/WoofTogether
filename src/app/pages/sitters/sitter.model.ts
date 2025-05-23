@@ -13,4 +13,7 @@ export interface Sitter {
     email: string;
     gender: string;
     experiencedWith: string[];
+    address: string;
+    lat?: number;
+    lng?: number;
   }  

@@ -6,6 +6,7 @@ import { UserContextService } from './shared/sharedUserContext/UserContextServic
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
   declarations: [],
@@ -16,6 +17,7 @@ import { NavbarComponent } from './shared/navbar/navbar.component';
     AppRoutingModule,
     AppComponent,       
     NavbarComponent,
+    GoogleMapsModule
   ],
   providers: [UserContextService],
 })
