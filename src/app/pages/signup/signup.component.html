@@ -36,8 +36,16 @@
 
             <div class="mb-3">
               <label for="profilePic" class="form-label">Profile Picture</label>
-              <input type="file" id="profilePic" class="form-control" name="profilePic" [(ngModel)]="profilePic" required #profilePic="ngModel">
-              <div *ngIf="signupForm.submitted && profilePic.invalid" class="text-danger small mb-1 text-end fade-in-error">
+              <!-- <input type="file" id="profilePic" class="form-control" name="profilePic" [(ngModel)]="profilePic" required #profilePic="ngModel"> -->
+              <input
+              type="file"
+              id="profilePic"
+              class="form-control"
+              name="profilePic"
+              (change)="onProfilePicSelected($event)"
+              required>
+              <!-- <div *ngIf="signupForm.submitted && profilePic.invalid" class="text-danger small mb-1 text-end fade-in-error"> -->
+                <div *ngIf="signupForm.submitted && !profilePicFile" ...>
                 Profile picture is required
               </div>
             </div>
@@ -247,6 +255,16 @@
                 </div>
 
                 <div class="mb-2">
+                <label class="form-label">Dog's Age</label>
+                <input type="number" class="form-control" [(ngModel)]="dog.age" name="dogAge-{{i}}" required>
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label">Temperament</label>
+                  <input type="text" class="form-control" [(ngModel)]="dog.temperament" name="dogTemperament-{{i}}" required>
+                </div>
+                
+                <div class="mb-2">
                   <label class="form-label">Vaccinated Against Rabies?</label>
                   <select class="form-select" [(ngModel)]="dog.rabiesVaccinated" name="dogVaccinated-{{i}}" required>
                     <option value="" disabled selected>Select</option>
@@ -254,6 +272,14 @@
                     <option value="no">No</option>
                   </select>
                 </div>
+
+                  <!-- <div class="mb-2">
+                  <select class="form-select" [(ngModel)]="dog.vaccinationStatus" name="dogVaccinationStatus-{{i}}" required>
+                  <option [ngValue]="true">Yes</option>
+                  <option [ngValue]="false">No</option>
+                  </select>
+                  </div> -->
+
                 <div class="mb-2">
                     <label class="form-label">Health Conditions</label>
                     <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">

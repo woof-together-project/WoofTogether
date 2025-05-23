@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 
 
 @Component({
@@ -14,13 +15,20 @@ import { HttpClient } from '@angular/common/http';
 
 export class SignupComponent {
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userContext: UserContextService) {}
+
+  //cognito data
+  email: string = '';
+  nickname: string = '';
+  username: string = '';
+  sub: string = '';
 
   // genetal data
   phone: string = '';
   city: string = '';
   street: string = '';
   profilePic: string = ''; // Note: for real upload you'll need FileReader or FormData
+profilePicFile: File | null = null;
 
   // sitter data
   rate: number | null = null;
@@ -33,7 +41,7 @@ export class SignupComponent {
 
   // dog data
   dogs: any[] = [
-  { name: '', breed: '', gender: '', fixed: '', size: '', weight: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
+  { name: '', breed: '', gender: '', fixed: '', size: '', weight: null, age: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
   ];
 
   showGeneralInfo: boolean = true;
@@ -114,6 +122,15 @@ export class SignupComponent {
     this.showDogCard.push(true);
   }
 
+  ngOnInit() {
+    this.userContext.getUserObservable().subscribe(currentUser => {
+    this.email = currentUser?.email ?? '';
+    this.username = currentUser?.username ?? '';
+    this.nickname = currentUser?.nickname ?? '';
+    this.sub = currentUser?.sub ?? '';
+  });
+  }
+
   removeDog(index: number) {
     this.dogs.splice(index, 1);
   }
@@ -187,9 +204,20 @@ export class SignupComponent {
   }
 
   submitForm() {
-    const signupData = this.prepareSignupData();
+    console.log('Form submitted with the following data:');
+    console.log('Email:', this.email);  
+    console.log('Nickname:', this.nickname);
 
-    this.http.post('https://your-api-id.execute-api.region.amazonaws.com/prod/signup', signupData)
+    const signupData = this.prepareSignupData();
+    const payload = {
+      email: this.email,
+      signupData: signupData
+    };
+
+    
+    console.log('Submitting form with payload:', payload);
+
+    this.http.post('https://yh6mfirykyw5taijkwggrekyi40ebnhd.lambda-url.us-east-1.on.aws/', payload)
       .subscribe({
         next: res => console.log('Submitted successfully:', res),
         error: err => console.error('Submission failed:', err)
@@ -216,6 +244,14 @@ export class SignupComponent {
       dogs: this.addDog ? this.dogs : []
     };
   }
+
+
+onProfilePicSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  this.profilePicFile = input.files?.[0] || null;
+  this.profilePic = this.profilePicFile?.name || '';
+}
+
 }
 
 

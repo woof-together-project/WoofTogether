@@ -3,7 +3,7 @@ import { RouterModule, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { environment } from './../../../environments/environment';
-
+import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 
 @Component({
   selector: 'app-navbar',
@@ -13,10 +13,11 @@ import { environment } from './../../../environments/environment';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private userContext: UserContextService) {}
   username: string | null = null;
   searchText: string = '';
   loading: boolean = true;
+  isComplete: boolean = false;
 
   async ngOnInit() {
       const urlParams = new URLSearchParams(window.location.search);
@@ -25,9 +26,23 @@ export class NavbarComponent {
       if (code) {
         try {
             const tokens = await this.exchangeCodeForTokens(code);
-            if (tokens && tokens.id_token) {
+            if (tokens && tokens.id_token) 
+              {
               const userDetails = this.parseJwt(tokens.id_token);
               this.username = userDetails.nickname;
+              
+            console.log('User Details:', userDetails);
+
+            if (userDetails.email && userDetails.nickname && userDetails.name && userDetails.sub) 
+                {
+                  this.userContext.setUser(userDetails.email, userDetails.nickname, userDetails.name, userDetails.sub);
+                  // const user = this.userContext.getCurrentUserValue();
+                   //console.log('User in another component:', user);
+                  await this.sendDataToBackend();
+                } 
+          else {
+                 console.error("Missing user details from token");
+               }
             }
           }
             catch (error) {
@@ -82,4 +97,70 @@ export class NavbarComponent {
       }).join(''));
       return JSON.parse(jsonPayload);
     }
+
+    
+			  
+ async sendDataToBackend()  
+ {
+    const currentUser = this.userContext.getCurrentUserValue();
+    const lambdaUrl = 'https://76lrewksipqyhundciqqozf42q0keslz.lambda-url.us-east-1.on.aws/';
+     
+    if (!currentUser || !currentUser.email || !currentUser.nickname || !currentUser.username || !currentUser.sub) 
+      {
+      console.error('[NavbarComponent] CRITICAL: User context is null or missing properties. Cannot send data to backend.');
+      console.error('Current User (from service):', currentUser);
+      return;
+    }
+
+     const payload = {
+      user: {
+        name: currentUser.username,
+        email: currentUser.email,
+        nickname: currentUser.nickname,
+        provider: 'COGNITO',
+        providerId: currentUser.sub,
+      }
+    };
+
+    console.log('Payload to send:', payload);
+
+   try {
+     console.log('Sending request to Lambda with payload:', payload);
+     const response = await fetch(lambdaUrl, {
+       method: 'POST',
+       headers: {
+         'Content-Type': 'application/json'
+       },
+       body: JSON.stringify(payload)
+     });
+   
+     const result = await response.json();
+     console.log('Lambda response:', result);
+
+     if (response.ok) {
+       if (result.exists === true) {
+         this.isComplete = true;
+         console.log('User already exists in the database.');
+       } else {
+         console.log('User created successfully.');
+       }
+     } else {
+       console.error('Lambda responded with error:', result);
+     }
+   } catch (err) {
+     console.error('Error sending request to Lambda:', err);
+   }
+ }
+	
+ handleProtectedRoute(event: Event, targetRoute: string): void {
+  event.preventDefault();
+  if (!this.isComplete) {
+    alert("Please complete your sign up information to access this page.");
+    this.router.navigate(['/signup']);
+  } else 
+  {
+    this.router.navigate([targetRoute]);
+    }
+  }
+
 }
