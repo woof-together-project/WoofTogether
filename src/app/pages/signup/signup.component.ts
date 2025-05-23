@@ -28,7 +28,7 @@ export class SignupComponent {
   city: string = '';
   street: string = '';
   profilePic: string = ''; // Note: for real upload you'll need FileReader or FormData
-profilePicFile: File | null = null;
+  profilePicFile: File | null = null;
 
   // sitter data
   rate: number | null = null;
@@ -205,7 +205,7 @@ profilePicFile: File | null = null;
 
   submitForm() {
     console.log('Form submitted with the following data:');
-    console.log('Email:', this.email);  
+    console.log('Email:', this.email);
     console.log('Nickname:', this.nickname);
 
     const signupData = this.prepareSignupData();
@@ -214,7 +214,7 @@ profilePicFile: File | null = null;
       signupData: signupData
     };
 
-    
+
     console.log('Submitting form with payload:', payload);
 
     this.http.post('https://yh6mfirykyw5taijkwggrekyi40ebnhd.lambda-url.us-east-1.on.aws/', payload)
@@ -241,7 +241,21 @@ profilePicFile: File | null = null;
         experienceWith: this.selectedSitterExperience,
         services: this.selectedSitterServices
       } : null,
-      dogs: this.addDog ? this.dogs : []
+      dogs: this.addDog ? this.dogs.map(d => ({
+        name: d.name,
+        breed: d.breed,
+        gender: d.gender,
+        size: d.size,
+        weight: d.weight,
+        age: d.age,
+        healthConditions: d.health,
+        moreDetails: d.moreDetails,
+        behavioralTraits: d.behavioralTraits,
+        favoriteActivities: d.favoriteActivities,
+        fixed: d.fixed === 'yes',
+        rabiesVaccinated: d.rabiesVaccinated === 'yes'
+      })) : []
+
     };
   }
 
