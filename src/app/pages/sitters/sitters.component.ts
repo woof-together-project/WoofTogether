@@ -3,11 +3,13 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sitter } from './sitter.model';
+import { GoogleMapsModule } from '@angular/google-maps';
+import { MapComponent } from '../../shared/map/map.component';
 
 @Component({
   selector: 'app-sitters',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, GoogleMapsModule, MapComponent],
   templateUrl: './sitters.component.html',
   styleUrls: ['./sitters.component.css']
 })
@@ -21,7 +23,7 @@ export class SittersComponent implements OnInit {
   location = {
     latitude: 32.0853,     // example: Tel Aviv
     longitude: 34.7818,
-    radius: 10             // in km (default radius)
+    radius: 30             // in km (default radius)
   };
 
   selectedServiceOptions: string[] = [];
@@ -37,6 +39,7 @@ export class SittersComponent implements OnInit {
   experienceWithOptions: string[] = [];
   serviceOptions: string[] = [];
   genderOptions: string[] = ['Any', 'Female', 'Male']; // Still static for now
+markers: { id: number; lat: number; lng: number; label?: string }[] = [];
 
   // Filters model
   filters = {
@@ -51,6 +54,9 @@ export class SittersComponent implements OnInit {
         {
           user_id: 1,
           name: "Nina’s Dog World",
+          address: "Dizengoff, Tel Aviv",
+          lat: 0,
+          lng: 0,
           gender: "female",
           aboutMe: "I’m a loving dog mom who enjoys spending time with all kinds of dogs. Experienced with shy and anxious rescues.",
           moreDetails: "Great with nervous dogs, medication administration, and older rescues. Volunteered at the SPCA in Tel Aviv for 2 years, and provided 3 years of private in-home sitting services. Specialize in nervous dogs who need extra patience.",
@@ -71,6 +77,9 @@ export class SittersComponent implements OnInit {
         {
           user_id: 2,
           name: "Paws with Alex",
+           address: "Herzl, Ramat Gan",
+          lat: 0,
+            lng: 0,
           gender: "male",
           aboutMe: "I enjoy long walks and energetic dogs. Great for active pups who love to explore.",
           moreDetails: "Best for big dogs that love exercise. College student with weekend flexibility. Helped train two Labrador puppies. Provided weekend boarding for neighbors. Great with big breeds like Huskies and Labs.",
@@ -87,6 +96,9 @@ export class SittersComponent implements OnInit {
         {
           user_id: 3,
           name: "Dana's Pup Retreat",
+           address: "Ben Yehuda, Jerusalem",
+    lat: 0,
+    lng: 0,
           gender: "female",
           aboutMe: "Calm, responsible, and attentive. Ideal for older or anxious dogs that need structure and consistency.",
           moreDetails: "Veterinary assistant background. Comfortable with medical needs and post-surgery care.",
@@ -100,55 +112,61 @@ export class SittersComponent implements OnInit {
           imageUrl: "assets/images/female_dogsitter.png",
           email: "dana@example.com"
         },
-        {
-          user_id: 4,
-          name: "Itay the Dog Buddy",
-          gender: "male",
-          aboutMe: "Friendly and reliable sitter with a deep love for dogs. Your pet’s routine will be my priority.",
-          moreDetails: "Comfortable with multi-pet households. Can manage reactive or dominant dogs.",
-          experienceYears: "2020–now",
-          rate: 70,
-          reviews: ["Reliable and great with my two dogs — they love him!"],
-          distance: 2.8,
-          serviceOptions: ["dog-sitting", "dog-walking"],
-          experiencedWith: ["reactive dogs", "big dogs", "anxious dogs"],
-          availability: "Flexible schedule including evenings and some weekends. Unavailable: May 18",
-          imageUrl: "assets/images/male_dogsitter.png",
-          email: "itay@example.com"
-        },
-        {
-          user_id: 5,
-          name: "Yael’s Doggy Paradise",
-          gender: "female",
-          aboutMe: "Full of energy and always happy to walk or play with your pup! I treat every dog like they’re my own.",
-          moreDetails: "Fun-focused care. Perfect for energetic or playful dogs.",
-          experienceYears: "2018–now",
-          rate: 85,
-          reviews: ["My dog gets excited every time she sees Yael!"],
-          distance: 4.4,
-          serviceOptions: ["dog-sitting", "dog-walking", "dog-boarding"],
-          experiencedWith: ["young dogs", "cubs", "small dogs"],
-          availability: "Evenings, holidays, and most weekends. Unavailable: June 1–3",
-          imageUrl: "assets/images/female_dogsitter.png",
-          email: "yael@example.com"
-        },
-        {
-          user_id: 6,
-          name: "Roi the New Walker",
-          gender: "male",
-          aboutMe: "While I’m new to professional sitting, I’m extremely responsible and punctual.",
-          moreDetails: "New to paid dog-sitting, but great with basic training and active dogs.",
-          experienceYears: "2023–now",
-          rate: 50,
-          reviews: ["Very sweet and careful. Great for short walks and beginner dogs."],
-          distance: 6.2,
-          serviceOptions: ["dog-walking"],
-          experiencedWith: ["young dogs", "big dogs"],
-          availability: "Weekdays 10:00–15:00. Not available Fridays or mornings with classes.",
-          imageUrl: "assets/images/male_dogsitter.png",
-          email: "roi@example.com"
-        }
+        // {
+        //   user_id: 4,
+        //   name: "Itay the Dog Buddy",
+        //   gender: "male",
+        //   aboutMe: "Friendly and reliable sitter with a deep love for dogs. Your pet’s routine will be my priority.",
+        //   moreDetails: "Comfortable with multi-pet households. Can manage reactive or dominant dogs.",
+        //   experienceYears: "2020–now",
+        //   rate: 70,
+        //   reviews: ["Reliable and great with my two dogs — they love him!"],
+        //   distance: 2.8,
+        //   serviceOptions: ["dog-sitting", "dog-walking"],
+        //   experiencedWith: ["reactive dogs", "big dogs", "anxious dogs"],
+        //   availability: "Flexible schedule including evenings and some weekends. Unavailable: May 18",
+        //   imageUrl: "assets/images/male_dogsitter.png",
+        //   email: "itay@example.com"
+        // },
+        // {
+        //   user_id: 5,
+        //   name: "Yael’s Doggy Paradise",
+        //   gender: "female",
+        //   aboutMe: "Full of energy and always happy to walk or play with your pup! I treat every dog like they’re my own.",
+        //   moreDetails: "Fun-focused care. Perfect for energetic or playful dogs.",
+        //   experienceYears: "2018–now",
+        //   rate: 85,
+        //   reviews: ["My dog gets excited every time she sees Yael!"],
+        //   distance: 4.4,
+        //   serviceOptions: ["dog-sitting", "dog-walking", "dog-boarding"],
+        //   experiencedWith: ["young dogs", "cubs", "small dogs"],
+        //   availability: "Evenings, holidays, and most weekends. Unavailable: June 1–3",
+        //   imageUrl: "assets/images/female_dogsitter.png",
+        //   email: "yael@example.com"
+        // },
+        // {
+        //   user_id: 6,
+        //   name: "Roi the New Walker",
+        //   gender: "male",
+        //   aboutMe: "While I’m new to professional sitting, I’m extremely responsible and punctual.",
+        //   moreDetails: "New to paid dog-sitting, but great with basic training and active dogs.",
+        //   experienceYears: "2023–now",
+        //   rate: 50,
+        //   reviews: ["Very sweet and careful. Great for short walks and beginner dogs."],
+        //   distance: 6.2,
+        //   serviceOptions: ["dog-walking"],
+        //   experiencedWith: ["young dogs", "big dogs"],
+        //   availability: "Weekdays 10:00–15:00. Not available Fridays or mornings with classes.",
+        //   imageUrl: "assets/images/male_dogsitter.png",
+        //   email: "roi@example.com"
+        // }
     ];
+
+    navigator.geolocation.getCurrentPosition(pos => {
+    this.location.latitude = pos.coords.latitude;
+    this.location.longitude = pos.coords.longitude;
+    });
+    this.geocodeSitters();
 
     //TODO - see if its relevant to the backend
     //this.loadSittersByLocation();
@@ -285,6 +303,80 @@ export class SittersComponent implements OnInit {
     });
 }
 
+async geocodeSitters() {
+  console.log("Geocoding sitters...");
+  const apiKey = 'AIzaSyDUNTfjujwFAkprM1BwCYk0QTWWyTprR-I'; // use env var later
+  const geocoded: Sitter[] = [];
 
+  for (const sitter of this.sitters) {
+    if (!sitter.address) continue;
+
+    const encoded = encodeURIComponent(sitter.address);
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encoded}&key=${apiKey}`;
+    
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (data.status === 'OK') {
+        const loc = data.results[0].geometry.location;
+        sitter.lat = loc.lat;
+        sitter.lng = loc.lng;
+        geocoded.push(sitter);
+        console.log(`Result for ${sitter.name}:`, data);
+
+      } else {
+        console.error(`Geocode failed for ${sitter.name}: ${data.status}`);
+      }
+    } catch (err) {
+      console.error(`Geocode error for ${sitter.name}`, err);
+    }
+
+  }
+
+  this.sitters = geocoded;
+  console.log("Sitters after geocoding:", this.sitters);
+  this.updateMarkers();
+}
+
+updateMarkers() {
+  this.markers = this.sitters
+    // .filter(s => this.withinRadius(s))
+    .filter(s => s.lat !== 0 && s.lng !== 0) 
+    .map(s => ({
+      id: s.user_id, 
+      lat: s.lat!,
+      lng: s.lng!,
+      label: s.name
+    }));
+
+    console.log("✅ Markers created:", this.markers); 
+}
+
+withinRadius(s: Sitter): boolean {
+  const R = 6371; // Earth radius in km
+  const dLat = this.deg2rad(s.lat! - this.location.latitude);
+  const dLon = this.deg2rad(s.lng! - this.location.longitude);
+
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(this.deg2rad(this.location.latitude)) *
+    Math.cos(this.deg2rad(s.lat!)) *
+    Math.sin(dLon / 2) ** 2;
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+
+  return d <= this.location.radius;
+}
+
+deg2rad(deg: number): number {
+  return deg * (Math.PI / 180);
+}
+
+
+onMarkerSelected(sitterId: number) {
+  this.selectedSitter = this.sitters.find(s => s.user_id === sitterId) || null;
+  this.selectedSitterId = sitterId;
+}
 
 }

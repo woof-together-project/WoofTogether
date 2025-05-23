@@ -90,10 +90,19 @@
         </li>
       </ul>
 
-      <!-- Map or Filters -->
-      <div class="map-area flex-grow-1">
-        <ng-container *ngIf="selectedTab === 'map'">
-          <div class="map-placeholder">Map goes here</div>
+       <!-- Map or Filters -->
+  <div class="flex-grow-1">
+    <ng-container *ngIf="selectedTab === 'map'">
+      <div class="h-100">
+        <app-map
+          id="mapElement"
+          [center]="{ lat: location.latitude, lng: location.longitude }"
+          [zoom]="13"
+          [markers]="markers"
+          (markerClicked)="onMarkerSelected($event)"
+        ></app-map>
+      </div>
+
         </ng-container>
         <ng-container *ngIf="selectedTab === 'criteria'">
           <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="w-100">
