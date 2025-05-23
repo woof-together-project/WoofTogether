@@ -2,7 +2,7 @@
   display: block;
   height: 100vh;
   overflow: hidden;
-  background-color: #ddbea9;
+  background-color: #f1f7ee;
 }
 
 /* CONTAINER */
@@ -25,7 +25,7 @@
 }
 
 .fw-bold {
-  color: #cb997e;
+  color: #7d8570;
 }
 
 /* MAIN LAYOUT */
@@ -50,7 +50,7 @@
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: #cb997e transparent;
+  scrollbar-color: #b0bea9 transparent;
   margin-top: -4px;
 }
 
@@ -70,7 +70,7 @@
 
 /* SITTER CARD */
 .sitter-card {
-  background-color: #ffe8d6;
+  background-color: #b0bea9;
   border-radius: 10px;
   padding: 1rem;
   margin-bottom: 0.5rem;
@@ -113,7 +113,7 @@
 .sitter-distance {
   font-size: 0.9rem;
   font-weight: bold;
-  color: #800;
+  color: #504b3a;
   margin-top: 0.5rem;
 }
 .sitter-distance.bottom {
@@ -144,7 +144,7 @@
 .map-area {
   flex: 1;
   min-height: 550px;
-  background-color: #ffe8d6;
+  background-color: #f1f7ee;
   border-radius: 12px;
   padding: 0rem;
   display: flex;
@@ -154,11 +154,11 @@
 }
 
 .nav-tabs .nav-link.active {
-  background-color: #ffe8d6 !important;
+  background-color: #7d8570 !important;
   color: black !important;
 }
 .nav-tabs .nav-link {
-  background-color: #cb997e;
+  background-color: #b0bea9;
   color: #000;
   font-weight: bold;
   border-radius: 20px 20px 0 0;
@@ -178,8 +178,8 @@
 }
 
 .btn {
-  border-color: #cb997e;
-  background-color: #cb997e;
+  border-color: #b0bea9;
+  background-color: #b0bea9;
   color: black;
 }
 
@@ -192,7 +192,7 @@
 }
 
 #rateMax{
-  color: #cb997e;
+  color: #b0bea9;
 }
 
 .form-label {
@@ -211,7 +211,7 @@ input[type="range"] {
 /* Track - Chrome, Safari */
 input[type="range"]::-webkit-slider-runnable-track {
   height: 8px;
-  background: #cb997e;  /* Line color */
+  background: #b0bea9;  /* Line color */
   border-radius: 5px;
 }
 
@@ -220,7 +220,7 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 18px;
   width: 18px;
-  background: #cb997e; /* Thumb color */
+  background: #b0bea9; /* Thumb color */
   border-radius: 50%;
   margin-top: -5px; /* Centers the thumb on the track */
   border: 2px solid white;
@@ -230,7 +230,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Track - Firefox */
 input[type="range"]::-moz-range-track {
   height: 8px;
-  background: #cb997e; /* Line color */
+  background: white; /* Line color */
   border-radius: 5px;
 }
 
@@ -238,7 +238,7 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-moz-range-thumb {
   height: 18px;
   width: 18px;
-  background: #cb997e; /* Thumb color */
+  background: #b0bea9; /* Thumb color */
   border-radius: 50%;
   border: none;
 }
@@ -252,19 +252,19 @@ input[type="range"]::-ms-track {
 }
 
 input[type="range"]::-ms-fill-lower {
-  background: #cb997e;
+  background: white;
   border-radius: 5px;
 }
 
 input[type="range"]::-ms-fill-upper {
-  background: #cb997e;
+  background: white;
   border-radius: 5px;
 }
 
 input[type="range"]::-ms-thumb {
   height: 18px;
   width: 18px;
-  background: #cb997e;
+  background: white;
   border-radius: 50%;
   border: none;
 }
