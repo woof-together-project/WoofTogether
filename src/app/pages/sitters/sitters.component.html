@@ -9,12 +9,42 @@
   <div class="row h-100 gx-4">
     <!-- LEFT: Sitters -->
     <div class="col-lg-4 d-flex flex-column h-100">
-      <!-- Search bar -->
+      
+      <!-- Search bar
       <div class="input-group mb-3">
         <span class="input-group-text">📍</span>
         <input type="text" class="form-control" placeholder="Search by city...">
         <button class="btn btn-success">Search</button>
+      </div> -->
+      <!-- Search bar with city suggestions -->
+      <div class="position-relative mb-3">
+        <div class="input-group">
+          <span class="input-group-text">📍</span>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search by city..."
+            [(ngModel)]="searchCity"
+            (focus)="loadCities()"
+            (input)="filterCities()"
+            (blur)="hideSuggestionsWithDelay()"
+          />
+          <button class="btn btn-success" (click)="onCitySearch()">Search</button>
+        </div>
+
+        <!-- Auto-suggestion dropdown -->
+        <ul *ngIf="filteredCities.length && showSuggestions"
+            class="list-group position-absolute w-100 z-3 bg-white shadow-sm"
+            style="top: 100%; max-height: 200px; overflow-y: auto;">
+          <li
+            class="list-group-item list-group-item-action"
+            *ngFor="let city of filteredCities"
+            (mousedown)="selectCity(city)">
+            {{ city }}
+          </li>
+        </ul>
       </div>
+
 
       <!-- Sitter List -->
       <div class="sitter-list flex-grow-1 overflow-auto">

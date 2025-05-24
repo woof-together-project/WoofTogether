@@ -26,6 +26,10 @@ export class SittersComponent implements OnInit {
     radius: 15           
   };
 
+  searchCity: string = '';
+  allCities: string[] = [];
+  filteredCities: string[] = [];
+  showSuggestions: boolean = false;
   disableRadius = true;
   selectedServiceOptions: string[] = [];
   selectedDogTypes: string[] = [];
@@ -162,7 +166,8 @@ export class SittersComponent implements OnInit {
     this.http.post<Sitter[]>(url, payload).subscribe({
       next: (data) => {
         this.sitters = data;          
-        this.updateMarkers();        
+        this.updateMarkers();
+        this.selectedTab = 'map';        
       },
       error: (err) => console.error('Filter request failed', err)
     });
@@ -214,6 +219,13 @@ export class SittersComponent implements OnInit {
         lng: s.longitude!,
         label: s.name
       }));
+    
+    this.markers.push({
+      id: -1, // Unique ID
+      lat: this.location.latitude,
+      lng: this.location.longitude,
+      label: 'You' // Or leave out if you don't want label
+  });
 
     console.log("✅ Markers created:", this.markers); 
   }
@@ -246,6 +258,7 @@ export class SittersComponent implements OnInit {
 
   buildFilterPayload() {
     return {
+      action: 'filterByCriteria',
       latitude: this.location.latitude,
       longitude: this.location.longitude,
       radius: this.location.radius,
@@ -256,4 +269,63 @@ export class SittersComponent implements OnInit {
       serviceOptions: this.selectedServiceOptions
     };
   }
+
+  loadCities() {
+  if (this.allCities.length === 0) {
+    this.http.post<string[]>('https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/', {
+      action: 'searchAvailableCitiesInDB'
+    }).subscribe({
+      next: (cities) => {
+        this.allCities = cities;
+        this.filteredCities = [...cities];
+        this.showSuggestions = true;
+      },
+      error: (err) => console.error('Failed to load cities', err)
+    });
+  } else {
+    this.filteredCities = [...this.allCities];
+    this.showSuggestions = true;
+  }
+}
+
+filterCities(): void {
+  const query = this.searchCity.toLowerCase();
+  this.filteredCities = this.allCities.filter(city =>
+    city.toLowerCase().includes(query)
+  );
+  this.showSuggestions = true;
+}
+
+
+onCitySearch() {
+  const city = this.searchCity.trim();
+  if (!city) return;
+
+  this.http.post<any[]>('https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/', {
+    action: 'searchByCity',
+    city: city
+  }).subscribe({
+    next: (sittersRes) => {
+      if (sittersRes.length === 0) {
+        alert(`No sitters found in "${city}"`);
+      }
+      this.clearFilters();
+      this.sitters = sittersRes;
+      this.updateMarkers();
+    },
+    error: (err) => console.error('Failed to search sitters by city', err)
+  });
+}
+selectCity(city: string): void {
+  this.searchCity = city;
+  this.showSuggestions = false;
+}
+
+hideSuggestionsWithDelay(): void {
+  setTimeout(() => {
+    this.showSuggestions = false;
+  }, 150); // short delay to allow click to register
+}
+
+
 }
