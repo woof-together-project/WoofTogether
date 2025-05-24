@@ -181,21 +181,6 @@ export class SittersComponent implements OnInit {
     this.serviceOptions = ['Dog-Sitting', 'Dog-Walking', 'Dog-Boarding'];
   }
 
-
-//   loadSitters(): void {
-//   const url = 'https://your-api-id.execute-api.region.amazonaws.com/prod/sitters/all'; //gets all sitters from the backend
-//   this.http.get<Sitter[]>(url).subscribe({
-//     next: async (sitters) => {
-//       this.sitters = sitters;
-//       await this.geocodeSitters();  // 👈 Add this to get lat/lng
-//       this.updateMarkers();         // Then display them
-//     },
-//     error: (err) => {
-//       console.error('Failed to load sitters:', err);
-//     }
-//   });
-// }
-
   onSelectSitter(sitter: Sitter) {
     if (this.selectedSitter?.user_id === sitter.user_id) {
       // Clicked the same sitter again → close
