@@ -142,22 +142,41 @@ export class SittersComponent implements OnInit {
     }
   }
 
-  clearFilters(): void {
-    this.filters = {
-      servicesSelected: [],
-      gender: 'Any',
-      rateMax: 150,
-      experiencedWith: []
-    };
-    this.selectedServiceOptions = [];
-    this.selectedDogTypes = [];
-    this.selectedGender = 'any';
-    this.disableRadius = true;
-    this.minRate = 0;
-    this.maxRate = 150;
+  // clearFilters(): void {
+  //   this.filters = {
+  //     servicesSelected: [],
+  //     gender: 'Any',
+  //     rateMax: 150,
+  //     experiencedWith: []
+  //   };
+  //   this.selectedServiceOptions = [];
+  //   this.selectedDogTypes = [];
+  //   this.selectedGender = 'any';
+  //   this.disableRadius = true;
+  //   this.minRate = 0;
+  //   this.maxRate = 150;
 
+  //   this.loadSittersByLocation();
+  // }
+
+  clearFilters(shouldReload: boolean = true): void {
+  this.filters = {
+    servicesSelected: [],
+    gender: 'Any',
+    rateMax: 150,
+    experiencedWith: []
+  };
+  this.selectedServiceOptions = [];
+  this.selectedDogTypes = [];
+  this.selectedGender = 'any';
+  this.disableRadius = true;
+  this.minRate = 0;
+  this.maxRate = 150;
+
+  if (shouldReload) {
     this.loadSittersByLocation();
   }
+}
 
   applyFilters(): void {
     const url = 'https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/';
@@ -309,9 +328,10 @@ onCitySearch() {
       if (sittersRes.length === 0) {
         alert(`No sitters found in "${city}"`);
       }
-      this.clearFilters();
+      this.clearFilters(false); // Clear filters but don't reload sitters
       this.sitters = sittersRes;
       this.updateMarkers();
+      this.selectedTab = 'map';
     },
     error: (err) => console.error('Failed to search sitters by city', err)
   });
