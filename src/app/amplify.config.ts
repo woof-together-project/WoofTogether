@@ -20,4 +20,3 @@ export const amplifyCognitoConfig = {
 };
 
 // Amplify.configure(amplifyCognitoConfig);
-console.log('✅ Amplify configured!');

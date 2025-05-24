@@ -8,7 +8,6 @@ import { routes } from './app/app.routes';
 import { amplifyCognitoConfig } from './app/amplify.config';
 
 //Amplify.configure(amplifyCognitoConfig);
-console.log('✅ Amplify configured!');
 
 bootstrapApplication(AppComponent, {
   providers: [provideHttpClient(), provideRouter(routes)],
