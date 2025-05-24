@@ -11,6 +11,5 @@
     [position]="{ lat: marker.lat, lng: marker.lng }"
     [label]="marker.label || ''"
     (mapClick)="onMarkerClick(marker.id)"
-     [icon]="getMarkerIcon(marker)"
   ></map-marker>
 </google-map>

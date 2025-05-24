@@ -203,26 +203,39 @@ export class SignupComponent {
     }
   }
 
-  submitForm() {
-    console.log('Form submitted with the following data:');
-    console.log('Email:', this.email);
-    console.log('Nickname:', this.nickname);
+ submitForm() {
+  console.log('Form submitted with the following data:');
+  console.log('Email:', this.email);
+  console.log('Nickname:', this.nickname);
 
-    const signupData = this.prepareSignupData();
-    const payload = {
-      email: this.email,
-      signupData: signupData
-    };
+  const signupData = this.prepareSignupData();
+  const payload = {
+    email: this.email,
+    signupData: signupData
+  };
 
+  console.log('Submitting form with payload:', payload);
 
-    console.log('Submitting form with payload:', payload);
+  this.http.post('https://yh6mfirykyw5taijkwggrekyi40ebnhd.lambda-url.us-east-1.on.aws/', payload)
+    .subscribe({
+      next: res => {
+        console.log('Submitted successfully:', res);
+        
+        // Update user context isComplete flag
+        const currentUser = this.userContext.getCurrentUserValue();
+        if (currentUser) {
+          currentUser.isComplete = true;
+          // Emit updated user state
+          (this.userContext as any).currentUser.next(currentUser);
+          console.log('isComplete updated in user context');
+        }
+      },
+      error: err => {
+        console.error('Submission failed:', err);
+      }
+    });
+}
 
-    this.http.post('https://yh6mfirykyw5taijkwggrekyi40ebnhd.lambda-url.us-east-1.on.aws/', payload)
-      .subscribe({
-        next: res => console.log('Submitted successfully:', res),
-        error: err => console.error('Submission failed:', err)
-      });
-  }
 
   prepareSignupData() {
     return {

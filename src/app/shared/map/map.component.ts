@@ -16,17 +16,17 @@ export class MapComponent {
 
    @Output() markerClicked = new EventEmitter<number>();
 
-    dogIcon: google.maps.Icon = {
-    url: 'assets/images/dogPaw.png',
-    scaledSize: new google.maps.Size(40, 40)
-  };
-  
-  getMarkerIcon(marker: any): string | google.maps.Icon | google.maps.Symbol {
-  if (marker.id === -1) {
-    return this.dogIcon;
-  }
-  return undefined as any;
-}
+//     dogIcon: google.maps.Icon = {
+//     url: 'assets/images/dogPaw.png',
+//     scaledSize: new google.maps.Size(40, 40)
+//   };
+
+//   getMarkerIcon(marker: any): string | google.maps.Icon | google.maps.Symbol {
+//   if (marker.id === -1) {
+//     return this.dogIcon;
+//   }
+//   return undefined as any;
+// }
 
 
   onMarkerClick(markerId: number) {

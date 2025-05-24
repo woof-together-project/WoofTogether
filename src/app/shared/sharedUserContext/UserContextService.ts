@@ -6,6 +6,7 @@ export interface UserDetails {
   nickname: string | null;
   username: string | null;
   sub: string | null;
+  isComplete?: boolean; 
 }
 
 @Injectable({
@@ -17,7 +18,7 @@ export class UserContextService {
   constructor() {}
 
   setUser(email: string | null, nickname: string | null, username: string | null, sub: string | null) {
-    const user: UserDetails = { email, nickname, username, sub };
+    const user: UserDetails = { email, nickname, username, sub, isComplete: false };
     this.currentUser.next(user);
     console.log('[UserContextService] setUser called. Emitted:', user);
   }
