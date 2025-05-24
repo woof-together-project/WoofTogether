@@ -16,22 +16,25 @@
           <div class="card-body" *ngIf="showGeneralInfo">
             <div class="mb-3">
               <label for="phone" class="form-label">Phone number</label>
-              <input type="text" id="phone" class="form-control" name="phone" [(ngModel)]="phone" required #phone="ngModel">
-              <div *ngIf="signupForm.submitted && phone.invalid" class="text-danger small mb-1 text-end fade-in-error">
+              <input type="text" id="phone" class="form-control" name="phone" [(ngModel)]="phone" required #phoneModel="ngModel">
+              <div *ngIf="signupForm.submitted && phoneModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
                 Phone number is required
               </div>
             </div>
             <div class="mb-3">
               <label for="city" class="form-label">City</label>
-              <input type="text" id="city" class="form-control" name="city" [(ngModel)]="city" required #city="ngModel">
-              <div *ngIf="signupForm.submitted && city.invalid" class="text-danger small mb-1 text-end fade-in-error">
+              <input type="text" id="city" class="form-control" name="city" [(ngModel)]="city" required #cityModel="ngModel">
+              <div *ngIf="signupForm.submitted && cityModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
                 City is required
               </div>
             </div>
 
             <div class="mb-3">
               <label for="street" class="form-label">Street</label>
-              <input type="text" id="street" class="form-control" name="street" [(ngModel)]="street">
+              <input type="text" id="street" class="form-control" name="street" [(ngModel)]="street" required #streetModel="ngModel">
+              <div *ngIf="signupForm.submitted && streetModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                Street is required
+              </div>
             </div>
 
             <div class="mb-3">
@@ -94,17 +97,17 @@
               </div>
               <div class="mb-2">
                 <label for="sitterBio" class="form-label">About Me</label>
-                <textarea class="form-control" id="sitterBio" rows="3" placeholder="Let us know about yourself.." name="sitterBio" ngModel #sitterBio="ngModel"></textarea>
+                <textarea class="form-control" id="sitterBio" rows="3" placeholder="Let us know about yourself and your experience.." name="sitterBio" ngModel #sitterBioModel="ngModel"></textarea>
               </div>
               <div class="mb-2">
-                <label for="experience" class="form-label">Experience</label>
-                <textarea class="form-control" id="experience" rows="3" placeholder="Let us know what about your work experience.." name="experience" [(ngModel)]="experience" #experience="ngModel"></textarea>
-                <div *ngIf="signupForm.submitted && experience.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                  Experience is required
+                <label class="form-label">Experience</label>
+                <input type="number" class="form-control" [(ngModel)]="experience" placeholder="Please enter the number of years you're taking care of dogs" name="experience" #experienceModel="ngModel" required>
+                <div *ngIf="signupForm.submitted && experienceModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                  Experience number of years is required
                 </div>
               </div>
               <div class="d-flex justify-content-end mt-3">
-                <button class="btn btn-primary" (click)="nextSitterPage()" [disabled]="!sitterBio">Next ➡️</button>
+                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
               </div>
             </div>
 
@@ -112,14 +115,14 @@
 
               <div class="mb-2">
                 <label for="rate" class="form-label">Hourly rate</label>
-                <input type="number" id="rate" class="form-control" placeholder="Enter a number" name="rate" [(ngModel)]="rate" required #rate="ngModel">
-                <div *ngIf="signupForm.submitted && rate.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                <input type="number" id="rate" class="form-control" placeholder="Enter a number" name="rate" [(ngModel)]="rate" required #rateModel="ngModel">
+                <div *ngIf="signupForm.submitted && rateModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
                   Rate is required
                 </div>
               </div>
               <div class="mb-2">
                 <label for="availability" class="form-label">Availability</label>
-                <textarea class="form-control" id="availability" rows="3" placeholder="Working hours and days, unavailable dates" name="availability" [(ngModel)]="availability" #availability="ngModel"></textarea>
+                <textarea class="form-control" id="availability" rows="3" placeholder="Working hours and days, unavailable dates" name="availability" [(ngModel)]="availability" #availabilityModel="ngModel"></textarea>
               </div>
               <div class="d-flex justify-content-between mt-3">
                 <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
@@ -202,7 +205,10 @@
               <div *ngSwitchCase="0" class="page" [class.active]="currentDogPage[i] === 0">
                 <div class="mb-2">
                   <label class="form-label">Dog's Name</label>
-                  <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required>
+                  <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required #dogNameModel="ngModel">
+                  <div *ngIf="signupForm.submitted && dogNameModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                  Dog name is required
+                  </div>
                 </div>
 
                 <div class="mb-2">
@@ -212,11 +218,14 @@
 
                 <div class="mb-2">
                   <label class="form-label">Gender</label>
-                  <select class="form-select" [(ngModel)]="dog.gender" name="dogGender-{{i}}" required>
+                  <select class="form-select" [(ngModel)]="dog.gender" name="dogGender-{{i}}" required #dogGenderModel="ngModel">
                     <option value="" disabled selected>Select Gender</option>
                     <option value="female">Female</option>
                     <option value="male">Male</option>
                   </select>
+                  <div *ngIf="signupForm.submitted && dogGenderModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                  Dog gender is required
+                  </div>
                 </div>
 
                 <div *ngIf="dog.gender">
@@ -224,11 +233,14 @@
                     <label class="form-label">
                       {{ dog.gender === 'male' ? 'Is your dog Castrated?' : 'Is your dog Sterilized?' }}
                     </label>
-                    <select class="form-select" [(ngModel)]="dog.fixed" name="dogFixed-{{i}}" required>
+                    <select class="form-select" [(ngModel)]="dog.fixed" name="dogFixed-{{i}}" required #dogFixedModel="ngModel">
                       <option value="" disabled selected>Select</option>
                       <option value="yes">Yes</option>
                       <option value="no">No</option>
                     </select>
+                    <div *ngIf="signupForm.submitted && dogFixedModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog sterilization info is required
+                    </div>
                   </div>
                 </div>
 
@@ -238,52 +250,53 @@
               </div>
 
               <div *ngSwitchCase="1" class="page" [class.active]="currentDogPage[i] === 1">
+
                 <div class="mb-2">
                   <label class="form-label">Dog's Size</label>
-                  <select class="form-select" [(ngModel)]="dog.size" name="dogSize-{{i}}" required>
+                  <select class="form-select" [(ngModel)]="dog.size" name="dogSize-{{i}}" required #dogSizeModel="ngModel">
                     <option value="" disabled selected>Select Size</option>
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
                     <option value="large">Large</option>
                     <option value="giant">Giant</option>
                   </select>
+                  <div *ngIf="signupForm.submitted && dogSizeModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog size is required
+                  </div>
                 </div>
 
                 <div class="mb-2">
                   <label class="form-label">Weight (kg)</label>
-                  <input type="number" class="form-control" [(ngModel)]="dog.weight" name="dogWeight-{{i}}" required>
+                  <input type="number" class="form-control" [(ngModel)]="dog.weight" name="dogWeight-{{i}}" required #dogWeightModel="ngModel">
+                  <div *ngIf="signupForm.submitted && dogWeightModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog weight is required
+                  </div>
                 </div>
 
                 <div class="mb-2">
                 <label class="form-label">Dog's Age</label>
-                <input type="number" class="form-control" [(ngModel)]="dog.age" name="dogAge-{{i}}" required>
+                <input type="number" class="form-control" [(ngModel)]="dog.age" name="dogAge-{{i}}" required #dogAgeModel="ngModel">
+                <div *ngIf="signupForm.submitted && dogAgeModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                  Dog age is required
+                </div>
                 </div>
 
-                <div class="mb-2">
+                <!--<div class="mb-2">
                   <label class="form-label">Temperament</label>
                   <input type="text" class="form-control" [(ngModel)]="dog.temperament" name="dogTemperament-{{i}}" required>
-                </div>
-                
+                </div>-->
+
                 <div class="mb-2">
                   <label class="form-label">Vaccinated Against Rabies?</label>
-                  <select class="form-select" [(ngModel)]="dog.rabiesVaccinated" name="dogVaccinated-{{i}}" required>
+                  <select class="form-select" [(ngModel)]="dog.rabiesVaccinated" name="dogVaccinated-{{i}}" required #dogVaccinatedModel="ngModel">
                     <option value="" disabled selected>Select</option>
                     <option value="yes">Yes</option>
                     <option value="no">No</option>
                   </select>
+                  <div *ngIf="signupForm.submitted && dogVaccinatedModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog vaccination info is required
+                    </div>
                 </div>
-
-                  <!-- <div class="mb-2">
-                  <select class="form-select" [(ngModel)]="dog.vaccinationStatus" name="dogVaccinationStatus-{{i}}" required>
-                  <option [ngValue]="true">Yes</option>
-                  <option [ngValue]="false">No</option>
-                  </select>
-                  </div> -->
-
-                <div class="mb-2">
-                    <label class="form-label">Health Conditions</label>
-                    <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
-                  </div>
 
                 <div class="d-flex justify-content-between mt-3">
                     <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
@@ -293,6 +306,12 @@
 
 
               <div *ngSwitchCase="2" class="page" [class.active]="currentDogPage[i] === 2">
+
+                <div class="mb-2">
+                    <label class="form-label">Health Conditions</label>
+                    <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
+                  </div>
+
                 <!-- Behavioral Traits -->
                 <div class="mb-3">
                   <label class="form-label fw-bold">Behavioral Traits</label>
