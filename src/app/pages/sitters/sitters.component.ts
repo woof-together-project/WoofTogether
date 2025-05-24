@@ -322,7 +322,9 @@ onCitySearch() {
 
   this.http.post<any[]>('https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/', {
     action: 'searchByCity',
-    city: city
+    city: city,
+    latitude: this.location.latitude,
+    longitude: this.location.longitude
   }).subscribe({
     next: (sittersRes) => {
       if (sittersRes.length === 0) {
@@ -345,6 +347,13 @@ hideSuggestionsWithDelay(): void {
   setTimeout(() => {
     this.showSuggestions = false;
   }, 150); // short delay to allow click to register
+}
+
+clearCitySearch(): void {
+  this.searchCity = '';
+  this.filteredCities = [...this.allCities];
+  this.showSuggestions = false;
+  this.clearFilters(true); 
 }
 
 
