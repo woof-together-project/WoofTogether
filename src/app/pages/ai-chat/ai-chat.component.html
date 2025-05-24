@@ -13,7 +13,9 @@
     <img src="assets/images/dogPaw.png" class="paw p9" />
     <img src="assets/images/dogPaw.png" class="paw p10" />
 
-    <h2 class="welcome">Hey there, how can I help you?</h2>
+    <h2 class="welcome">
+    {{ nickname ? 'Hey ' + nickname + ', how can I help you?' : 'Hey there, how can I help you?' }}
+    </h2>
 
     <!-- Chat Messages -->
     <div class="chat-box">
