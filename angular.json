@@ -36,7 +36,7 @@
         },
           "configurations": {
             "production": {
-              "baseHref": "https://ui.d3ophfm6oi7gy4.amplifyapp.com/WoofTogether",
+              "baseHref": "/",
               "budgets": [
                 {
                   "type": "initial",
