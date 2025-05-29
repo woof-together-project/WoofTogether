@@ -54,7 +54,7 @@
           <!-- Summary View -->
           <ng-container *ngIf="selectedSitterId !== sitter.sitterId; else expandedCard">
             <div class="d-flex gap-3">
-              <img [src]="sitter.imageUrl || 'assets/images/default-profile.png'" class="sitter-img" />
+              <img [src]="sitter.imageUrl " class="sitter-img" />
               <div class="sitter-info">
                 <h5 class="mb-1">{{ sitter.name }}</h5>
                 <p class="mb-1">{{ sitter.aboutMe }}</p>
@@ -77,16 +77,22 @@
               <p><strong>Services:</strong> {{ sitter.serviceOptions.join(', ') }}</p>
               <div>
                 <strong>Reviews:</strong> ⭐⭐⭐⭐⭐
-                <a class="text-decoration-none text-primary ms-2" data-bs-toggle="collapse"
+                <!-- <a class="text-decoration-none text-primary ms-2" data-bs-toggle="collapse"
                   [attr.href]="'#collapseReviews' + sitter.sitterId" role="button" aria-expanded="false"
                   [attr.aria-controls]="'collapseReviews' + sitter.sitterId" (click)="$event.stopPropagation()">
                   ...see more
-                </a>
-                <div class="collapse mt-2" [id]="'collapseReviews' + sitter.sitterId">
+                </a> -->
+                <div class="mt-2">
+                <div *ngFor="let review of sitter.reviews">
+                  <small class="text-muted d-block">“{{ review }}”</small>
+                </div>
+              </div>
+
+                <!-- <div class="collapse mt-2" [id]="'collapseReviews' + sitter.sitterId">
                   <div *ngFor="let review of sitter.reviews">
                     <small class="text-muted d-block">“{{ review }}”</small>
                   </div>
-                </div>
+                </div> -->
               </div>
               <p><strong>More Info:</strong> {{ sitter.moreDetails }}</p>
               <div class="d-flex justify-content-between align-items-center mt-2">

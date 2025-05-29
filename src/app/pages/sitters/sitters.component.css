@@ -300,3 +300,10 @@ app-map, #mapElement {
   height: 100%;
   background-color: #f1f7ee;
 }
+
+.sitter-img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+}

@@ -4,11 +4,11 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app/app.routes';
-//import { Amplify } from 'aws-amplify';
-import { amplifyCognitoConfig } from './app/amplify.config';
 
-//Amplify.configure(amplifyCognitoConfig);
 
 bootstrapApplication(AppComponent, {
-  providers: [provideHttpClient(), provideRouter(routes)],
+  providers: [
+    provideHttpClient(),
+    provideRouter(routes)
+  ],
 });

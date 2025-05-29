@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Sitter } from './sitter.model';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { MapComponent } from '../../shared/map/map.component';
+import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 
 @Component({
   selector: 'app-sitters',
@@ -15,7 +16,7 @@ import { MapComponent } from '../../shared/map/map.component';
 })
 
 export class SittersComponent implements OnInit {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private userContext: UserContextService) {}
 
   selectedTab: 'map' | 'criteria' | null = 'map';
   sitters: Sitter[] = [];
@@ -25,6 +26,12 @@ export class SittersComponent implements OnInit {
     longitude: 0,
     radius: 15           
   };
+
+   //cognito data
+  useremail: string = '';
+  nickname: string = '';
+  username: string = '';
+  sub: string = '';
 
   searchCity: string = '';
   allCities: string[] = [];
@@ -51,6 +58,7 @@ export class SittersComponent implements OnInit {
     experiencedWith: [] as string[]
   };
 
+  currentUserEmail: string = '';
 
   async ngOnInit(): Promise<void> {
   try {
@@ -73,6 +81,16 @@ export class SittersComponent implements OnInit {
   ];
 
   this.serviceOptions = ['Dog-Sitting', 'Dog-Walking', 'Dog-Boarding'];
+
+     this.userContext.getUserObservable().subscribe(currentUser => {
+    this.useremail = currentUser?.email ?? '';
+    this.username = currentUser?.username ?? '';
+    this.nickname = currentUser?.nickname ?? '';
+    this.sub = currentUser?.sub ?? '';
+    this.currentUserEmail = this.useremail || 'daniella@gmail.com';
+  });
+
+  
 }
 
 
@@ -89,10 +107,10 @@ export class SittersComponent implements OnInit {
         console.error('Error getting location:', error);
         reject(error);
       },
-      {
-        timeout: 10000,
-        enableHighAccuracy: true
-      }
+      // {
+      //   timeout: 10000,
+      //   enableHighAccuracy: true
+      // }
     );
   });
 }
@@ -142,23 +160,6 @@ export class SittersComponent implements OnInit {
     }
   }
 
-  // clearFilters(): void {
-  //   this.filters = {
-  //     servicesSelected: [],
-  //     gender: 'Any',
-  //     rateMax: 150,
-  //     experiencedWith: []
-  //   };
-  //   this.selectedServiceOptions = [];
-  //   this.selectedDogTypes = [];
-  //   this.selectedGender = 'any';
-  //   this.disableRadius = true;
-  //   this.minRate = 0;
-  //   this.maxRate = 150;
-
-  //   this.loadSittersByLocation();
-  // }
-
   clearFilters(shouldReload: boolean = true): void {
   this.filters = {
     servicesSelected: [],
@@ -181,10 +182,16 @@ export class SittersComponent implements OnInit {
   applyFilters(): void {
     const url = 'https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/';
     const payload = this.buildFilterPayload(); 
+    console.log("✅ Filter payload:", payload);
     
     this.http.post<Sitter[]>(url, payload).subscribe({
       next: (data) => {
-        this.sitters = data;          
+        //this.sitters = data;     
+       this.sitters = data.map(sitter => ({
+        ...sitter,
+        imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
+      }));
+   
         this.updateMarkers();
         this.selectedTab = 'map';        
       },
@@ -192,8 +199,8 @@ export class SittersComponent implements OnInit {
     });
   }
 
-  currentUserEmail = 'daniella@gmail.com';
-
+  //currentUserEmail = 'daniella@gmail.com';
+  
   getSmartEmailLink(userEmail: string, sitterEmail: string, sitterName: string): string {
     const subject = encodeURIComponent('Looking for a dog sitter');
     const body = encodeURIComponent(`Hi ${sitterName}, I saw your profile and would love to connect!`);
@@ -218,11 +225,17 @@ export class SittersComponent implements OnInit {
   loadSittersByLocation(): void {
     const url = 'https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/';
     const payload = this.buildFilterPayload();
-
+    console.log("✅ Loading sitters with payload:", payload);
+    
     this.http.post<Sitter[]>(url, payload).subscribe({
       next: (data) => {
-        this.sitters = data;
-        console.log("✅ Sitters loaded:", this.sitters);
+        //this.sitters = data;
+       this.sitters = data.map(sitter => ({
+        ...sitter,
+        imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
+      }));
+
+        console.log("Sitters loaded:", this.sitters);
         this.updateMarkers();
       },
       error: (err) => console.error('Failed to fetch sitters:', err)

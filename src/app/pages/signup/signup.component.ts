@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, Input  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { NavigationService } from '../../shared/navigation/navigation.service';
 
 
 @Component({
@@ -14,8 +16,9 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 })
 
 export class SignupComponent {
-
-  constructor(private http: HttpClient, private userContext: UserContextService) {}
+  constructor(private http: HttpClient, private userContext: UserContextService,   
+        private snackBar: MatSnackBar,  private navigationService: NavigationService
+) {}
 
   //cognito data
   email: string = '';
@@ -28,8 +31,8 @@ export class SignupComponent {
   city: string = '';
   street: string = '';
   profilePic: string = ''; // Note: for real upload you'll need FileReader or FormData
-  profilePicFile: File | null = null;
-
+  profilePicFile: File | null = null; // Store the file object for upload
+  
   // sitter data
   rate: number | null = null;
   availability: string = '';
@@ -220,18 +223,22 @@ export class SignupComponent {
     .subscribe({
       next: res => {
         console.log('Submitted successfully:', res);
-        
         // Update user context isComplete flag
-        const currentUser = this.userContext.getCurrentUserValue();
-        if (currentUser) {
-          currentUser.isComplete = true;
-          // Emit updated user state
-          (this.userContext as any).currentUser.next(currentUser);
-          console.log('isComplete updated in user context');
-        }
+        this.userContext.setUserCompleteStatus(true);
+        this.snackBar.open('Signup successful!', 'Close', {
+          duration: 1500
+        });
+
+        setTimeout(() => {
+        this.navigationService.requestHomeRedirect();
+        }, 1500);
+
       },
       error: err => {
         console.error('Submission failed:', err);
+        this.snackBar.open('Signup failed. Please try again.', 'Close', {
+          duration: 1500
+        });
       }
     });
 }
@@ -274,9 +281,59 @@ export class SignupComponent {
 
 
 onProfilePicSelected(event: Event): void {
+  console.log('[onProfilePicSelected] Event triggered:', event);
+
   const input = event.target as HTMLInputElement;
-  this.profilePicFile = input.files?.[0] || null;
-  this.profilePic = this.profilePicFile?.name || '';
+  const file = input.files?.[0];
+
+  if (!file) {
+    console.warn('[onProfilePicSelected] No file selected.');
+    return;
+  }
+
+  console.log('[onProfilePicSelected] File selected:', {
+    name: file.name,
+    type: file.type,
+    size: file.size
+  });
+
+  const profilePicFile = file;
+  this.profilePic = file.name;
+
+  const lambdaUrl = 'https://ecby5wkmj5j5ugvkzh4poqmbna0eusvw.lambda-url.us-east-1.on.aws/';
+  console.log('[onProfilePicSelected] Sending request to Lambda for presigned URL:', {
+    fileName: file.name,
+    fileType: file.type
+  });
+
+  this.http.post<any>(lambdaUrl, {
+    fileName: file.name,
+    fileType: file.type
+  }).subscribe({
+    next: (res) => {
+      console.log('[Lambda Response] Presigned URL and Public URL received:', res);
+
+      const presignedUrl = res.url;
+      const publicUrl = res.publicUrl;
+
+      console.log('[S3 Upload] Uploading file to S3 via presigned URL...');
+      this.http.put(presignedUrl, file, {
+        headers: { 'Content-Type': file.type }
+      }).subscribe({
+        next: () => {
+          console.log('[S3 Upload] Upload successful');
+          this.profilePic = publicUrl;
+          console.log('[S3 Upload] Stored public URL:', publicUrl);
+        },
+        error: (err) => {
+          console.error('[S3 Upload] Upload to S3 failed:', err);
+        }
+      });
+    },
+    error: (err) => {
+      console.error('[Lambda Error] Failed to get presigned URL:', err);
+    }
+  });
 }
 
 }
