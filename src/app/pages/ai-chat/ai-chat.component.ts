@@ -49,22 +49,39 @@ export class AiChatComponent implements OnInit{
       this.nickname = currentUser?.nickname ?? null;
       this.sub = currentUser?.sub ?? null;
 
-      if (this.sub) {
-        this.http.get<any>(`https://fgqmlufb663hbl2gzc77fvfa6a0szvmz.lambda-url.us-east-1.on.aws/?sub=${this.sub}`)
-          .subscribe({
-            next: (res) => {
-              this.messages = Array.isArray(res.messages) ? res.messages : [];
-            },
-            error: (err) => {
-              if (err.status !== 404 && err.status !== 204 && err.status !== 200) {
-                this.messages.push({
-                  role: 'assistant',
-                  content: 'Something went wrong while loading chat history 🐾',
-                });
-              }
+      // Only fetch chat history ONCE when sub is ready
+      if (this.sub && this.messages.length === 0) {
+        this.http.get<any>(`https://fgqmlufb663hbl2gzc77fvfa6a0szvmz.lambda-url.us-east-1.on.aws/?sub=${this.sub}`).subscribe({
+          next: (res) => {
+            this.messages = Array.isArray(res.messages) ? res.messages : [];
+          },
+          error: (err) => {
+            if (![200, 204, 404].includes(err.status)) {
+              this.messages.push({
+                role: 'assistant',
+                content: 'Something went wrong while loading chat history 🐾',
+              });
             }
-          });
+          }
+        });
       }
     });
   }
+
+
+  @ViewChild('messagesContainer') messagesContainer!: ElementRef;
+
+  ngAfterViewChecked() {
+    this.scrollToBottom();
+  }
+
+  scrollToBottom() {
+    try {
+      const el = this.messagesContainer.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    } catch (err) {
+      console.error('Scroll error:', err);
+    }
+  }
+
 }
