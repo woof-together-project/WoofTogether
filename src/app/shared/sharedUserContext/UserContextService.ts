@@ -32,4 +32,21 @@ export class UserContextService {
   getUserObservable() {
     return this.currentUser.asObservable();
   }
+
+  getUserEmail(): string | null {
+    const user = this.getCurrentUserValue();
+    const email = user ? user.email : null;
+    return email;
+  }
+
+  setUserCompleteStatus(isComplete: boolean) {
+    const currentUser = this.getCurrentUserValue();
+    if (currentUser) {
+      const updatedUser: UserDetails = { ...currentUser, isComplete };
+      this.currentUser.next(updatedUser);
+      console.log('[UserContextService] setUserCompleteStatus called. Updated user:', updatedUser);
+    } else {
+      console.warn('[UserContextService] setUserCompleteStatus called but no current user found.');
+    }
+  }
 }
