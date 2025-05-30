@@ -10,8 +10,8 @@ export const amplifyCognitoConfig = {
         oauth: {
           domain: 'us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com',
           scopes: ['openid', 'email', 'profile'],
-          redirectSignIn: ['http://localhost:4200/'],
-          redirectSignOut: ['http://localhost:4200/'],
+          redirectSignIn: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
+          redirectSignOut: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
           responseType: 'code' as const
         }
       }
