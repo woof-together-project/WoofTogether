@@ -53,18 +53,33 @@
 <section class="faq-section page-wrapper">
   <h2 class="faq-title"> Common Questions ❓</h2>
 
-  <div *ngFor="let faq of faqList; let i = index"
+  <!-- <div *ngFor="let faq of faqList; let i = index"
   class="faq-item"
   [class.open]="faq.isOpen"
 >
-  <div class="faq-question" (click)="toggleFAQ(i)">
-    {{ faq.question }}
-    <span class="faq-toggle">{{ faq.isOpen ? '−' : '+' }}</span>
-  </div>
+  <div class="faq-question">
+  {{ faq.question }}
+  <span class="faq-toggle" (click)="toggleFAQ(i)">{{ faq.isOpen ? '−' : '+' }}</span>
+</div>
+
   <div class="faq-answer">
     {{ faq.answer }}
   </div>
+</div> -->
+
+<div *ngFor="let faq of faqList; let i = index" class="faq-item" (click)="toggleFAQ(i)">
+  <div class="faq-question">
+    <span class="faq-text">{{ faq.question }}</span>
+    <span class="faq-toggle">{{ faq.isOpen ? '−' : '+' }}</span>
+  </div>
+
+  <div class="faq-answer" *ngIf="faq.isOpen">
+    {{ faq.answer }}
+  </div>
 </div>
+
+
+
 
 </section>
 

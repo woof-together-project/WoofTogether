@@ -17,21 +17,17 @@
 }  */
 
 .home-container {
-  background: url('/assets/images/dogsPark.png');
+  min-height: 100vh;
+  background-image: url('/assets/images/dogsPark.png');
   background-repeat: no-repeat;
   background-size: cover;
-  background-position: center top;
-  background-attachment: scroll;
-  min-height: 100vh;
-  /* background: transparent; */
-  position: relative;
-  z-index: 1;
-  /* padding: 2rem; */
-  width: 100vw;
-  width: 100%;
-  /* max-width: 100%; */
-  box-sizing: border-box;
+  background-position: center center;
+  background-attachment: fixed;
+
+  overflow-x: auto;
+  overflow-y: auto;
 }
+
 
 .page-wrapper {
   max-width: 1200px;
@@ -51,58 +47,6 @@
   position: relative;
   z-index: 2;
 }
-
-
-/* === NAVBAR === */
-/* .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.3);
-  padding: 10px 20px;
-  border-radius: 10px;
-}
-
-.logo {
-  font-size: 30px;
-}
-
-.nav-links {
-  display: flex;
-  list-style: none;
-  gap: 30px;
-  font-size: 18px;
-}
-
-.nav-links li {
-  cursor: pointer;
-}
-
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  position: relative;
-  z-index: 5; /* ✅ Keeps login and search clickable
-}
-
-.nav-actions input {
-  padding: 6px 14px;
-  border-radius: 20px;
-  border: none;
-}
-
-.login-btn {
-  background: white;
-  color: black;
-  padding: 6px 16px;
-  border-radius: 20px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  position: relative;
-  z-index: 5; /* ✅ Ensures button is clickable
-} */
 
 /* === MAIN CONTENT === */
 .carousel-container {
@@ -140,7 +84,7 @@
 
 /* Title styling */
 .text-content h1 {
-  font-size: 60px;
+  font-size: 80px;
   line-height: 1;
   margin-bottom: 1rem;
   margin-left: -180px;
@@ -158,7 +102,7 @@
 
 /* the text under WOOF TOGETHER title*/
 .text-content p {
-  font-size: 18px;
+  font-size: 20px;
   color: rgba(19, 18, 18, 0.945);
   line-height: 1.8;
   max-width: 420px;
@@ -176,21 +120,6 @@
   margin-top: 40px;
 }
 
-/* .arrow-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: white;
-  color: black;
-  font-size: 1.5rem;
-  border: none;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-  z-index: 3;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-} */
 
 
 .arrow-btn {
@@ -257,6 +186,12 @@
   opacity: 0;
   z-index: 0;
 }
+
+.faq-divider {
+  margin-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
 
 .card img {
   width: 100%;
@@ -468,18 +403,12 @@
 }
 
 .faq-answer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.4s ease, padding 0.3s ease;
+  margin-top: 0.75rem;
   font-size: 16px;
   color: #333;
-  padding: 0 0;
+  line-height: 1.6;
 }
-
-.faq-item.open .faq-answer {
-  max-height: 300px; /* enough for most answers */
-  padding-top: 10px;
-}
+ 
 
 .article-image {
   width: 100%;
@@ -513,4 +442,33 @@
 .article-section.about-us {
   font-family: 'Poppins', 'Segoe UI', sans-serif;
 }
+
+.faq-question {
+  cursor: default;
+}
+
+.faq-toggle {
+  cursor: pointer;
+  color: #5c2b29;
+}
+
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.home-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.5);
+  z-index: 1;
+  pointer-events: none;
+}
+
 

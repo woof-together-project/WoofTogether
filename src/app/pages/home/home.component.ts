@@ -66,7 +66,7 @@ export class HomeComponent{
     },
     {
       question: 'Is WoofTogether free to use?',
-      answer: 'Yes! You can browse and connect with sitters at no cost. Premium features are optional.',
+      answer: 'Yes! All features on the website are completely free to use — including browsing, connecting with sitters, and more.',
       isOpen: false,
     },
     {
@@ -81,9 +81,18 @@ export class HomeComponent{
     },
   ];
 
-  toggleFAQ(index: number) {
-    this.faqList[index].isOpen = !this.faqList[index].isOpen;
-  }
+  // toggleFAQ(index: number) {
+  //   this.faqList[index].isOpen = !this.faqList[index].isOpen;
+  // }
+
+//   toggleFAQ(index: number, event: MouseEvent): void {
+//   event.stopPropagation(); // optional, to prevent parent click if needed
+//   this.faqList[index].isOpen = !this.faqList[index].isOpen;
+// }
+
+toggleFAQ(index: number): void {
+  this.faqList[index].isOpen = !this.faqList[index].isOpen;
+}
 
 
   prevCard() {
