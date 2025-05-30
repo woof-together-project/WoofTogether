@@ -11,7 +11,7 @@ export class LoginService {
       .set('username', username)
       .set('password', password);
 
-      return this.http.get('http://localhost:8080', {
+      return this.http.get('https://ui.dhz62hiqax4cs.amplifyapp.com/', {
         params,
         responseType: 'text' as const
       });
