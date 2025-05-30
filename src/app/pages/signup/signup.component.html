@@ -48,7 +48,7 @@
               (change)="onProfilePicSelected($event)"
               required>
               <!-- <div *ngIf="signupForm.submitted && profilePic.invalid" class="text-danger small mb-1 text-end fade-in-error"> -->
-                <div *ngIf="signupForm.submitted && !profilePicFile" ...>
+                <div *ngIf="signupForm.submitted && !profilePicFile" class="text-danger small mb-1 text-end fade-in-error">
                 Profile picture is required
               </div>
             </div>
