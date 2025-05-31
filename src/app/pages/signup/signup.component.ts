@@ -16,7 +16,7 @@ import { NavigationService } from '../../shared/navigation/navigation.service';
 })
 
 export class SignupComponent {
-  constructor(private http: HttpClient, private userContext: UserContextService,   
+  constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService
 ) {}
 
@@ -32,7 +32,7 @@ export class SignupComponent {
   street: string = '';
   profilePic: string = ''; // Note: for real upload you'll need FileReader or FormData
   profilePicFile: File | null = null; // Store the file object for upload
-  
+
   // sitter data
   rate: number | null = null;
   availability: string = '';
@@ -49,7 +49,7 @@ export class SignupComponent {
 
   showGeneralInfo: boolean = true;
   showSitterSection: boolean = false;
-  showDogSections: boolean[] = [false];
+  showDogSections: boolean[] = [true];
   showDogCard: boolean[] = [true]; // One boolean per dog
   sitterCardOpen = true;
   isSitter: boolean = false;
@@ -121,7 +121,7 @@ export class SignupComponent {
       moreDetails: ''
     });
     this.currentDogPage.push(0);
-    this.showDogSections.push(false);
+    this.showDogSections.push(true);
     this.showDogCard.push(true);
   }
 
@@ -202,6 +202,11 @@ export class SignupComponent {
 
     // If user just checked addDog, reset showDogSections properly
     if (this.addDog && this.showDogSections.length !== this.dogs.length) {
+      this.showDogSections = this.dogs.map(() => true);
+    }
+
+    if (this.addDog) {
+      // Make sure all dog sections are expanded
       this.showDogSections = this.dogs.map(() => true);
     }
   }
