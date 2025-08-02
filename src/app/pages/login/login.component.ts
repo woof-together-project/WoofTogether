@@ -34,7 +34,7 @@ export class LoginComponent {
       `&scope=${encodeURIComponent(scopes.join(' '))}` +
       `&prompt=login`;
   
-    console.log('🔗 Redirecting to Cognito UI:', oauthUrl);
+    console.log('Redirecting to Cognito UI:', oauthUrl);
     window.location.href = oauthUrl;
   }
 }

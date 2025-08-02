@@ -4,14 +4,16 @@
 export const amplifyCognitoConfig = {
   Auth: {
     Cognito: {
-      userPoolClientId: '5s339emasb5u0mf4jej6dvic06',
-      userPoolId: 'us-east-1_U3ZIL1hLZ',
+      userPoolClientId: '5r2o2aopa92hgot078tfhvkf41',
+      userPoolId: 'us-east-1_V1S8KqZxK',
       loginWith: {
         oauth: {
-          domain: 'us-east-1u3zil1hlz.auth.us-east-1.amazoncognito.com',
+          domain: 'https://us-east-1v1s8kqzxk.auth.us-east-1.amazoncognito.com',
           scopes: ['openid', 'email', 'profile'],
-          redirectSignIn: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
-          redirectSignOut: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
+          redirectSignIn: ['http://localhost:4200/'],
+          redirectSignOut: ['http://localhost:4200/'],
+          // redirectSignIn: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
+          // redirectSignOut: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
           responseType: 'code' as const
         }
       }

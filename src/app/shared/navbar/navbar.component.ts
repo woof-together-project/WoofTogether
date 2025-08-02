@@ -14,6 +14,7 @@ import { NavigationService } from '../../shared/navigation/navigation.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
+  static readonly insertUserToDBURL = 'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; //insert user to DB lambda function URL
   constructor(private router: Router, private userContext: UserContextService,   private navigationService: NavigationService) {}
   username: string | null = null;
   searchText: string = '';
@@ -107,7 +108,7 @@ export class NavbarComponent {
  async sendDataToBackend()  
  {
     const currentUser = this.userContext.getCurrentUserValue();
-    const lambdaUrl = 'https://76lrewksipqyhundciqqozf42q0keslz.lambda-url.us-east-1.on.aws/';
+    const lambdaUrl = NavbarComponent.insertUserToDBURL;
      
     if (!currentUser) 
       {
@@ -161,7 +162,8 @@ export class NavbarComponent {
   const currentUser = this.userContext.getCurrentUserValue();
   if (!(currentUser?.isComplete)) {
     alert("Please complete your sign up information to access this page.");
-    this.router.navigate(['/signup']);
+    this.router.navigate([targetRoute]);
+    // this.router.navigate(['/signup']);
   } else 
   {
     this.router.navigate([targetRoute]);

@@ -16,6 +16,7 @@ import { NavigationService } from '../../shared/navigation/navigation.service';
 })
 
 export class SignupComponent {
+  static readonly signupURL =  'https://eu2okj2maowkb7rrlnqmtnmfru0nvaif.lambda-url.us-east-1.on.aws/'; //signup lambda function URL
   constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService
 ) {}
@@ -224,7 +225,7 @@ export class SignupComponent {
 
   console.log('Submitting form with payload:', payload);
 
-  this.http.post('https://yh6mfirykyw5taijkwggrekyi40ebnhd.lambda-url.us-east-1.on.aws/', payload)
+  this.http.post(SignupComponent.signupURL , payload)
     .subscribe({
       next: res => {
         console.log('Submitted successfully:', res);
@@ -305,7 +306,7 @@ onProfilePicSelected(event: Event): void {
   const profilePicFile = file;
   this.profilePic = file.name;
 
-  const lambdaUrl = 'https://ecby5wkmj5j5ugvkzh4poqmbna0eusvw.lambda-url.us-east-1.on.aws/';
+  const lambdaUrl = SignupComponent.signupURL;
   console.log('[onProfilePicSelected] Sending request to Lambda for presigned URL:', {
     fileName: file.name,
     fileType: file.type

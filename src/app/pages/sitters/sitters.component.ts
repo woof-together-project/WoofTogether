@@ -16,6 +16,8 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 })
 
 export class SittersComponent implements OnInit {
+  static readonly getSittersUrl = 'https://5zhpsv4mgumqdxkzbwqfisqnba0xkzkm.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL
+
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
   selectedTab: 'map' | 'criteria' | null = 'map';
@@ -180,7 +182,7 @@ export class SittersComponent implements OnInit {
 }
 
   applyFilters(): void {
-    const url = 'https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/';
+    const url = SittersComponent.getSittersUrl; 
     const payload = this.buildFilterPayload(); 
     console.log("✅ Filter payload:", payload);
     
@@ -223,7 +225,7 @@ export class SittersComponent implements OnInit {
   }
 
   loadSittersByLocation(): void {
-    const url = 'https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/';
+    const url = SittersComponent.getSittersUrl;
     const payload = this.buildFilterPayload();
     console.log("✅ Loading sitters with payload:", payload);
     
@@ -256,7 +258,7 @@ export class SittersComponent implements OnInit {
       id: -1, // Unique ID
       lat: this.location.latitude,
       lng: this.location.longitude,
-      label: 'You' // Or leave out if you don't want label
+      label: 'You' 
   });
 
     console.log("✅ Markers created:", this.markers); 
@@ -304,7 +306,7 @@ export class SittersComponent implements OnInit {
 
   loadCities() {
   if (this.allCities.length === 0) {
-    this.http.post<string[]>('https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/', {
+    this.http.post<string[]>(SittersComponent.getSittersUrl, {
       action: 'searchAvailableCitiesInDB'
     }).subscribe({
       next: (cities) => {
@@ -333,7 +335,7 @@ onCitySearch() {
   const city = this.searchCity.trim();
   if (!city) return;
 
-  this.http.post<any[]>('https://axqbyybq2e7zxh6t56uvfn2qcu0ynmmp.lambda-url.us-east-1.on.aws/', {
+  this.http.post<any[]>(SittersComponent.getSittersUrl , {
     action: 'searchByCity',
     city: city,
     latitude: this.location.latitude,

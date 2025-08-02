@@ -103,8 +103,6 @@ toggleFAQ(index: number): void {
     this.currentIndex = (this.currentIndex + 1) % this.cards.length;
   }
 
-  
-
   getCardClass(index: number): string {
     const relative = (index - this.currentIndex + this.cards.length) % this.cards.length;
 
