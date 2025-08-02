@@ -162,8 +162,8 @@ export class NavbarComponent {
   const currentUser = this.userContext.getCurrentUserValue();
   if (!(currentUser?.isComplete)) {
     alert("Please complete your sign up information to access this page.");
-    this.router.navigate([targetRoute]);
-    // this.router.navigate(['/signup']);
+    //this.router.navigate([targetRoute]);
+     this.router.navigate(['/signup']);
   } else 
   {
     this.router.navigate([targetRoute]);
