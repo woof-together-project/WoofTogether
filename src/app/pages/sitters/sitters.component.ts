@@ -91,8 +91,6 @@ export class SittersComponent implements OnInit {
     this.sub = currentUser?.sub ?? '';
     this.currentUserEmail = this.useremail || 'daniella@gmail.com';
   });
-
-  
 }
 
 
@@ -225,24 +223,33 @@ export class SittersComponent implements OnInit {
   }
 
   loadSittersByLocation(): void {
-    const url = SittersComponent.getSittersUrl;
-    const payload = this.buildFilterPayload();
-    console.log("✅ Loading sitters with payload:", payload);
-    
-    this.http.post<Sitter[]>(url, payload).subscribe({
-      next: (data) => {
-        //this.sitters = data;
-       this.sitters = data.map(sitter => ({
-        ...sitter,
-        imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
-      }));
+  const url = SittersComponent.getSittersUrl;
+  const payload = this.buildFilterPayload();
+  console.log("✅ Loading sitters with payload:", payload);
 
-        console.log("Sitters loaded:", this.sitters);
-        this.updateMarkers();
-      },
-      error: (err) => console.error('Failed to fetch sitters:', err)
+  this.http.post<Sitter[]>(url, payload).subscribe({
+    next: (data) => {
+      this.sitters = data
+  .filter(sitter => sitter.email !== this.useremail)
+  .map(sitter => {
+      const imageUrl = sitter.profilePictureUrl &&
+                      sitter.profilePictureUrl.trim() !== '' &&
+                      sitter.profilePictureUrl.startsWith('http')
+        ? encodeURI(sitter.profilePictureUrl)
+        : 'assets/images/default-profile.png';
+
+      return {
+        ...sitter,
+        imageUrl: imageUrl
+      };
     });
-  }
+      console.log("Sitters loaded:", this.sitters);
+      this.updateMarkers();
+    },
+    error: (err) => console.error('Failed to fetch sitters:', err)
+  });
+}
+
 
   updateMarkers() {
     this.markers = this.sitters
