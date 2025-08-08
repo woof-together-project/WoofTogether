@@ -8,7 +8,7 @@ body {
 
 /* === NAVIGATION BAR === */
 nav.navbar {
-  position: absolute;
+  position: fixed;
   background-color: transparent;
   backdrop-filter: blur(10px);               /* subtle blur effect */
   padding: 0.5rem 1rem;

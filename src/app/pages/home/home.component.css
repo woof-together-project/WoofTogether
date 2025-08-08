@@ -16,6 +16,8 @@
   background-attachment: scroll;
 }  */
 
+
+/*
 .home-container {
   min-height: 100vh;
   background-image: url('/assets/images/dogsPark.png');
@@ -23,9 +25,49 @@
   background-size: cover;
   background-position: center center;
   background-attachment: fixed;
-
   overflow-x: auto;
   overflow-y: auto;
+}
+*/
+
+.home-container {
+  height: 100vh;
+  overflow: hidden;
+  background-image: url('/assets/images/dogsPark.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  position: relative;
+}
+
+/* This inner container is the scrollable area */
+.home-scrollable {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 0; /* keep content where it is */
+  margin-top: 55px; /* visually offset scrollbar */
+  box-sizing: content-box;
+}
+
+/* transparent scrollbar */
+.home-scrollable::-webkit-scrollbar {
+  width: 12px;
+}
+
+.home-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.home-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.home-scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5); /* darker on hover */
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3); /* optional glow */
 }
 
 
@@ -119,8 +161,6 @@
   justify-content: center;
   margin-top: 40px;
 }
-
-
 
 .arrow-btn {
   background: transparent;
@@ -408,7 +448,7 @@
   color: #333;
   line-height: 1.6;
 }
- 
+
 
 .article-image {
   width: 100%;

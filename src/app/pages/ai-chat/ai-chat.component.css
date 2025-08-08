@@ -10,6 +10,25 @@
   box-sizing: border-box;
 }
 
+.scroll-container::-webkit-scrollbar {
+  width: 12px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+
 .chat-page {
   background-color: #c1d5b7;
   min-height: 100vh;
