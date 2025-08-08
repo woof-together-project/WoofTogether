@@ -1,3 +1,7 @@
+* {
+  font-family: 'Comfortaa', 'Segoe UI', sans-serif;
+}
+
 .scrollable-card {
   max-height: 500px;  /* adjust how "tall" your notebook page is */
   overflow-y: auto;
@@ -7,12 +11,36 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
+/* === Scrollbar Styling for Form and Card Scroll Areas === */
+.form-scroll-area::-webkit-scrollbar,
+.scrollable-card::-webkit-scrollbar {
+  width: 8px; /* or 6px if you want a slimmer scroll */
+}
+
+.form-scroll-area::-webkit-scrollbar-track,
+.scrollable-card::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.form-scroll-area::-webkit-scrollbar-thumb,
+.scrollable-card::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.form-scroll-area::-webkit-scrollbar-thumb:hover,
+.scrollable-card::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+
 .form-scroll-area {
   margin-top: 55px;
   height: calc(100vh - 55px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 2rem 70px;
+  padding: 0 2rem 40px;
   scrollbar-gutter: stable both-edges;
 }
 

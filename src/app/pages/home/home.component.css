@@ -29,6 +29,9 @@
   overflow-y: auto;
 }
 */
+* {
+  font-family: 'Comfortaa', 'Segoe UI', sans-serif;
+}
 
 .home-container {
   height: 100vh;
@@ -43,13 +46,13 @@
 
 /* This inner container is the scrollable area */
 .home-scrollable {
-  height: 100%;
+  height: calc(100% - 30px);
   overflow-y: auto;
   overflow-x: hidden;
   padding-top: 0; /* keep content where it is */
   margin-top: 55px; /* visually offset scrollbar */
   box-sizing: content-box;
-}
+  }
 
 /* transparent scrollbar */
 .home-scrollable::-webkit-scrollbar {
@@ -118,10 +121,10 @@
 /* Line to the left of the title */
 .vertical-line {
   width: 10px;
-  height: 120px;
+  height: 150px;
   background-color: white;
   border-radius: 2px;
-  transform: translateX(-200px) translateY(40px); /* ✅ moves far left & down */
+  transform: translateX(-200px) translateY(0px); /* ✅ moves far left & down */
 }
 
 /* Title styling */
@@ -130,11 +133,13 @@
   line-height: 1;
   margin-bottom: 1rem;
   margin-left: -180px;
+
 }
 
 .text-content .light {
   font-weight: 300;
   color: #f8e3c3;
+  font-weight: bold;
 }
 
 .text-content .bold {
@@ -149,6 +154,7 @@
   line-height: 1.8;
   max-width: 420px;
   margin-left: -180px;
+  font-weight: bold;
 }
 
 /* === CAROUSEL === */
@@ -160,6 +166,7 @@
   align-items: center;
   justify-content: center;
   margin-top: 40px;
+  margin-bottom: 40px;
 }
 
 .arrow-btn {
@@ -348,6 +355,7 @@
   display: flex;
   justify-content: center;
   margin-top: 80px;
+  margin-bottom: 80px;
 }
 
 .article-box {
@@ -448,7 +456,6 @@
   color: #333;
   line-height: 1.6;
 }
-
 
 .article-image {
   width: 100%;
