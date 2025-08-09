@@ -1,7 +1,8 @@
 <div class="container-fluid vh-100 d-flex">
     <!-- Right Form Section (2/3) -->
-    <div class="col-md-7 p-5 overflow-auto">
-      <h2 class="mb-3">Welcome to WoofTogether! We're glad you've decided to join us.</h2>
+    <div class="col-md-6 form-scroll-area">
+      <h2 class="mb-3">Welcome to WoofTogether!</h2>
+      <h2 class="mb-3">We're glad you've decided to join us.</h2>
       <p>Please note that joining our community requires having at least one dog (the more the merrier) or being a dogsitter.</p>
 
       <!-- General User Details -->
@@ -39,7 +40,6 @@
 
             <div class="mb-3">
               <label for="profilePic" class="form-label">Profile Picture</label>
-              <!-- <input type="file" id="profilePic" class="form-control" name="profilePic" [(ngModel)]="profilePic" required #profilePic="ngModel"> -->
               <input
               type="file"
               id="profilePic"
@@ -47,7 +47,6 @@
               name="profilePic"
               (change)="onProfilePicSelected($event)"
               required>
-              <!-- <div *ngIf="signupForm.submitted && profilePic.invalid" class="text-danger small mb-1 text-end fade-in-error"> -->
                 <div *ngIf="signupForm.submitted && !profilePicFile" class="text-danger small mb-1 text-end fade-in-error">
                 Profile picture is required
               </div>
@@ -83,7 +82,8 @@
           </div>
           <div class="card-body">
           <ng-container [ngSwitch]="currentSitterPage">
-            <div *ngSwitchCase="0" class="page" [class.active]="currentSitterPage === 0">
+            <div *ngSwitchCase="0" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 0">
+              <div class="flex-grow-1">
               <div class="mb-3">
                 <label for="gender" class="form-label">Gender</label>
                 <select id="gender" class="form-select" name="gender" [(ngModel)]="gender" required>
@@ -106,13 +106,6 @@
                   Experience number of years is required
                 </div>
               </div>
-              <div class="d-flex justify-content-end mt-3">
-                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
-              </div>
-            </div>
-
-            <div *ngSwitchCase="1" class="page" [class.active]="currentSitterPage === 1">
-
               <div class="mb-2">
                 <label for="rate" class="form-label">Hourly rate</label>
                 <input type="number" id="rate" class="form-control" placeholder="Enter a number" name="rate" [(ngModel)]="rate" required #rateModel="ngModel">
@@ -120,17 +113,19 @@
                   Rate is required
                 </div>
               </div>
-              <div class="mb-2">
-                <label for="availability" class="form-label">Availability</label>
-                <textarea class="form-control" id="availability" rows="3" placeholder="Working hours and days, unavailable dates" name="availability" [(ngModel)]="availability" #availabilityModel="ngModel"></textarea>
               </div>
-              <div class="d-flex justify-content-between mt-3">
-                <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
+              <div class="d-flex justify-content-end pt-3 border-top">
                 <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
               </div>
             </div>
 
-            <div *ngSwitchCase="2" class="page" [class.active]="currentSitterPage === 2">
+            <div *ngSwitchCase="1" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 1">
+
+<div class="flex-grow-1">
+              <div class="mb-2">
+                <label for="availability" class="form-label">Availability</label>
+                <textarea class="form-control" id="availability" rows="3" placeholder="Working hours and days, unavailable dates" name="availability" [(ngModel)]="availability" #availabilityModel="ngModel"></textarea>
+              </div>
               <div class="mb-3">
                 <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
                 <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
@@ -144,6 +139,15 @@
                   </div>
                 </div>
               </div>
+</div>
+              <div class="d-flex justify-content-between pt-3 border-top">
+                <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
+                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 2">
+<div class="flex-grow-1">
               <div class="mb-3">
                 <label class="form-label fw-bold">Service Options</label>
                 <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
@@ -157,7 +161,8 @@
                   </div>
                 </div>
               </div>
-              <div class="d-flex justify-content-between mt-3">
+</div>
+              <div class="d-flex justify-content-between pt-3 border-top">
                 <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
               </div>
             </div>
@@ -202,7 +207,8 @@
 
           <div class="card-body">
             <ng-container [ngSwitch]="currentDogPage[i]">
-              <div *ngSwitchCase="0" class="page" [class.active]="currentDogPage[i] === 0">
+              <div *ngSwitchCase="0" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 0">
+                <div class="flex-grow-1">
                 <div class="mb-2">
                   <label class="form-label">Dog's Name</label>
                   <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required #dogNameModel="ngModel">
@@ -243,13 +249,15 @@
                     </div>
                   </div>
                 </div>
+                </div>
 
-                <div class="d-flex justify-content-end mt-3">
+                <div class="d-flex justify-content-end pt-3 border-top">
                   <button class="btn btn-primary" (click)="nextDogPage(i)">Next ➡️</button>
                 </div>
               </div>
 
-              <div *ngSwitchCase="1" class="page" [class.active]="currentDogPage[i] === 1">
+              <div *ngSwitchCase="1" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 1">
+                <div class="flex-grow-1">
 
                 <div class="mb-2">
                   <label class="form-label">Dog's Size</label>
@@ -297,15 +305,17 @@
                     Dog vaccination info is required
                     </div>
                 </div>
+                </div>
 
-                <div class="d-flex justify-content-between mt-3">
+                <div class="d-flex justify-content-between pt-3 border-top">
                     <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
                     <button class="btn btn-primary" (click)="nextDogPage(i)">Next ➡️</button>
                 </div>
               </div>
 
 
-              <div *ngSwitchCase="2" class="page" [class.active]="currentDogPage[i] === 2">
+              <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 2">
+                <div class="flex-grow-1">
 
                 <div class="mb-2">
                     <label class="form-label">Health Conditions</label>
@@ -322,14 +332,16 @@
                     </div>
                   </div>
                 </div>
+                </div>
 
-                <div class="d-flex justify-content-between mt-3">
+                <div class="d-flex justify-content-between pt-3 border-top">
                   <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
                   <button class="btn btn-primary" (click)="nextDogPage(i)">Next ➡️</button>
                 </div>
               </div>
 
-                <div *ngSwitchCase="3" class="page" [class.active]="currentDogPage[i] === 3">
+                <div *ngSwitchCase="3" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 3">
+                  <div class="flex-grow-1">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Favorite Activities</label>
                     <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
@@ -346,7 +358,8 @@
                     <label class="form-label">Anything Else?</label>
                     <input type="text" class="form-control" [(ngModel)]="dog.moreDetails" name="dogMoreDetails-{{i}}">
                   </div>
-                  <div class="d-flex justify-content-between mt-3">
+                  </div>
+                  <div class="d-flex justify-content-between pt-3 border-top">
                     <button class="btn btn-secondary" (click)="previousDogPage(i)">⬅️ Back</button>
                   </div>
               </div>
@@ -366,9 +379,10 @@
       </form>
     </div>
 
-    <!-- Left Image Section -->
-    <div class="col-5 d-none d-md-block p-0">
-      <img src="assets/images/signupDog.jpg" class="img-fluid h-100 w-100 object-fit-cover" alt="WoofTogether welcome image">
-    </div>
+    <!-- Right Image Section -->
+  <div class="col-6 d-none d-md-block p-0 dog-image-container">
+    <img src="assets/images/signupDog.jpg" alt="WoofTogether welcome image" />
+  </div>
+
 
   </div>

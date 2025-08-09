@@ -1,4 +1,6 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap');
+* {
+  font-family: 'Comfortaa', 'Segoe UI', sans-serif;
+}
 
 body {
   margin: 0;
@@ -8,9 +10,9 @@ body {
 
 /* === NAVIGATION BAR === */
 nav.navbar {
-  position: absolute;
+  position: fixed;
   background-color: transparent;
-  backdrop-filter: blur(10px);               /* subtle blur effect */
+  backdrop-filter: blur(3px);               /* subtle blur effect */
   padding: 0.5rem 1rem;
   display: flex;
   justify-content: space-between;
@@ -24,6 +26,7 @@ nav.navbar {
 
 .logo {
   font-size: 1.5rem;
+
 }
 
 .nav-links {
@@ -38,9 +41,10 @@ nav.navbar {
   text-decoration: none;
   padding: 0.4rem 1rem;
   color: #333;
-  font-weight: 500;
+  font-weight: 900;
   border-radius: 20px;
   transition: background 0.3s;
+  text-shadow: 0 0 1px black;
 }
 
 .nav-links li a:hover {
@@ -49,9 +53,14 @@ nav.navbar {
 }
 
 .nav-links li a.active-link {
-  font-weight: 800;
+  font-weight: 900;
   background-color: #365020;
   color: white;
+}
+
+.bold-text {
+  font-weight: bold;
+  text-shadow: 0 0 1px black;
 }
 
 .nav-actions {
@@ -72,8 +81,9 @@ nav.navbar {
   padding: 0.4rem 1rem;
   border-radius: 20px;
   border: none;
-  font-weight: bold;
+  font-weight: 800;
   cursor: pointer;
+
 }
 
 .nav-actions .login-btn:hover {

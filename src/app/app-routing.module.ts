@@ -12,7 +12,9 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'ask-us', component: AiChatComponent },
   { path: 'sitters', component: SittersComponent },
-  { path: 'signup',  component: SignupComponent }
+  { path: 'signup',  component: SignupComponent },
+  { path: 'my-profile', component: UserManagementComponent }
+
 ];
 
 @NgModule({

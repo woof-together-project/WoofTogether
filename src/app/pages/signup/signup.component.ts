@@ -86,7 +86,6 @@ export class SignupComponent {
     'Protective',
     'Territorial',
     'Playful',
-    'Protective',
     'Friendly',
   ];
 

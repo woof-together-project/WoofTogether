@@ -1,3 +1,7 @@
+* {
+  font-family: 'Comfortaa', 'Segoe UI', sans-serif;
+}
+
 :host {
   display: block;
   height: 100vh;
