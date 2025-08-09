@@ -15,9 +15,12 @@
         [(ngModel)]="searchText"
         placeholder="Search..."
         class="search-box" />
-      <div *ngIf="username as name; else showLogin" class="hello-text bold-text">
+      <button
+        *ngIf="username as name; else showLogin"
+        class="hello-btn"
+        (click)="goToProfile()">
         Hello {{ name }} 👋
-      </div>
+      </button>
 
     <ng-template #showLogin>
       <button class="login-btn" (click)="login()">Login</button>

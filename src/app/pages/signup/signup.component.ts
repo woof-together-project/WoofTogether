@@ -255,11 +255,12 @@ export class SignupComponent {
       phone: this.phone,
       city: this.city,
       street: this.street,
+      gender: this.gender,
       profilePic: this.profilePic, // for now just the file name or base64 if needed
       isSitter: this.isSitter,
       addDog: this.addDog,
       sitterDetails: this.isSitter ? {
-        gender: this.gender,
+        //gender: this.gender,
         bio: this.sitterBio,
         experience: this.experience,
         rate: this.rate,

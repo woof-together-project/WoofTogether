@@ -24,6 +24,25 @@ nav.navbar {
   z-index: 10;
 }
 
+.hello-btn {
+  background-color: #365020; /* your main green */
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 50px; /* ✅ fully rounded pill style */
+  cursor: pointer;
+  font-family: 'Comfortaa', sans-serif;
+  transition: background-color 0.2s ease;
+}
+
+.hello-btn:hover {
+  background-color: #608f39; /* hover green */
+}
+
+
+
+
 .logo {
   font-size: 1.5rem;
 

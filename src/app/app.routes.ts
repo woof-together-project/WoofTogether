@@ -5,7 +5,7 @@ import { SittersComponent } from './pages/sitters/sitters.component';
 import { DogMatchComponent } from './pages/dog-match/dog-match.component';
 import { AiChatComponent } from './pages/ai-chat/ai-chat.component';
 import { SignupComponent } from './pages/signup/signup.component';
-
+import { UserManagementComponent } from './pages/user-management/user-management.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -14,6 +14,7 @@ export const routes: Routes = [
   { path: 'dog-match', component: DogMatchComponent},
   { path: 'ask-us', component: AiChatComponent},
   { path: 'signup', component: SignupComponent},
+  { path: 'user-management', component: UserManagementComponent}
 ];
 
 

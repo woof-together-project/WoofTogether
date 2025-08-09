@@ -24,7 +24,7 @@ export class NavbarComponent {
   async ngOnInit() {
       const urlParams = new URLSearchParams(window.location.search);
       const code = urlParams.get('code');
-      
+
       this.navigationService.homeRedirect$.subscribe(() => {
       this.router.navigate(['/']);
         });
@@ -33,18 +33,18 @@ export class NavbarComponent {
       if (code) {
         try {
             const tokens = await this.exchangeCodeForTokens(code);
-            if (tokens && tokens.id_token) 
+            if (tokens && tokens.id_token)
               {
               const userDetails = this.parseJwt(tokens.id_token);
               this.username = userDetails.nickname;
-              
+
             console.log('User Details:', userDetails);
 
-            if (userDetails.email && userDetails.nickname && userDetails.name && userDetails.sub) 
+            if (userDetails.email && userDetails.nickname && userDetails.name && userDetails.sub)
                 {
                   this.userContext.setUser(userDetails.email, userDetails.nickname, userDetails.name, userDetails.sub);
                   await this.sendDataToBackend();
-                } 
+                }
           else {
                  console.error("Missing user details from token");
                }
@@ -55,7 +55,7 @@ export class NavbarComponent {
             }
         }
     }
-  
+
     async exchangeCodeForTokens(code: string) {
       const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
       const body = new URLSearchParams({
@@ -84,16 +84,16 @@ export class NavbarComponent {
         throw error;
     }
     }
-  
-  
+
+
     redirectToLogin(): void {
      window.location.href = environment.loginUrl;
     }
-  
+
     login() : void {
       this.redirectToLogin();
     }
-  
+
      parseJwt(token: string): any {
       const base64Url = token.split('.')[1];
       const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -103,14 +103,14 @@ export class NavbarComponent {
       return JSON.parse(jsonPayload);
     }
 
-    
-			  
- async sendDataToBackend()  
+
+
+ async sendDataToBackend()
  {
     const currentUser = this.userContext.getCurrentUserValue();
     const lambdaUrl = NavbarComponent.insertUserToDBURL;
-     
-    if (!currentUser) 
+
+    if (!currentUser)
       {
       console.error('CRITICAL: User context is null or missing properties. Current User (from service):', currentUser);
       return;
@@ -137,7 +137,7 @@ export class NavbarComponent {
        },
        body: JSON.stringify(payload)
      });
-   
+
      const result = await response.json();
      console.log('Lambda response:', result);
 
@@ -156,7 +156,17 @@ export class NavbarComponent {
      console.error('Error sending request to Lambda:', err);
    }
  }
-	
+
+ goToProfile(): void {
+  const currentUser = this.userContext.getCurrentUserValue();
+  if (!currentUser?.isComplete) {
+    this.router.navigate(['/signup']); // redirect incomplete profiles
+  } else {
+    this.router.navigate(['/user-management']); // go to user management
+  }
+}
+
+
  handleProtectedRoute(event: Event, targetRoute: string): void {
   event.preventDefault();
   const currentUser = this.userContext.getCurrentUserValue();
@@ -164,7 +174,7 @@ export class NavbarComponent {
     alert("Please complete your sign up information to access this page.");
     //this.router.navigate([targetRoute]);
      this.router.navigate(['/signup']);
-  } else 
+  } else
   {
     this.router.navigate([targetRoute]);
     }
