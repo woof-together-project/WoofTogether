@@ -56,6 +56,11 @@ export class DogMatchComponent implements OnInit {
   sizeOptions: string[] = ['Small', 'Medium', 'Large', 'Giant'];
   temperamentOptions: string[] = []; // e.g., ['Calm', 'Playful', 'Aggressive']
   breedOptions: string[] = [];       // load dynamically if needed
+  searchCity: string = '';
+  allCities: string[] = [];
+  filteredCities: string[] = [];
+  showSuggestions: boolean = false;
+  cityError: string | null = null;
 
   markers: { id: number; lat: number; lng: number; label?: string }[] = [];
 
@@ -145,6 +150,8 @@ loadDogsByLocation(): void {
       userName: (dog as any).userName ?? (dog as any).ownerName,
       userId: (dog as any).userId ?? (dog as any).ownerId,
       userEmail: (dog as any).userEmail ?? (dog as any).ownerEmail ?? (dog as any).email,
+      moreDetails: (dog as any).moreDetails ?? '',
+      favoriteActivities: (dog as any).favoriteActivities ?? [],
       imageUrl
     };
         });
@@ -157,6 +164,8 @@ loadDogsByLocation(): void {
 }
 
 buildFilterPayload() {
+  console.log("Current filters:", this.filters);
+
   return {
     action: 'filterDogsByCriteria',
     latitude: this.location.latitude,
@@ -164,17 +173,54 @@ buildFilterPayload() {
     radius: this.location.radius,
     noRadiusFilter: this.disableRadius,
 
-    size: this.filters.size,                       // e.g. 'Small', 'Medium', 'Large'
-    temperaments: this.filters.temperaments,       // array of temperament strings
-    breed: this.filters.breed,                     // breed name or 'Any'
-    ageMin: this.filters.ageMin,
-    ageMax: this.filters.ageMax,
-    weightMin: this.filters.weightMin,
-    weightMax: this.filters.weightMax,
-    vaccinated: this.filters.vaccinated,           // true, false, or null
-    neutered: this.filters.neutered                // true, false, or null
+    Size:
+      this.filters.size && this.filters.size !== 'Any'
+        ? [String(this.filters.size).toLowerCase()]
+        : [],
+    Breed:
+      this.filters.breed && this.filters.breed !== 'Any'
+        ? String(this.filters.breed).toLowerCase()
+        : '',
+
+    AgeMin: this.filters.ageMin ?? null,
+    AgeMax: this.filters.ageMax ?? null,
+    WeightMin: this.filters.weightMin ?? null,
+    WeightMax: this.filters.weightMax ?? null,
+    RabiesVaccinated: this.filters.vaccinated ?? null, 
+    Fixed: this.filters.neutered ?? null,              
+    FavoriteActivities: this.filters.temperaments || [],
+    
+    City: (this.searchCity || '').trim(),
+
+    excludeEmail: this.currentUserEmail || ''
   };
 }
+
+
+// buildFilterPayload() {
+//   console.log("Current filters:", this.filters);
+//   const sizes =
+//     this.filters.size && this.filters.size !== 'Any'
+//       ? [String(this.filters.size).toLowerCase()] 
+//       : [];
+//   return {
+//     action: 'filterDogsByCriteria',
+//     latitude: this.location.latitude,
+//     longitude: this.location.longitude,
+//     radius: this.location.radius,
+//     noRadiusFilter: this.disableRadius,
+
+//     sizes,                      
+//     temperaments: this.filters.temperaments,       // array of temperament strings
+//     breed: this.filters.breed,                     // breed name or 'Any'
+//     ageMin: this.filters.ageMin,
+//     ageMax: this.filters.ageMax,
+//     weightMin: this.filters.weightMin,
+//     weightMax: this.filters.weightMax,
+//     vaccinated: this.filters.vaccinated,           // true, false, or null
+//     neutered: this.filters.neutered                // true, false, or null
+//   };
+// }
 
 updateMarkers() { 
   this.markers = this.dogs
@@ -221,10 +267,15 @@ clearFilters(): void {
     next: (data) => {
       this.dogs = data.map(dog => ({
         ...dog,
-        imageUrl: dog.profilePictureUrl
-          ? encodeURI(dog.profilePictureUrl)
-          : 'assets/images/default-dog.png'
-      }));
+         id: (dog as any).id ?? (dog as any).dogId,
+         name: (dog as any).name ?? (dog as any).dogName,
+         userEmail: (dog as any).userEmail ?? (dog as any).ownerEmail ?? (dog as any).email,
+         userName: (dog as any).userName ?? (dog as any).ownerName ?? '',
+         imageUrl:
+           (dog as any).profilePictureUrl && String((dog as any).profilePictureUrl).trim().startsWith('http')
+             ? encodeURI((dog as any).profilePictureUrl)
+             : 'assets/images/default-dog.png'
+       }));
       
       this.updateMarkers();
       this.selectedTab = 'map';        
@@ -309,4 +360,135 @@ withinRadius(s: Dog): boolean {
     return deg * (Math.PI / 180);
   }
   
+  loadCities() {
+  if (this.allCities.length === 0) {
+    this.http.post<string[]>(DogMatchComponent.getDogURL, {
+      action: 'searchAvailableCitiesInDB'
+    }).subscribe({
+      next: (cities) => {
+        this.allCities = cities || [];
+        this.filteredCities = [...this.allCities];
+        this.showSuggestions = true;
+      },
+      error: (err) => console.error('Failed to load cities for dogs', err)
+    });
+  } else {
+    this.filteredCities = [...this.allCities];
+    this.showSuggestions = true;
+  }
+}
+
+filterCities(): void {
+  const q = (this.searchCity || '').toLowerCase();
+  this.filteredCities = this.allCities.filter(c => c.toLowerCase().includes(q));
+  this.showSuggestions = true;
+}
+
+// onCitySearch(): void {
+//   const city = (this.searchCity || '').trim();
+//   if (!city) return;
+
+//   this.http.post<any[]>(DogMatchComponent.getDogURL, {
+//     action: 'searchByCity',
+//     city,
+//     latitude: this.location.latitude,
+//     longitude: this.location.longitude
+//   }).subscribe({
+//     next: (dogsRes) => {
+//       if (!dogsRes || dogsRes.length === 0) {
+//         alert(`No partners found in "${city}"`);
+//       }
+//       // Optional: clear filters but don't reload location query
+//       this.clearFilters?.();
+
+//       // Normalize images + set list
+//       this.dogs = (dogsRes || []).map(dog => {
+//         const raw = dog.profilePictureUrl || dog.imageUrl || '';
+//         const imageUrl =
+//           typeof raw === 'string' && raw.trim() && raw.startsWith('http')
+//             ? encodeURI(raw)
+//             : 'assets/images/default-dog.png';
+//         return { ...dog, imageUrl };
+//       });
+
+//       this.updateMarkers();
+//       this.selectedTab = 'map';
+//       this.showSuggestions = false;
+//     },
+//     error: (err) => console.error('Failed to search dogs by city', err)
+//   });
+// }
+
+onCitySearch(): void {
+  const city = (this.searchCity || '').trim();
+  if (!city) return;
+
+  this.http.post<any[]>(DogMatchComponent.getDogURL, {
+    action: 'searchByCity',
+    city,
+    latitude: this.location.latitude,
+    longitude: this.location.longitude
+  }).subscribe({
+    next: (dogsRes) => {
+      if (!dogsRes || dogsRes.length === 0) {
+        // show message
+        this.cityError = `No dogs found in "${city}". Showing all nearby dogs.`;
+        console.log('[CitySearch] no results -> show error');
+
+        // let Angular render the banner this tick, then reset after 2s
+        setTimeout(() => {
+          this.searchCity = '';
+          this.filteredCities = [...this.allCities];
+          this.showSuggestions = false;
+          this.loadDogsByLocation();
+          this.cityError = null;
+        }, 2000);
+        return;
+      }
+
+      // success
+      this.cityError = null;
+      this.dogs = dogsRes.map(dog => {
+        const raw = dog.profilePictureUrl || dog.imageUrl || '';
+        const imageUrl =
+          typeof raw === 'string' && raw.trim() && raw.startsWith('http')
+            ? encodeURI(raw)
+            : 'assets/images/default-dog.png';
+        return { ...dog, imageUrl };
+      });
+      this.updateMarkers();
+      this.selectedTab = 'map';
+      this.showSuggestions = false;
+    },
+    error: (err) => {
+      console.error('Failed to search dogs by city', err);
+      this.cityError = 'Something went wrong searching that city. Showing all nearby dogs.';
+      setTimeout(() => {
+        this.searchCity = '';
+        this.filteredCities = [...this.allCities];
+        this.showSuggestions = false;
+        this.loadDogsByLocation();
+        this.cityError = null;
+      }, 2000);
+    }
+  });
+}
+
+selectCity(city: string): void {
+  this.searchCity = city;
+  this.showSuggestions = false;
+}
+
+hideSuggestionsWithDelay(): void {
+  setTimeout(() => (this.showSuggestions = false), 150);
+}
+
+clearCitySearch(): void {
+  this.searchCity = '';
+  this.filteredCities = [...this.allCities];
+  this.showSuggestions = false;
+  // optional: reload by location after clearing city
+  this.loadDogsByLocation();
+}
+
 }

@@ -16,7 +16,8 @@ export interface Dog {
   temperament: string;
   healthConditions?: string | null;
   isNeutered: boolean;
-  favoriteActivities?: string | null;
+  moreDetails?: string;
+  favoriteActivities?: string[];
   vaccinationStatus: boolean;
   createdAt: string;          // ISO date string
 }
