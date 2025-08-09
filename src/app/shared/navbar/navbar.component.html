@@ -2,11 +2,14 @@
   <div class="logo">🐶</div>
   <ul class="nav-links">
     <li><a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
-    <li><a href="#" (click)="handleProtectedRoute($event, '/sitters')">Sitters</a></li>
-    <li><a href="#" (click)="handleProtectedRoute($event, '/dog-match')">Dog Match</a></li>
+    <li><a href="#" (click)="handleProtectedRoute($event, '/sitters')">Sitters</a>
+    </li>
+    <li>
+      <a href="#" (click)="handleProtectedRoute($event, '/dog-match')">Dog Match</a>
+    </li>
     <!-- <li><a routerLink="/sitters" routerLinkActive="active-link">Sitters</a></li>
     <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li> -->
-    <li><a routerLink="/ask-us" routerLinkActive="active-link">Ask Us</a></li>
+    <li><a href="#" (click)="handleProtectedRoute($event, '/ask-us')">Ask Us</a></li>
   </ul>
 
    <div class="nav-actions">
@@ -18,7 +21,7 @@
       <button
         *ngIf="username as name; else showLogin"
         class="hello-btn"
-        (click)="goToProfile()">
+        (click)="goToProfile($event)">
         Hello {{ name }} 👋
       </button>
 

@@ -24,6 +24,15 @@ nav.navbar {
   z-index: 10;
 }
 
+.is-busy { pointer-events: none; opacity: .75; }
+.spinner {
+  width: 14px; height: 14px; margin-left: .4rem;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%; animation: spin .8s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
 .hello-btn {
   background-color: #365020; /* your main green */
   color: white;

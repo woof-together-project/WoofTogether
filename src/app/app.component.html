@@ -1,2 +1,6 @@
 <app-navbar></app-navbar>
 <router-outlet></router-outlet>
+
+<div class="page-overlay" *ngIf="overlay.visible$ | async">
+  <div class="loader"></div>
+</div>
