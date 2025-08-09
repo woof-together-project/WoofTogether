@@ -66,15 +66,17 @@
               <p *ngIf="dog.favoriteActivities && dog.favoriteActivities.length">
                 <strong>Favorite activities:</strong> {{ dog.favoriteActivities.join(', ') }}
               </p>
-              
-              <div class="d-flex justify-content-end mt-3">
-                <a
-                  [href]="getSmartEmailLink(currentUserEmail, dog.userEmail!, dog.userName!)"
-                  class="btn btn-primary btn-sm px-3"
-                  (click)="$event.stopPropagation()">
-                  Contact Owner
-                </a>
-              </div>
+
+            <!-- Contact Owner button aligned right -->
+            <div class="mt-3 text-end">
+              <a
+                [href]="getSmartEmailLink(currentUserEmail, dog.userEmail!, dog.userName!)"
+                class="btn btn-primary btn-sm fw-bold px-3"
+                (click)="$event.stopPropagation()">
+                Contact Owner
+              </a>
+            </div>
+
             </div>
           </ng-template>
         </div>
@@ -190,7 +192,7 @@
             </div>
 
 
-              <!-- Temperaments -->
+              Temperaments
               <div class="col-md-4 mb-3">
                 <label class="fw-bold">Temperaments</label>
                 <div *ngFor="let t of temperamentOptions" class="form-check">
