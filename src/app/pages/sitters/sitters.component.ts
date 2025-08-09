@@ -17,6 +17,7 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 
 export class SittersComponent implements OnInit {
   static readonly getSittersUrl = 'https://5zhpsv4mgumqdxkzbwqfisqnba0xkzkm.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL
+  // static readonly getSittersUrl = 'https://vj7lapeqfmnbf4fn75tc5m6zn40fpqyl.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL in final user
 
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
@@ -47,11 +48,11 @@ export class SittersComponent implements OnInit {
   maxRate: number = 150;
   selectedSitter: Sitter | null = null;
   selectedSitterId: number | null = null;
-
   experienceWithOptions: string[] = [];
   serviceOptions: string[] = [];
   genderOptions: string[] = ['Any', 'Female', 'Male'];
   markers: { id: number; lat: number; lng: number; label?: string }[] = [];
+  cityError: string | null = null;
 
   filters = {
     servicesSelected: [] as string[],
@@ -107,15 +108,10 @@ export class SittersComponent implements OnInit {
         console.error('Error getting location:', error);
         reject(error);
       },
-      // {
-      //   timeout: 10000,
-      //   enableHighAccuracy: true
-      // }
     );
   });
 }
 
-  
   onSelectSitter(sitter: Sitter) {
     if (this.selectedSitter?.sitterId === sitter.sitterId) {
       this.selectedSitter = null;
@@ -198,8 +194,6 @@ export class SittersComponent implements OnInit {
       error: (err) => console.error('Filter request failed', err)
     });
   }
-
-  //currentUserEmail = 'daniella@gmail.com';
   
   getSmartEmailLink(userEmail: string, sitterEmail: string, sitterName: string): string {
     const subject = encodeURIComponent('Looking for a dog sitter');
@@ -338,26 +332,80 @@ filterCities(): void {
 }
 
 
-onCitySearch() {
-  const city = this.searchCity.trim();
+// onCitySearch() {
+//   const city = this.searchCity.trim();
+//   if (!city) return;
+
+//   this.http.post<any[]>(SittersComponent.getSittersUrl , {
+//     action: 'searchByCity',
+//     city: city,
+//     latitude: this.location.latitude,
+//     longitude: this.location.longitude
+//   }).subscribe({
+//     next: (sittersRes) => {
+//       if (sittersRes.length === 0) {
+//         alert(`No sitters found in "${city}"`);
+//       }
+//       this.clearFilters(false); // Clear filters but don't reload sitters
+//       this.sitters = sittersRes;
+//       this.updateMarkers();
+//       this.selectedTab = 'map';
+//     },
+//     error: (err) => console.error('Failed to search sitters by city', err)
+//   });
+// }
+
+onCitySearch(): void {
+  const city = (this.searchCity || '').trim();
   if (!city) return;
 
-  this.http.post<any[]>(SittersComponent.getSittersUrl , {
+  this.http.post<any[]>(SittersComponent.getSittersUrl, {
     action: 'searchByCity',
-    city: city,
+    city,
     latitude: this.location.latitude,
     longitude: this.location.longitude
   }).subscribe({
     next: (sittersRes) => {
-      if (sittersRes.length === 0) {
-        alert(`No sitters found in "${city}"`);
+      if (!sittersRes || sittersRes.length === 0) {
+        // show error banner
+        this.cityError = `No sitters found in "${city}". Showing all nearby sitters.`;
+        console.log('[CitySearch] no results -> show error');
+
+        // let Angular render it before clearing
+        setTimeout(() => {
+          this.searchCity = '';
+          this.filteredCities = [...this.allCities];
+          this.showSuggestions = false;
+          this.loadSittersByLocation(); // reload full list
+          this.cityError = null;
+        }, 2000);
+        return;
       }
-      this.clearFilters(false); // Clear filters but don't reload sitters
-      this.sitters = sittersRes;
+
+      // success case
+      this.cityError = null;
+      this.clearFilters(false); // keep filters cleared, don't reload sitters
+      this.sitters = sittersRes.map(sitter => ({
+        ...sitter,
+        imageUrl: sitter.profilePictureUrl
+          ? encodeURI(sitter.profilePictureUrl)
+          : 'assets/images/default-profile.png'
+      }));
       this.updateMarkers();
       this.selectedTab = 'map';
+      this.showSuggestions = false;
     },
-    error: (err) => console.error('Failed to search sitters by city', err)
+    error: (err) => {
+      console.error('Failed to search sitters by city', err);
+      this.cityError = 'Something went wrong searching that city. Showing all nearby sitters.';
+      setTimeout(() => {
+        this.searchCity = '';
+        this.filteredCities = [...this.allCities];
+        this.showSuggestions = false;
+        this.loadSittersByLocation();
+        this.cityError = null;
+      }, 2000);
+    }
   });
 }
 selectCity(city: string): void {
@@ -377,6 +425,4 @@ clearCitySearch(): void {
   this.showSuggestions = false;
   this.clearFilters(true); 
 }
-
-
 }

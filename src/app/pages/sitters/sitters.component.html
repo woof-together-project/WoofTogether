@@ -45,6 +45,12 @@
             {{ city }}
           </li>
         </ul>
+         <!-- Error message -->
+        <div *ngIf="cityError"
+            class="alert alert-warning py-2 px-3 mt-2 mb-0"
+            style="position: relative; z-index: 1100;">
+          {{ cityError }}
+        </div>
       </div>
 
 
@@ -123,6 +129,8 @@
        <!-- Map or Filters -->
   <div class="flex-grow-1">
     <ng-container *ngIf="selectedTab === 'map'">
+      
+      
       <div class="h-100">
         <app-map
           id="mapElement"

@@ -15,8 +15,6 @@ import { LoadingOverlayService } from '../../shared/loading-overlay.service';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-
-
 export class NavbarComponent {
   static readonly insertUserToDBURL = 'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; //insert user to DB lambda function URL
   // top of NavbarComponent
