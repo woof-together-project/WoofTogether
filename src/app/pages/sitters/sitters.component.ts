@@ -17,6 +17,7 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 
 export class SittersComponent implements OnInit {
   static readonly getSittersUrl = 'https://5zhpsv4mgumqdxkzbwqfisqnba0xkzkm.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL
+  // static readonly getSittersUrl = 'https://vj7lapeqfmnbf4fn75tc5m6zn40fpqyl.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL in final user
 
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
@@ -107,15 +108,10 @@ export class SittersComponent implements OnInit {
         console.error('Error getting location:', error);
         reject(error);
       },
-      // {
-      //   timeout: 10000,
-      //   enableHighAccuracy: true
-      // }
     );
   });
 }
 
-  
   onSelectSitter(sitter: Sitter) {
     if (this.selectedSitter?.sitterId === sitter.sitterId) {
       this.selectedSitter = null;
@@ -198,8 +194,6 @@ export class SittersComponent implements OnInit {
       error: (err) => console.error('Filter request failed', err)
     });
   }
-
-  //currentUserEmail = 'daniella@gmail.com';
   
   getSmartEmailLink(userEmail: string, sitterEmail: string, sitterName: string): string {
     const subject = encodeURIComponent('Looking for a dog sitter');
@@ -377,6 +371,4 @@ clearCitySearch(): void {
   this.showSuggestions = false;
   this.clearFilters(true); 
 }
-
-
 }

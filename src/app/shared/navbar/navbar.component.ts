@@ -15,6 +15,7 @@ import { NavigationService } from '../../shared/navigation/navigation.service';
 })
 export class NavbarComponent {
   static readonly insertUserToDBURL = 'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; //insert user to DB lambda function URL
+    // static readonly insertUserToDBURL = 'https://og3trfcczul4fjn5hsachnn7ma0lijfq.lambda-url.us-east-1.on.aws/'; //insert user to DB lambda function URL in final user
   constructor(private router: Router, private userContext: UserContextService,   private navigationService: NavigationService) {}
   username: string | null = null;
   searchText: string = '';
