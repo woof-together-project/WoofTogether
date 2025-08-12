@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Sitter } from './sitter.model';
@@ -53,6 +53,29 @@ export class SittersComponent implements OnInit {
   genderOptions: string[] = ['Any', 'Female', 'Male'];
   markers: { id: number; lat: number; lng: number; label?: string }[] = [];
   cityError: string | null = null;
+
+  // ===== Reviews Part =====
+showReviewModal = false;           // For reviews list modal
+showAddReviewModal = false;        // For add review modal
+reviewsLoading = false;
+reviewSubmitting = false;
+modalSitter: any | null = null;
+
+reviews: Array<{
+  id: number;
+  sitterId: number;
+  userId: number;
+  rating: number;
+  comment: string;
+  reviewDate: string;
+}> = [];
+
+reviewsAverage = 0;
+reviewsCount = 0;
+newReview = { rating: 5, comment: '' };
+@ViewChild('addReviewForm') addReviewForm!: ElementRef;
+@ViewChild('reviewModalBody') reviewModalBody!: ElementRef;
+
 
   filters = {
     servicesSelected: [] as string[],
@@ -234,7 +257,9 @@ export class SittersComponent implements OnInit {
 
       return {
         ...sitter,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
+        reviewCount: sitter.reviewCount ?? 0,        
+        averageRating: sitter.averageRating ?? 0
       };
     });
       console.log("Sitters loaded:", this.sitters);
@@ -425,4 +450,83 @@ clearCitySearch(): void {
   this.showSuggestions = false;
   this.clearFilters(true); 
 }
+
+
+// --- Functions ---
+openReviews(sitter: any) {
+  this.modalSitter = sitter;
+  this.showReviewModal = true;
+  this.loadReviews(sitter.sitterId);
+}
+
+closeReviews() {
+  this.showReviewModal = false;
+}
+
+openAddReview() {
+  this.showAddReviewModal = true;
+}
+
+closeAddReview() {
+  this.showAddReviewModal = false;
+}
+
+loadReviews(sitterId: number) {
+  this.reviewsLoading = true;
+
+  this.http.post<any>(SittersComponent.getSittersUrl, {
+    action: 'getReviews',
+    sitterId: sitterId
+  }).subscribe({
+    next: (data) => {
+      this.reviews = data.reviews;
+      this.reviewsAverage = data.average;
+      this.reviewsCount = data.count;
+
+      if (this.modalSitter) {
+        this.modalSitter.reviewCount = data.count;
+      }
+
+      this.reviewsLoading = false;
+    },
+    error: (err) => {
+      console.error('Failed to load reviews:', err);
+      this.reviewsLoading = false;
+    }
+  });
+}
+
+submitReview() {
+  if (!this.modalSitter) return;
+
+  this.reviewSubmitting = true;
+
+  this.http.post<any>(SittersComponent.getSittersUrl, {
+    action: 'addReview',
+    sitterId: this.modalSitter.sitterId,
+    userEmail: this.currentUserEmail,
+    rating: this.newReview.rating,
+    comment: this.newReview.comment
+  }).subscribe({
+    next: (data) => {
+      this.reviews = data.reviews;
+      this.reviewsAverage = data.average;
+      this.reviewsCount = data.count;
+
+      this.modalSitter.reviewCount = data.count;
+      this.modalSitter.averageRating = data.average;
+
+      this.newReview = { rating: 5, comment: '' };
+      this.reviewSubmitting = false;
+      this.showAddReviewModal = false;
+
+      console.log("✅ Review added successfully");
+    },
+    error: (err) => {
+      console.error('Failed to submit review:', err);
+      this.reviewSubmitting = false;
+    }
+  });
+}
+
 }
