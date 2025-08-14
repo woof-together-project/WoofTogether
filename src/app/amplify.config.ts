@@ -1,6 +1,7 @@
 // amplify.config.ts
 //import { Amplify } from 'aws-amplify';
 
+//not in use!
 export const amplifyCognitoConfig = {
   Auth: {
     Cognito: {
