@@ -328,7 +328,7 @@ async sendDataToBackend() {
     const requiresComplete = targetRoute === '/sitters' || targetRoute === '/dog-match';
 
     if (requiresComplete && !u.isComplete) {
-      // no alert while waiting; once ready, just go to signup
+      alert("Please complete your sign up information to access this page.");
       this.router.navigate(['/signup']);
       return;
     }

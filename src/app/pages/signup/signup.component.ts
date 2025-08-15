@@ -262,7 +262,6 @@ export class SignupComponent {
       isSitter: this.isSitter,
       addDog: this.addDog,
       sitterDetails: this.isSitter ? {
-        //gender: this.gender,
         bio: this.sitterBio,
         experience: this.experience,
         rate: this.rate,
