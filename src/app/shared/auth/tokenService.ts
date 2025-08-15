@@ -93,4 +93,35 @@ export class TokenService {
     const refresh_token = data.refresh_token ?? rt;
     this.setTokens({ ...data, refresh_token });
   }
+
+  private decodeJwt<T = any>(jwt?: string | null): T | null {
+  if (!jwt) return null;
+  try {
+    const [_, payload] = jwt.split('.');
+    const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+    return JSON.parse(decodeURIComponent(escape(json)));
+  } catch { return null; }
+}
+
+getAccessTokenExp(): number | null {
+  const claims = this.decodeJwt(this.getAccessToken());
+  return claims?.exp ? claims.exp * 1000 : null; // ms
+}
+
+getIdTokenExp(): number | null {
+  const claims = this.decodeJwt(this.getIdToken());
+  return claims?.exp ? claims.exp * 1000 : null; // ms
+}
+
+// Stronger status than just "isExpired"
+getStatus(): 'NONE' | 'VALID' | 'EXPIRED_ACCESS_BUT_REFRESH' | 'EXPIRED' {
+  const at = this.getAccessToken();
+  const rt = this.getRefreshToken();
+  if (!at) return 'NONE';
+  const exp = this.getAccessTokenExp();
+  const now = Date.now();
+  if (exp && now < exp) return 'VALID';
+  if (rt) return 'EXPIRED_ACCESS_BUT_REFRESH';
+  return 'EXPIRED';
+}
 }

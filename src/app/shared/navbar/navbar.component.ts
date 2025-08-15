@@ -7,6 +7,8 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 import { NavigationService } from '../../shared/navigation/navigation.service';
 import { TokenService } from '../../shared/auth/tokenService';
 
+type Intent = 'login' | 'signup';
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
@@ -16,7 +18,7 @@ import { TokenService } from '../../shared/auth/tokenService';
 })
 export class NavbarComponent {
   static readonly insertUserToDBURL =
-    'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; // insert user to DB lambda function URL
+    'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; // insert user to DB lambda
 
   constructor(
     private router: Router,
@@ -27,43 +29,130 @@ export class NavbarComponent {
 
   username: string | null = null;
   searchText: string = '';
-  loading: boolean = true;
-  isComplete: boolean = false;
+  loading = true;
+  isComplete = false;
+
+  // async ngOnInit() {
+  //   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
+
+  //   this.tokenSvc.loadFromStorage();
+
+  //   if (this.tokenSvc.getIdToken()) {
+  //     if (this.tokenSvc.isExpired() && this.tokenSvc.getRefreshToken()) {
+  //       await this.tokenSvc.refreshIfPossible();
+  //     }
+  //     this.hydrateFromIdToken(this.tokenSvc.getIdToken());
+  //   }
+
+  //   const url = new URL(window.location.href);
+  //   const code = url.searchParams.get('code');
+  //   const rawState = url.searchParams.get('state');
+
+  //   // Defaults if state missing/bad
+  //   let intent: Intent = 'login';
+  //   let returnTo = '/';
+
+  //   if (rawState) {
+  //     try {
+  //       const obj = JSON.parse(atob(rawState));
+  //       intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
+  //       returnTo = obj.returnTo || '/';
+  //     } catch {
+  //       // ignore parse errors, keep defaults
+  //     }
+  //   }
+
+  //   if (code) {
+  //     try {
+  //       const tokens = await this.exchangeCodeForTokens(code);
+  //       if (tokens && tokens.id_token) {
+  //         this.tokenSvc.setTokens(tokens);
+
+  //         // hydrate UI/user context
+  //         this.hydrateFromIdToken(tokens.id_token);
+
+  //         // optional: sync user to backend only once per user
+  //         await this.sendDataToBackendOnce();
+
+  //         // route decision based on intent
+  //         if (intent === 'signup') {
+  //           await this.router.navigate(['/signup']);
+  //         } else {
+  //           await this.router.navigate([returnTo || '/']);
+  //         }
+
+  //         // clean the URL so refresh doesn't retrigger
+  //         url.searchParams.delete('code');
+  //         url.searchParams.delete('state');
+  //         window.history.replaceState({}, '', url.toString());
+  //       }
+  //     } catch (error) {
+  //       console.error('Error exchanging code for tokens:', error);
+  //     }
+  //   }
+
+  //   this.loading = false;
+  // }
 
   async ngOnInit() {
-    //navigate to home when requested
-    this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
+  this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
 
-    //Rehydrate tokens from storage so refresh doesn't log user out
-    this.tokenSvc.loadFromStorage();
+  this.tokenSvc.loadFromStorage();
 
-    //If we already have tokens, hydrate user (and silently refresh if needed)
-    if (this.tokenSvc.getIdToken()) {
-      if (this.tokenSvc.isExpired() && this.tokenSvc.getRefreshToken()) {
-        await this.tokenSvc.refreshIfPossible();
-      }
-      this.hydrateFromIdToken(this.tokenSvc.getIdToken());
-    }
-    const url = new URL(window.location.href);
-    const code = url.searchParams.get('code');
+  // ✅ Only hydrate if token is still valid. Do NOT refresh on boot.
+  const status = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
+  console.log('Token status on boot:', status);
 
-    if (code) {
-      try {
-        const tokens = await this.exchangeCodeForTokens(code);
-        if (tokens && tokens.id_token) {
-          this.tokenSvc.setTokens(tokens);
-          this.hydrateFromIdToken(tokens.id_token);
-          url.searchParams.delete('code');
-          window.history.replaceState({}, '', url.toString());
-          await this.sendDataToBackendOnce();
-        }
-      } catch (error) {
-        console.error('Error exchanging code for tokens:', error);
-      }
-    }
-
-    this.loading = false;
+  if (status === 'VALID') {
+    this.hydrateFromIdToken(this.tokenSvc.getIdToken());
+  } else {
+    // show as signed out until user actively logs in
+    this.username = null;
   }
+
+  // --- handle OAuth callback (unchanged) ---
+  const url = new URL(window.location.href);
+  const code = url.searchParams.get('code');
+  const rawState = url.searchParams.get('state');
+
+  let intent: Intent = 'login';
+  let returnTo = '/';
+
+  if (rawState) {
+    try {
+      const obj = JSON.parse(atob(rawState));
+      intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
+      returnTo = obj.returnTo || '/';
+    } catch {}
+  }
+
+  if (code) {
+    try {
+      const tokens = await this.exchangeCodeForTokens(code);
+      if (tokens?.id_token) {
+        this.tokenSvc.setTokens(tokens);
+        this.hydrateFromIdToken(tokens.id_token);
+
+        await this.sendDataToBackendOnce();
+
+        if (intent === 'signup') {
+          await this.router.navigate(['/signup']);
+        } else {
+          await this.router.navigate([returnTo || '/']);
+        }
+
+        url.searchParams.delete('code');
+        url.searchParams.delete('state');
+        window.history.replaceState({}, '', url.toString());
+      }
+    } catch (error) {
+      console.error('Error exchanging code for tokens:', error);
+    }
+  }
+
+  this.loading = false;
+}
+  // ---- AUTH FLOW ----
 
   async exchangeCodeForTokens(code: string) {
     const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
@@ -79,6 +168,7 @@ export class NavbarComponent {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          // you chose to keep the client secret in the browser
           'Authorization': 'Basic ' + btoa(`${environment.clientId}:${environment.clientSecret}`)
         },
         body
@@ -89,6 +179,7 @@ export class NavbarComponent {
         throw new Error(`Failed to exchange code. Status: ${response.status} ${text}`);
       }
 
+      // shape: { access_token, id_token, refresh_token, expires_in, token_type }
       const data = await response.json();
       return data;
     } catch (error) {
@@ -98,13 +189,14 @@ export class NavbarComponent {
   }
 
   redirectToLogin(): void {
-    window.location.href = environment.loginUrl;
+    window.location.href = environment.loginUrl; // still works if you use it elsewhere
   }
 
   login(): void {
     this.redirectToLogin();
   }
 
+  // ---- USER HYDRATION ----
 
   private hydrateFromIdToken(idToken: string | null) {
     if (!idToken) return;
@@ -136,6 +228,7 @@ export class NavbarComponent {
     return JSON.parse(jsonPayload);
   }
 
+  // ---- BACKEND SYNC (ONCE) ----
 
   private async sendDataToBackendOnce() {
     const current = this.userContext.getCurrentUserValue();
@@ -193,6 +286,8 @@ export class NavbarComponent {
     }
   }
 
+  // ---- ROUTING HELPERS ----
+
   handleProtectedRoute(event: Event, targetRoute: string): void {
     event.preventDefault();
     const currentUser = this.userContext.getCurrentUserValue();
@@ -206,5 +301,39 @@ export class NavbarComponent {
 
   redirectToHome() {
     this.router.navigate(['/']);
+  }
+
+  logout(): void {
+    // 1) clear local state/tokens
+    this.localSignOut();
+
+    // 2) end Cognito Hosted UI session (so next login can choose another user)
+    const logoutUrl = this.buildCognitoLogoutUrl();
+    window.location.href = logoutUrl;
+  }
+
+  private localSignOut(): void {
+    // remove saved tokens + timers
+    this.tokenSvc.clear();
+
+    // clear “synced to backend” flag for this user (optional)
+    const sub = this.userContext.getCurrentUserValue?.()?.sub;
+    if (sub) localStorage.removeItem(`userSynced:${sub}`);
+
+    // clear user context if your service exposes a clear/reset method
+    // (optional chaining in case it doesn’t exist)
+    this.userContext.clearUser?.();
+
+    // update navbar UI immediately
+    this.username = null;
+  }
+
+  private buildCognitoLogoutUrl(): string {
+    const domain = environment.cognitoDomain.replace(/\/+$/, ''); // trim trailing slash
+    const clientId = encodeURIComponent(environment.clientId);
+    const logoutUri = encodeURIComponent(environment.signOutRedirectUri || environment.redirectUri);
+
+    // Standard Cognito Hosted UI logout
+    return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
   }
 }
