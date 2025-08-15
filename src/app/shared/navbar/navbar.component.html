@@ -13,20 +13,30 @@
   </ul>
 
    <div class="nav-actions">
-      <input
+      <!-- <input
         type="text"
         [(ngModel)]="searchText"
         placeholder="Search..."
-        class="search-box" />
-      <button
-        *ngIf="username as name; else showLogin"
-        class="hello-btn"
-        (click)="goToProfile($event)">
+        class="search-box" /> -->
+      <!-- <div *ngIf="username as name; else showLogin" class="hello-text bold-text">
         Hello {{ name }} 👋
-      </button>
+      </div>
+      <button class="login-btn" (click)="logout()" style="margin-left: 8px">Logout</button>
 
     <ng-template #showLogin>
       <button class="login-btn" (click)="login()">Login</button>
     </ng-template>
-  </div>
+  </div> -->
+  <ng-container *ngIf="username as name; else showLogin">
+    <div class="hello-text bold-text">
+      Hello {{ name }} 👋
+    </div>
+    <button class="login-btn" (click)="logout()">Logout</button>
+  </ng-container>
+
+  <!-- Show when logged out -->
+  <ng-template #showLogin>
+    <button class="login-btn" (click)="login()">Login</button>
+  </ng-template>
+</div>
 </nav>

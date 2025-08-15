@@ -6,7 +6,9 @@ import { environment } from './../../../environments/environment';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 import { NavigationService } from '../../shared/navigation/navigation.service';
 import { LoadingOverlayService } from '../../shared/loading-overlay.service';
+import { TokenService } from '../../shared/auth/tokenService';
 
+type Intent = 'login' | 'signup';
 
 @Component({
   selector: 'app-navbar',
@@ -16,96 +18,79 @@ import { LoadingOverlayService } from '../../shared/loading-overlay.service';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  static readonly insertUserToDBURL = 'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; //insert user to DB lambda function URL
-  // top of NavbarComponent
+  static readonly insertUserToDBURL =
+    'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; // insert user to DB lambda
+    // static readonly insertUserToDBURL = 'https://og3trfcczul4fjn5hsachnn7ma0lijfq.lambda-url.us-east-1.on.aws/'; //insert user to DB lambda function URL in final user
   static readonly profileURL = 'https://5org75ldcmqj6zhgsat7gi6mia0qwnav.lambda-url.us-east-1.on.aws/'; // GET ?sub=...
-
-  constructor(private router: Router, private userContext: UserContextService,   private navigationService: NavigationService,
-  private overlay: LoadingOverlayService) {}
+  constructor(
+  private router: Router,
+  private userContext: UserContextService,
+  private navigationService: NavigationService,
+  private overlay: LoadingOverlayService,
+  private tokenSvc: TokenService
+  ) {}
   username: string | null = null;
   searchText: string = '';
   loading: boolean = true;
   isComplete: boolean = false;
 
-  /* async ngOnInit() {
-      this.userContext.getUserObservable().subscribe(u => {
-      this.username = u?.nickname ?? null;
-      });
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-
-      this.navigationService.homeRedirect$.subscribe(() => {
-      this.router.navigate(['/']);
-        });
-
-
-      if (code) {
-        try {
-            const tokens = await this.exchangeCodeForTokens(code);
-            if (tokens && tokens.id_token) {
-              const userDetails = this.parseJwt(tokens.id_token);
-              this.username = userDetails.nickname ?? null;
-
-              // put user into context immediately (so the button can read it)
-              if (userDetails.email && userDetails.nickname && userDetails.name && userDetails.sub) {
-                  this.userContext.setUser(
-                  userDetails.email,
-                  userDetails.nickname,
-                  userDetails.name,
-                  userDetails.sub
-                  );
-
-                // wait for backend insert/check to set isComplete
-                await this.sendDataToBackend();
-                this.userContext.markReady();
-              }
-
-              console.log('User Details:', userDetails);
-
-              if (userDetails.email && userDetails.nickname && userDetails.name && userDetails.sub)
-                  {
-                    this.userContext.setUser(userDetails.email, userDetails.nickname, userDetails.name, userDetails.sub);
-                    await this.sendDataToBackend();
-                    this.userContext.markReady();
-                  }
-              else {
-                  console.error("Missing user details from token");
-              }
-            }
-        }
-            catch (error) {
-              console.error('Error exchanging code for tokens:', error);
-            }
-            finally {
-              this.loading = false; // enable the button
-            }
-      } else {
-        this.userContext.markReady();
-        this.loading = false;
-      }
-  } */
-
   async ngOnInit() {
+    this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
+    this.tokenSvc.loadFromStorage();
     this.userContext.getUserObservable().subscribe(u => {
       this.username = u?.nickname ?? null;
     });
-
     this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
-
+    // ✅ Only hydrate if token is still valid. Do NOT refresh on boot.
+    const status = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
+    console.log('Token status on boot:', status);
     const code = new URLSearchParams(window.location.search).get('code');
+
+    if (status === 'VALID') {
+      this.hydrateFromIdToken(this.tokenSvc.getIdToken());
+    } else {
+      // show as signed out until user actively logs in
+      this.username = null;
+    }
+
+    // --- handle OAuth callback (unchanged) ---
+    const url = new URL(window.location.href);
+    /*const code = url.searchParams.get('code');
+    const rawState = url.searchParams.get('state');
+
+    let intent: Intent = 'login';
+    let returnTo = '/';
+
+    if (rawState) {
+      try {
+        const obj = JSON.parse(atob(rawState));
+        intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
+        returnTo = obj.returnTo || '/';
+      } catch {}
+    } */
 
     if (code) {
       try {
         const tokens = await this.exchangeCodeForTokens(code);
         if (tokens?.id_token) {
           const u = this.parseJwt(tokens.id_token);
+          this.tokenSvc.setTokens(tokens); //amit
+          this.hydrateFromIdToken(tokens.id_token); //amit
 
           if (u.email && u.nickname && u.name && u.sub) {
             this.userContext.setUser(u.email, u.nickname, u.name, u.sub);
 
             // ⬅️ one call only; this must set isComplete based on Lambda response
             await this.sendDataToBackend();
+
+            /* if (intent === 'signup') {
+              await this.router.navigate(['/signup']);
+            } else {
+              await this.router.navigate([returnTo || '/']);
+            } */
+            url.searchParams.delete('code');
+            url.searchParams.delete('state');
+            window.history.replaceState({}, '', url.toString());
           } else {
             console.error('Missing user details from token');
           }
@@ -139,96 +124,74 @@ export class NavbarComponent {
             },
             body
         });
-        if (response.ok) {
-            const data = await response.json();
-            return data;
-        } else {
-            throw new Error(`Failed to exchange code for tokens. Status: ${response.status}`);
-        }
-    } catch (error) {
-        console.error('Error exchanging code:', error);
-        throw error;
-    }
-    }
-
-
-    redirectToLogin(): void {
-     window.location.href = environment.loginUrl;
-    }
-
-    login() : void {
-      this.redirectToLogin();
-    }
-
-     parseJwt(token: string): any {
-      const base64Url = token.split('.')[1];
-      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-      }).join(''));
-      return JSON.parse(jsonPayload);
-    }
-
-
-
- /* async sendDataToBackend()
- {
-    const currentUser = this.userContext.getCurrentUserValue();
-    const lambdaUrl = NavbarComponent.insertUserToDBURL;
-
-    if (!currentUser)
-      {
-      console.error('CRITICAL: User context is null or missing properties. Current User (from service):', currentUser);
-      return;
-    }
-
-     const payload = {
-      user: {
-        name: currentUser.username,
-        email: currentUser.email,
-        nickname: currentUser.nickname,
-        provider: 'COGNITO',
-        providerId: currentUser.sub,
+        if (!response.ok) {
+        const text = await response.text().catch(() => '');
+        throw new Error(`Failed to exchange code. Status: ${response.status} ${text}`);
       }
-    };
 
-    console.log('Payload to send:', payload);
+      // shape: { access_token, id_token, refresh_token, expires_in, token_type }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error exchanging code:', error);
+      throw error;
+    }
+  }
 
-   try {
-     console.log('Sending request to Lambda with payload:', payload);
-     const response = await fetch(lambdaUrl, {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify(payload)
-     });
+  redirectToLogin(): void {
+    window.location.href = environment.loginUrl; // still works if you use it elsewhere
+  }
 
-     const result = await response.json();
-     console.log('Lambda response:', result);
+  login(): void {
+    this.redirectToLogin();
+  }
 
-     if (response.ok) {
-        *//* if (result.userExists === true || result.created === true || result.isCompleted === true) {
-          this.userContext.setUserCompleteStatus(true);
-          console.log('User profile marked complete.');
-        } else {
-          console.log('User created but not marked complete.');
-        } *//*
-        const complete =
-          result?.isCompleted === true ||
-          result?.isComplete === true ||
-          result?.profileCompleted === true;
+  // ---- USER HYDRATION ----
 
-        this.userContext.setUserCompleteStatus(!!complete);
-        console.log('[UserContext] isComplete set to:', !!complete);
-     } else {
-       console.error('Lambda responded with error:', result);
-     }
-   } catch (err) {
-     console.error('Error sending request to Lambda:', err);
-   }
- }
- */
+  private hydrateFromIdToken(idToken: string | null) {
+    if (!idToken) return;
+
+    const userDetails = this.parseJwt(idToken);
+    this.username = userDetails?.nickname ?? null;
+
+    if (userDetails?.email && userDetails?.nickname && userDetails?.name && userDetails?.sub) {
+      this.userContext.setUser(
+        userDetails.email,
+        userDetails.nickname,
+        userDetails.name,
+        userDetails.sub
+      );
+    } else {
+      console.warn('Missing claims on id_token; cannot set full user context.', userDetails);
+    }
+  }
+
+  parseJwt(token: string): any {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  }
+
+
+ // ---- BACKEND SYNC (ONCE) ----
+
+  private async sendDataToBackendOnce() {
+    const current = this.userContext.getCurrentUserValue();
+    if (!current) return;
+
+    const key = `userSynced:${current.sub}`;
+    if (localStorage.getItem(key) === '1') return;
+
+    await this.sendDataToBackend();
+    localStorage.setItem(key, '1');
+  }
+
 
  private async fetchCompletionFromProfile(sub: string): Promise<boolean | null> {
   try {
@@ -246,6 +209,8 @@ export class NavbarComponent {
 
 async sendDataToBackend() {
   const currentUser = this.userContext.getCurrentUserValue();
+  const lambdaUrl = NavbarComponent.insertUserToDBURL;
+
   if (!currentUser) {
     console.error('No current user in context');
     return;
@@ -297,24 +262,6 @@ async sendDataToBackend() {
 }
 
 
-  /* async handleProtectedRoute(event: Event, targetRoute: string): Promise<void> {
-    event.preventDefault();
-    await this.waitAuthWithOverlay();
-    const currentUser = this.userContext.getCurrentUserValue();
-    if (!(currentUser?.isComplete)) {
-      alert("Please complete your sign up information to access this page.");
-      //this.router.navigate([targetRoute]);
-       this.router.navigate(['/signup']);
-    } else
-    {
-      this.router.navigate([targetRoute]);
-      }
-    }
-
-     redirectToHome() {
-      this.router.navigate(['/']);
-  } */
-
   async handleProtectedRoute(event: Event, targetRoute: string): Promise<void> {
     event.preventDefault();
 
@@ -336,6 +283,9 @@ async sendDataToBackend() {
     this.router.navigate([targetRoute]);
   }
 
+  redirectToHome() {
+    this.router.navigate(['/']);
+  }
 
   private async waitAuthWithOverlay(): Promise<void> {
     if (!this.userContext.isReady()) this.overlay.show();    // show overlay only if not ready
@@ -366,7 +316,37 @@ async sendDataToBackend() {
     this.router.navigate([complete ? '/user-management' : '/signup']);
   }
 
+  logout(): void {
+    // 1) clear local state/tokens
+    this.localSignOut();
 
+    // 2) end Cognito Hosted UI session (so next login can choose another user)
+    const logoutUrl = this.buildCognitoLogoutUrl();
+    window.location.href = logoutUrl;
+  }
 
+  private localSignOut(): void {
+    // remove saved tokens + timers
+    this.tokenSvc.clear();
 
+    // clear “synced to backend” flag for this user (optional)
+    const sub = this.userContext.getCurrentUserValue?.()?.sub;
+    if (sub) localStorage.removeItem(`userSynced:${sub}`);
+
+    // clear user context if your service exposes a clear/reset method
+    // (optional chaining in case it doesn’t exist)
+    this.userContext.clearUser?.();
+
+    // update navbar UI immediately
+    this.username = null;
+  }
+
+  private buildCognitoLogoutUrl(): string {
+    const domain = environment.cognitoDomain.replace(/\/+$/, ''); // trim trailing slash
+    const clientId = encodeURIComponent(environment.clientId);
+    const logoutUri = encodeURIComponent(environment.signOutRedirectUri || environment.redirectUri);
+
+    // Standard Cognito Hosted UI logout
+    return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
+  }
 }

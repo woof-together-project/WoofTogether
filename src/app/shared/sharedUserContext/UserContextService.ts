@@ -71,4 +71,14 @@ export class UserContextService {
     // add inside UserContextService
     return this._ready$.value;
   }
+
+  clearUser(): void {
+    this.currentUser.next(null);
+    console.log('[UserContextService] clearUser called. User cleared.');
+  }
+
+  isAuthenticated(): boolean {
+    const u = this.currentUser.value;
+    return !!(u && u.sub && u.email);
+  }
 }
