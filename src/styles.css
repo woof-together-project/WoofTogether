@@ -34,3 +34,81 @@ html, body {
     transform: translateY(0);
   }
 }
+
+/*
+ === Angular Material (MDC) snackbars – single source of truth ===
+*/
+/* 1) Container must be invisible *//*
+
+.cdk-overlay-container .mat-mdc-snack-bar-container.success-snackbar,
+.cdk-overlay-container .mat-mdc-snack-bar-container.warn-snackbar {
+  background: transparent !important;
+  background-color: transparent !important; */
+/* some themes set background-color *//*
+
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+*/
+/* Sometimes MDC applies backgrounds to the inner wrapper too *//*
+
+.cdk-overlay-container .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar,
+.cdk-overlay-container .mat-mdc-snack-bar-container.warn-snackbar .mdc-snackbar {
+  background: transparent !important;
+}
+
+*/
+/* 2) Style only the surface *//*
+
+.cdk-overlay-container .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface {
+  background: #2e7d32 !important;
+  color: #fff !important;
+  border-left: 6px solid #9fe29f;
+  border-radius: 10px !important;
+  box-shadow: 0 14px 28px rgba(46,125,50,.45) !important;
+}
+.cdk-overlay-container .mat-mdc-snack-bar-container.warn-snackbar .mdc-snackbar__surface {
+  background: #b00020 !important;
+  color: #fff !important;
+  border-left: 6px solid #ffc2c7;
+  border-radius: 10px !important;
+  box-shadow: 0 14px 28px rgba(176,0,32,.45) !important;
+}
+
+*/
+/* 3) Nuke any overlays/pseudo-elements some themes add *//*
+
+.cdk-overlay-container .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface::before,
+.cdk-overlay-container .mat-mdc-snack-bar-container.success-snackbar .mdc-snackbar__surface::after,
+.cdk-overlay-container .mat-mdc-snack-bar-container.warn-snackbar .mdc-snackbar__surface::before,
+.cdk-overlay-container .mat-mdc-snack-bar-container.warn-snackbar .mdc-snackbar__surface::after {
+  content: none !important;
+}
+
+*/
+/* Typography + action *//*
+
+.cdk-overlay-container .mat-mdc-snack-bar-container .mdc-snackbar__label {
+  font-weight: 800;
+  letter-spacing: .2px;
+  text-transform: none;
+}
+.cdk-overlay-container .mat-mdc-snack-bar-container .mdc-button__label {
+  color: #fff !important;
+  font-weight: 700;
+}
+
+*/
+/* Subtle pop on the surface only *//*
+
+@keyframes snackbar-pop {
+  from { transform: translateY(8px) scale(.98); opacity: .8; }
+  to   { transform: translateY(0)   scale(1);    opacity: 1; }
+}
+.cdk-overlay-container .mat-mdc-snack-bar-container .mdc-snackbar__surface {
+  animation: snackbar-pop .12s ease-out both;
+}
+*/
