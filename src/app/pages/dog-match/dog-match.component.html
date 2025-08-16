@@ -1,5 +1,5 @@
 <div class="container-fluid px-4 py-3 dogmatch-container">
-  <!-- Header -->
+  <!-- PAGE TITLE -->
   <div class="text-center mb-3">
     <h1 class="fw-bold">FIND ME A DOG MATCH</h1>
     <hr />
@@ -9,8 +9,12 @@
     <!-- LEFT: Dog List -->
     <div class="col-lg-4 d-flex flex-column h-100">
       <div class="dog-list flex-grow-1 overflow-auto">
-        <div class="dog-card" *ngFor="let dog of dogs" (click)="toggleDogDetails(dog.id)">
-          <!-- Collapsed View -->
+        <div
+          class="dog-card"
+          *ngFor="let dog of dogs"
+          (click)="toggleDogDetails(dog.id); focusOnDog(dog)"
+        >
+          <!-- Collapsed -->
           <ng-container *ngIf="selectedDogId !== dog.id; else expandedDog">
             <div class="d-flex gap-3">
               <img [src]="dog.imageUrl" class="dog-img" />
@@ -19,16 +23,18 @@
                 <p class="mb-1">{{ dog.breed }}</p>
                 <p class="mb-0 small text-muted">
                   Owner: {{ dog.userName }} •
-                  <a [href]="'mailto:' + dog.userEmail" (click)="$event.stopPropagation()">
-                    {{ dog.userEmail }}
-                  </a>
+                  <a
+                    [href]="'mailto:' + dog.userEmail"
+                    (click)="$event.stopPropagation()"
+                    >{{ dog.userEmail }}</a
+                  >
                 </p>
                 <p class="text-muted mb-0">📍 {{ dog.distanceKm }} km away</p>
               </div>
             </div>
           </ng-container>
 
-          <!-- Expanded View -->
+          <!-- Expanded -->
           <ng-template #expandedDog>
             <div>
               <div class="d-flex align-items-center gap-3 mb-2">
@@ -36,47 +42,46 @@
                 <div>
                   <h5 class="mb-0">{{ dog.name }}</h5>
                   <p class="mb-1"><strong>Owner:</strong> {{ dog.userName }}</p>
-                    <p class="mb-1">
-                      <strong>Email:</strong>
-                      <a [href]="'mailto:' + dog.userEmail" (click)="$event.stopPropagation()">
-                        {{ dog.userEmail }}
-                      </a>
-                    </p>
+                  <p class="mb-1">
+                    <strong>Email:</strong>
+                    <a
+                      [href]="'mailto:' + dog.userEmail"
+                      (click)="$event.stopPropagation()"
+                      >{{ dog.userEmail }}</a
+                    >
+                  </p>
                 </div>
               </div>
 
               <p><strong>Breed:</strong> {{ dog.breed }}</p>
+              <p><strong>Gender:</strong> {{ dog.gender }}</p>
               <p><strong>Age:</strong> {{ dog.age }} years</p>
               <p><strong>Size:</strong> {{ dog.size }}</p>
-              <p><strong>Temperament:</strong> {{ dog.temperament }}</p>
-              <p><strong>Vaccinated:</strong> {{ dog.vaccinationStatus ? 'Yes' : 'No' }}</p>
+              <p><strong>Weight:</strong> {{ dog.weight }} kg</p>
+              <p *ngIf="dog.healthConditions">
+                <strong>Health Conditions:</strong> {{ dog.healthConditions }}
+              </p>
+              <p><strong>Rabies Vaccinated:</strong> {{ dog.vaccinationStatus ? 'Yes' : 'No' }}</p>
               <p><strong>Neutered:</strong> {{ dog.isNeutered ? 'Yes' : 'No' }}</p>
-              <p><strong>Distance:</strong> {{ dog.distanceKm }} km</p>
 
-              <div class="mt-2 d-flex justify-content-between align-items-center">
-                <span class="text-muted">📍 {{ dog.distanceKm }} km away</span>
-                
-              </div>
-              <!-- More details -->
               <p *ngIf="dog.moreDetails && dog.moreDetails.trim() !== ''">
                 <strong>More details:</strong> {{ dog.moreDetails }}
               </p>
 
-              <!-- Favorite activities -->
               <p *ngIf="dog.favoriteActivities && dog.favoriteActivities.length">
                 <strong>Favorite activities:</strong> {{ dog.favoriteActivities.join(', ') }}
               </p>
 
-            <!-- Contact Owner button aligned right -->
-            <div class="mt-3 text-end">
-              <a
-                [href]="getSmartEmailLink(currentUserEmail, dog.userEmail!, dog.userName!)"
-                class="btn btn-primary btn-sm fw-bold px-3"
-                (click)="$event.stopPropagation()">
-                Contact Owner
-              </a>
-            </div>
-
+              <div class="mt-3 d-flex justify-content-between align-items-center">
+                <span class="text-muted">📍 {{ dog.distanceKm }} km away</span>
+                <a
+                  [href]="getSmartEmailLink(currentUserEmail, dog.userEmail!, dog.userName!)"
+                  class="btn btn-success btn-sm contact-btn"
+                  (click)="$event.stopPropagation()"
+                >
+                  Contact Owner
+                </a>
+              </div>
             </div>
           </ng-template>
         </div>
@@ -85,93 +90,113 @@
 
     <!-- RIGHT: Map & Filters -->
     <div class="col-lg-8 d-flex flex-column">
-      <!-- Tabs -->
-      <ul class="nav nav-tabs justify-content-end mb-2">
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="selectedTab === 'map'" (click)="selectTab('map')">By Location</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" [class.active]="selectedTab === 'criteria'" (click)="selectTab('criteria')">By Criteria</a>
-        </li>
-      </ul>
+      <!-- HEADER ROW (Toolbar left, Tabs right) -->
+      <div class="map-header-row">
+        <!-- Toolbar LEFT -->
+        <div class="toolbar-inner">
+          <button class="btn btn-success btn-sm" (click)="resetMapView()">
+            Return to Default View
+          </button>
+           <!-- <div class="ms-auto small text-muted">
+          Zoom: {{ zoomLevel }} | Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
+        </div> -->
 
-      <!-- Tab Content -->
-      <div class="flex-grow-1">
-        <!-- Map -->
-            <ng-container *ngIf="selectedTab === 'map'">
+          <div class="position-relative toolbar-search">
+            <div class="input-group">
+              <span class="input-group-text">📍</span>
+              <!-- <input
+                type="text"
+                class="form-control"
+                placeholder="Search by city..."
+                [(ngModel)]="searchCity"
+                (focus)="loadCities()"
+                (input)="filterCities()"
+                (blur)="hideSuggestionsWithDelay()"
+              /> -->
 
-      <!-- City Search Bar -->
-      <div class="position-relative mb-2">
-        <div class="input-group" style="max-width:520px;">
-          <span class="input-group-text">📍</span>
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Search by city..."
-            [(ngModel)]="searchCity"
-            (focus)="loadCities()"
-            (input)="filterCities()"
-            (blur)="hideSuggestionsWithDelay()"
-          />
-          <button class="btn btn-success" (click)="onCitySearch()">Search</button>
-          <button class="btn btn-outline-secondary" type="button" (click)="clearCitySearch()">Clear</button>
+            <div class="search-row d-flex align-items-center gap-2">
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by city..."
+                  [(ngModel)]="searchCity"
+                  (focus)="loadCities()"
+                  (input)="filterCities(); clearMessageOnTyping()"
+                  (blur)="hideSuggestionsWithDelay()"
+                />
+
+                <!-- <button class="btn btn-primary" (click)="onCitySearch()">Search</button>
+                <button class="btn btn-secondary" (click)="clearCitySearch()">Clear</button> -->
+
+                <!-- Message appears inline after Clear -->
+              </div>
+
+              <button class="btn btn-success" (click)="onCitySearch()">Search</button>
+              <button class="btn btn-outline-secondary" type="button" (click)="clearCitySearch()">
+                Clear
+              </button>
+
+                <div *ngIf="uiMessage" class="city-msg" [class.city-msg-error]="uiMessage.type==='error'">
+                  <span class="city-msg-text">{{ uiMessage.text }}</span>
+                  <button type="button" class="city-msg-close" (click)="uiMessage=null">×</button>
+                </div>
+            </div>
+
+            <!-- Suggestions -->
+            <ul
+              *ngIf="filteredCities.length && showSuggestions"
+              class="list-group position-absolute bg-white shadow-sm"
+              style="top:100%;left:0;width:100%;max-height:220px;overflow-y:auto;z-index:1070;"
+            >
+              <li
+                class="list-group-item list-group-item-action"
+                *ngFor="let city of filteredCities"
+                (mousedown)="selectCity(city)"
+              >
+                {{ city }}
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <!-- Auto-suggestion Dropdown -->
-        <ul *ngIf="filteredCities.length && showSuggestions"
-            class="list-group position-absolute bg-white shadow-sm"
-            style="top:100%;left:0;width:520px;max-height:220px;overflow-y:auto;z-index:1030;">
-          <li class="list-group-item list-group-item-action"
-              *ngFor="let city of filteredCities"
-              (mousedown)="selectCity(city)">
-            {{ city }}
+        <!-- Tabs RIGHT -->
+        <ul class="nav nav-tabs ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" [class.active]="selectedTab === 'map'" (click)="selectTab('map')"
+              >By Location</a
+            >
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              [class.active]="selectedTab === 'criteria'"
+              (click)="selectTab('criteria')"
+              >By Criteria</a
+            >
           </li>
         </ul>
       </div>
-      <!-- Error banner -->
-        <div *ngIf="cityError"
-            class="alert alert-warning py-2 px-3 mt-2 mb-2"
-            style="position: relative; z-index: 1100;">
-          {{ cityError }}
-        </div>
 
-
-      <!-- Map -->
-      <app-map
-        [center]="{ lat: location.latitude, lng: location.longitude }"
-        [zoom]="13"
-        [markers]="markers"
-        (markerClicked)="onMarkerSelected($event)">
-      </app-map>
-
-      <!-- Find Dogs Button -->
-      <div class="text-center mt-2">
-        <button class="btn btn-primary" (click)="loadDogsByLocation()">Find Dogs</button>
-      </div>
-
-    </ng-container>
-
-        <!-- <ng-container *ngIf="selectedTab === 'map'">
-          <app-map
-            [center]="{ lat: location.latitude, lng: location.longitude }"
-            [zoom]="13"
-            [markers]="markers"
-            (markerClicked)="onMarkerSelected($event)">
-          </app-map>
-
-          
-
-          <div class="text-center mt-2">
-            <button class="btn btn-primary" (click)="loadDogsByLocation()">Find Dogs</button>
+      <!-- CONTENT -->
+      <div class="flex-grow-1">
+        <!-- MAP TAB -->
+        <ng-container *ngIf="selectedTab === 'map'">
+          <div class="map-area">
+            <app-map
+              id="mapElement"
+              [center]="{ lat: location.latitude, lng: location.longitude }"
+              [zoom]="zoomLevel"
+              [markers]="markers"
+              (markerClicked)="onMarkerSelected($event)"
+            >
+            </app-map>
           </div>
+        </ng-container>
 
-        </ng-container> -->
-
-        <!-- Criteria Filters -->
+        <!-- CRITERIA TAB -->
         <ng-container *ngIf="selectedTab === 'criteria'">
           <form (ngSubmit)="applyFilters()" class="p-3">
             <div class="row">
-              <!-- Size -->
               <div class="col-md-4 mb-3">
                 <label class="fw-bold">Size</label>
                 <select class="form-select" [(ngModel)]="filters.size" name="size">
@@ -179,36 +204,18 @@
                 </select>
               </div>
 
-             <!-- Breed -->
-            <div class="col-md-4 mb-3">
-              <label class="fw-bold">Breed</label>
-              <input 
-                type="text" 
-                class="form-control" 
-                [(ngModel)]="filters.breed" 
-                name="breed" 
-                placeholder="Enter breed"
-              />
-            </div>
-
-
-              Temperaments
               <div class="col-md-4 mb-3">
-                <label class="fw-bold">Temperaments</label>
-                <div *ngFor="let t of temperamentOptions" class="form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [value]="t"
-                    [checked]="filters.temperaments.includes(t)"
-                    (change)="onTemperamentChange($event)"
-                    name="temperaments" />
-                  <label class="form-check-label">{{ t }}</label>
-                </div>
+                <label class="fw-bold">Breed</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="filters.breed"
+                  name="breed"
+                  placeholder="Enter breed"
+                />
               </div>
             </div>
 
-            <!-- Age & Weight -->
             <div class="row">
               <div class="col-md-3 mb-3">
                 <label class="fw-bold">Age Min</label>
@@ -220,31 +227,49 @@
               </div>
               <div class="col-md-3 mb-3">
                 <label class="fw-bold">Weight Min</label>
-                <input type="number" class="form-control" [(ngModel)]="filters.weightMin" name="weightMin" />
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="filters.weightMin"
+                  name="weightMin"
+                />
               </div>
               <div class="col-md-3 mb-3">
                 <label class="fw-bold">Weight Max</label>
-                <input type="number" class="form-control" [(ngModel)]="filters.weightMax" name="weightMax" />
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="filters.weightMax"
+                  name="weightMax"
+                />
               </div>
             </div>
 
-            <!-- Health -->
             <div class="row">
               <div class="col-md-6 mb-3">
                 <div class="form-check">
-                  <input type="checkbox" class="form-check-input" [(ngModel)]="filters.vaccinated" name="vaccinated" />
-                  <label class="form-check-label fw-bold">Vaccinated</label>
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [(ngModel)]="filters.vaccinated"
+                    name="vaccinated"
+                  />
+                  <label class="form-check-label fw-bold">Rabies Vaccinated</label>
                 </div>
               </div>
               <div class="col-md-6 mb-3">
                 <div class="form-check">
-                  <input type="checkbox" class="form-check-input" [(ngModel)]="filters.neutered" name="neutered" />
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    [(ngModel)]="filters.neutered"
+                    name="neutered"
+                  />
                   <label class="form-check-label fw-bold">Neutered</label>
                 </div>
               </div>
             </div>
 
-            <!-- Radius -->
             <div class="row mb-3">
               <div class="col-md-6">
                 <label class="fw-bold">Radius (km)</label>
@@ -253,27 +278,38 @@
                   class="form-control"
                   [(ngModel)]="location.radius"
                   name="radius"
-                  [disabled]="disableRadius" />
+                  [disabled]="disableRadius"
+                />
               </div>
               <div class="col-md-6 mt-4">
                 <div class="form-check">
-                  <input class="form-check-input" type="checkbox" [(ngModel)]="disableRadius" name="disableRadius" />
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    [(ngModel)]="disableRadius"
+                    name="disableRadius"
+                  />
                   <label class="form-check-label">Don't filter by radius</label>
                 </div>
               </div>
             </div>
 
-            <!-- Buttons -->
             <div class="text-center">
               <button type="submit" class="btn btn-success me-2">Apply Filters</button>
-              <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
+                Clear Filters
+              </button>
             </div>
-
-      
-
           </form>
         </ng-container>
       </div>
     </div>
   </div>
 </div>
+
+<div class="floating-map-info">
+  Zoom: {{ zoomLevel }} |
+  Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
+</div>
+
+

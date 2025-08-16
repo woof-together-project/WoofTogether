@@ -40,7 +40,7 @@
 
       <!-- Sitter Cards -->
       <div class="sitter-list flex-grow-1 overflow-auto">
-        <div class="sitter-card" *ngFor="let sitter of sitters" (click)="toggleSitterDetails(sitter.sitterId)">
+        <div class="sitter-card" *ngFor="let sitter of sitters" (click)="toggleSitterDetails(sitter.sitterId); focusOnSitter(sitter)">
           <!-- Summary -->
           <ng-container *ngIf="selectedSitterId !== sitter.sitterId; else expandedCard">
             <div class="d-flex gap-3">
@@ -101,12 +101,22 @@
         </li>
       </ul>
 
+  <!-- Small toolbar above the map -->
+      <div class="map-toolbar d-flex align-items-center gap-2 mb-2">
+        <button class="btn btn-outline-dark btn-sm" (click)="resetMapView()">
+          Return to Default View
+        </button>
+        <div class="ms-auto small text-muted">
+          Zoom: {{ zoom }} | Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
+        </div>
+      </div>
+
       <div class="flex-grow-1">
         <ng-container *ngIf="selectedTab === 'map'">
           <div class="h-100">
             <app-map id="mapElement"
                      [center]="{ lat: location.latitude, lng: location.longitude }"
-                     [zoom]="13"
+                     [zoom]="zoom"
                      [markers]="markers"
                      (markerClicked)="onMarkerSelected($event)">
             </app-map>
@@ -114,7 +124,6 @@
         </ng-container>
 
         <ng-container *ngIf="selectedTab === 'criteria'">
-          <!-- Your filters go here -->
         </ng-container>
       </div>
     </div>

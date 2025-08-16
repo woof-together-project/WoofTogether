@@ -85,6 +85,9 @@ newReview = { rating: 5, comment: '' };
   };
 
   currentUserEmail: string = '';
+  defaultZoom = 13;
+  zoom = this.defaultZoom;
+  center = { lat: this.location.latitude, lng: this.location.longitude };
 
   async ngOnInit(): Promise<void> {
   try {
@@ -92,6 +95,9 @@ newReview = { rating: 5, comment: '' };
     this.location.latitude = coords.latitude;
     this.location.longitude = coords.longitude;
     console.log('Location resolved:', coords);
+    this.center = { lat: this.location.latitude, lng: this.location.longitude };
+    this.zoom = this.defaultZoom;
+
     this.loadSittersByLocation();
 
   } catch (err) {
@@ -312,9 +318,23 @@ newReview = { rating: 5, comment: '' };
   }
 
   onMarkerSelected(sitterId: number) {
-    this.selectedSitter = this.sitters.find(s => s.sitterId === sitterId) || null;
-    this.selectedSitterId = sitterId;
-  }
+  const m = this.markers.find(x => x.id === sitterId);
+  if (!m) return;
+
+  this.setMapView(m.lat, m.lng, 16);
+
+  // open the sitter card
+  const s = this.sitters.find(si => si.sitterId === sitterId);
+  if (s) this.selectedSitterId = s.sitterId;
+
+  this.selectedSitter = s || null;   // if you have selectedSitter property
+}
+
+private setMapView(lat: number, lng: number, zoom: number) {
+  this.center = { lat, lng };  // new object triggers change detection
+  this.zoom = zoom;
+}
+
 
   buildFilterPayload() {
     return {
@@ -527,6 +547,39 @@ submitReview() {
       this.reviewSubmitting = false;
     }
   });
+}
+
+ resetMapView(): void {
+    this.center = { lat: this.location.latitude, lng: this.location.longitude };
+    this.zoom = this.defaultZoom;
+  }
+
+  focusOnSitter(sitter: Sitter): void {
+  // try coordinates on the sitter first
+  let lat = sitter.latitude ?? sitter.latitude ?? null;
+  let lng = sitter.longitude ?? sitter.longitude ?? null;
+
+  // fallback: find the sitter's marker (you said marker.id === sitterId)
+  if (lat == null || lng == null) {
+    const m = this.markers.find(mm => mm.id === sitter.sitterId);
+    if (m) { lat = m.lat; lng = m.lng; }
+  }
+
+  if (lat == null || lng == null) return;
+
+  this.location = {
+    ...this.location,
+    latitude: lat,
+    longitude: lng
+  };
+
+  this.selectedTab = 'map';
+  this.zoom = 16;
+
+  setTimeout(() => {
+    document.getElementById('mapElement')
+      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, 0);
 }
 
 }

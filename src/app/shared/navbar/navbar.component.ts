@@ -152,6 +152,8 @@ export class NavbarComponent {
 
   this.loading = false;
 }
+
+
   // ---- AUTH FLOW ----
 
   async exchangeCodeForTokens(code: string) {
@@ -189,7 +191,7 @@ export class NavbarComponent {
   }
 
   redirectToLogin(): void {
-    window.location.href = environment.loginUrl; // still works if you use it elsewhere
+    window.location.href = environment.loginUrl;
   }
 
   login(): void {
