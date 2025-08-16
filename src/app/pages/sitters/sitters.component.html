@@ -123,12 +123,87 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="selectedTab === 'criteria'">
-        </ng-container>
-      </div>
-    </div>
-  </div>
-</div>
+ <ng-container *ngIf="selectedTab === 'criteria'">
+          <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="w-100">
+            <div class="row px-4">
+ 
+              <!-- Service Options -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Service Options</label>
+                <div *ngFor="let option of serviceOptions" class="d-flex align-items-center mb-1" style="margin-left: 118px;">
+                  <input
+                    type="checkbox"
+                    class="form-check-input me-2"
+                    [id]="'service-' + option"
+                    [value]="option"
+                    [checked]="selectedServiceOptions.includes(option)"
+                    (change)="onServiceOptionChange($event)"
+                    name="serviceOptions"
+                  />
+                  <label [for]="'service-' + option" class="form-check-label mb-0">
+                    {{ option }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Sitter Gender</label>
+                <div *ngFor="let gender of ['any', 'female', 'male']" class="d-flex align-items-center mb-1" style="margin-left: 128px;">
+                  <input
+                    type="radio"
+                    class="form-check-input me-2"
+                    [value]="gender"
+                    [(ngModel)]="selectedGender"
+                    [id]="'gender-' + gender"ד
+                    name="gender"
+                  />
+                  <label [for]="'gender-' + gender" class="form-check-label mb-0">
+                    {{ gender.charAt(0).toUpperCase() + gender.slice(1) }}
+                  </label>
+                </div>
+              </div>
+
+              <!-- Experienced With (single vertical list) -->
+              <div class="col-md-4 mb-3">
+                <label class="form-label fw-bold">Experienced With</label>
+                <div class="form-check d-flex align-items-center mb-1" style="margin-left: 113px;" *ngFor="let type of experienceWithOptions">
+                  <input
+                    type="checkbox"
+                    class="form-check-input me-2"
+                    [value]="type"
+                    [checked]="filters.experiencedWith.includes(type)"
+                    (change)="onExperienceChange($event)"
+                    id="exp-{{ type }}"
+                  />
+                  <label class="form-check-label" [for]="'exp-' + type" style="margin: 0;">
+                    {{ type }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Rate -->
+            <div class="row" style="margin: -80px 400px 10px 0px;">
+              <label class="form-label fw-bold">Max Rate (₪)</label>
+              <input
+                type="range"
+                class="form-range"
+                style="width: 450px; margin-left: 190px;"
+                min="0"
+                max="150"
+                step="5"
+                [(ngModel)]="filters.rateMax"
+                name="rateMax"
+              />
+              <div class="text-center small"  style="margin-top: 10px;">Up to ₪{{ filters.rateMax }}</div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="text-center mt-4 mb-3 d-flex justify-content-center gap-3">
+              <button type="submit" class="btn btn-success">Apply Filters</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
+            </div>
 
 <!-- ========== REVIEWS MODAL ========== -->
 <div class="modal-backdrop-custom" *ngIf="showReviewModal" (click)="closeReviews()"></div>
