@@ -1,41 +1,38 @@
-.dogmatcher-container {
+/* Page & container */
+:host {
+  display: block;
+  height: 100vh;
+  overflow: hidden;
+  background-color: #f1f7ee;
+}
+
+.dogmatch-container {
   height: 85%;
   padding: 1.5rem;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: "Segoe UI", sans-serif;
   background-color: #f1f7ee;
   box-sizing: border-box;
 }
 
+/* Title */
 .text-center {
   text-align: center;
   margin-bottom: 1rem;
   margin-top: 4rem;
 }
+.fw-bold { color: #7d8570; }
 
-.fw-bold {
-  color: #7d8570;
-}
-
-/* Dog Card Layout */
+/* Left: dog list */
 .dog-list {
   flex: 1;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #b0bea9 transparent;
 }
-.dog-list::-webkit-scrollbar {
-  width: 0;
-}
-.dog-list:hover::-webkit-scrollbar {
-  width: 8px;
-}
-.dog-list::-webkit-scrollbar-thumb {
-  background-color: #c4c4c4;
-  border-radius: 8px;
-}
-.dog-list::-webkit-scrollbar-thumb:hover {
-  background-color: #999;
-}
+.dog-list::-webkit-scrollbar { width: 0; }
+.dog-list:hover::-webkit-scrollbar { width: 8px; }
+.dog-list::-webkit-scrollbar-thumb { background-color: #c4c4c4; border-radius: 8px; }
+.dog-list::-webkit-scrollbar-thumb:hover { background-color: #999; }
 
 .dog-card {
   background-color: #b0bea9;
@@ -45,49 +42,107 @@
   transition: all 0.3s ease;
   cursor: pointer;
 }
-.dog-card:hover {
-  transform: translateY(-2px);
-}
-.dog-card.expanded {
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
+.dog-card:hover { transform: translateY(-2px); }
+.dog-card.expanded { box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
 .dog-img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 50%;
+  width: 60px; height: 60px; object-fit: cover; border-radius: 50%;
 }
 
-.dog-summary p {
-  margin-bottom: 0.3rem;
+/* Tabs */
+.nav-tabs .nav-link.active { background-color: #7d8570 !important; color: black !important; }
+.nav-tabs .nav-link { background-color: #b0bea9; color: #000; font-weight: bold; border-radius: 20px 20px 0 0; margin-left: 0.5rem; }
+
+/* Buttons */
+.btn { border-color: #b0bea9; background-color: #b0bea9; color: black; }
+
+.contact-btn {
+  background-color: #28a745 !important; color: #fff !important; font-weight: 600;
+  border-radius: 9999px; padding: 0.35rem 0.9rem; box-shadow: 0 2px 6px rgba(0,0,0,.12); border: none;
+}
+.contact-btn:hover { background-color: #68aa76 !important; }
+.contact-btn:active { transform: translateY(1px); background-color: #60926c !important; }
+
+/* Right column layout */
+.col-lg-8 { display: flex; flex-direction: column; height: 100%; }
+.flex-grow-1 { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+/* Header row above the map: toolbar (left) + tabs (right) */
+.map-header-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px; /* space before map */
+}
+.toolbar-inner { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.toolbar-search { width: 520px; max-width: 100%; }
+.map-header-row .nav-tabs { margin-left: auto; } /* push tabs to right */
+
+/* Map area */
+.map-area {
+  flex: 1 0 auto;
+  min-height: 550px;
+  background-color: #f1f7ee;
+  border-radius: 12px;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
+}
+.map-area app-map, #mapElement { width: 100%; height: 100% !important; }
+:host ::ng-deep google-map { width: 100%; height: 100% !important; }
+
+
+.search-row {
+  flex-wrap: wrap; /* allow wrapping if screen too small */
 }
 
-.nav-tabs .nav-link.active {
-  background-color: #7d8570 !important;
-  color: black !important;
+.city-msg {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #fff3cd;
+  border: 1px solid #ffe69c;
+  color: #7a5b00;
+  font-weight: 500;
+  font-size: 0.9rem;
 }
-.nav-tabs .nav-link {
-  background-color: #b0bea9;
-  color: #000;
+
+.city-msg-error {
+  background: #fde2e1;
+  border-color: #f8b4b0;
+  color: #7a1b1b;
+}
+
+.city-msg-icon {
   font-weight: bold;
-  border-radius: 20px 20px 0 0;
-  margin-left: 0.5rem;
 }
 
-.btn {
-  border-color: #b0bea9;
-  background-color: #b0bea9;
-  color: black;
+.city-msg-close {
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  cursor: pointer;
+  line-height: 1;
 }
 
-.page-title h2 {
-  margin-bottom: 24px; /* push the <hr> down */
+.floating-map-info {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 5000;
+
+  background: rgba(6, 70, 3, 0.65);
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.2;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
 
-.page-title hr {
-  margin-top: 12px;  /* adjust as needed */
-  border: none;
-  border-top: 1px solid #ccc;
-  width: 100%;
-}
+
