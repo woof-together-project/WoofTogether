@@ -110,7 +110,16 @@
                 <label for="sitterBio" class="form-label">About Me</label>
                 <textarea class="form-control" id="sitterBio" rows="3" placeholder="Let us know about yourself and your experience.." name="sitterBio" ngModel #sitterBioModel="ngModel"></textarea>
               </div>
-              <div class="mb-2">
+
+              </div>
+              <div class="d-flex justify-content-end pt-3 border-top">
+                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="1" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 1">
+
+            <div class="mb-2">
                 <label class="form-label">Experience</label>
                 <input type="number" class="form-control" [(ngModel)]="experience" placeholder="Please enter the number of years you're taking care of dogs" name="experience" #experienceModel="ngModel" required>
                 <div *ngIf="signupForm.submitted && experienceModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
@@ -124,22 +133,24 @@
                   Rate is required
                 </div>
               </div>
-              </div>
-              <div class="d-flex justify-content-end pt-3 border-top">
-                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
-              </div>
-            </div>
 
-            <div *ngSwitchCase="1" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 1">
-
-<div class="flex-grow-1">
+            <div class="flex-grow-1">
               <div class="mb-2">
                 <label for="availability" class="form-label">Availability</label>
                 <textarea class="form-control" id="availability" rows="3" placeholder="Working hours and days, unavailable dates" name="availability" [(ngModel)]="availability" #availabilityModel="ngModel"></textarea>
               </div>
+
+            </div>
+              <div class="d-flex justify-content-between pt-3 border-top">
+                <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
+                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
+              </div>
+            </div>
+
+            <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 2">
               <div class="mb-3">
                 <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
-                <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                <div class="border p-2 rounded" style="max-height: 175px; overflow-y: auto;">
                   <div *ngFor="let type of experienceWithOptions">
                     <input
                       type="checkbox"
@@ -150,15 +161,8 @@
                   </div>
                 </div>
               </div>
-</div>
-              <div class="d-flex justify-content-between pt-3 border-top">
-                <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
-                <button class="btn btn-primary" (click)="nextSitterPage()">Next ➡️</button>
-              </div>
-            </div>
 
-            <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 2">
-<div class="flex-grow-1">
+            <div class="flex-grow-1">
               <div class="mb-3">
                 <label class="form-label fw-bold">Service Options</label>
                 <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
@@ -172,7 +176,7 @@
                   </div>
                 </div>
               </div>
-</div>
+            </div>
               <div class="d-flex justify-content-between pt-3 border-top">
                 <button class="btn btn-secondary" (click)="previousSitterPage()">⬅️ Back</button>
               </div>
@@ -241,11 +245,6 @@
                 </div>
 
                 <div class="mb-2">
-                  <label class="form-label">Dog's Breed</label>
-                  <input type="text" class="form-control" [(ngModel)]="dog.breed" name="dogBreed-{{i}}">
-                </div>
-
-                <div class="mb-2">
                   <label class="form-label">Gender</label>
                   <select class="form-select" [(ngModel)]="dog.gender" name="dogGender-{{i}}" required #dogGenderModel="ngModel">
                     <option value="" disabled selected>Select Gender</option>
@@ -282,6 +281,11 @@
               <div *ngSwitchCase="1" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 1">
                 <div class="flex-grow-1">
 
+                  <div class="mb-2">
+                  <label class="form-label">Dog's Breed</label>
+                  <input type="text" class="form-control" [(ngModel)]="dog.breed" name="dogBreed-{{i}}">
+                </div>
+
                 <div class="mb-2">
                   <label class="form-label">Dog's Size</label>
                   <select class="form-select" [(ngModel)]="dog.size" name="dogSize-{{i}}" required #dogSizeModel="ngModel">
@@ -317,17 +321,7 @@
                   <input type="text" class="form-control" [(ngModel)]="dog.temperament" name="dogTemperament-{{i}}" required>
                 </div>-->
 
-                <div class="mb-2">
-                  <label class="form-label">Vaccinated Against Rabies?</label>
-                  <select class="form-select" [(ngModel)]="dog.rabiesVaccinated" name="dogVaccinated-{{i}}" required #dogVaccinatedModel="ngModel">
-                    <option value="" disabled selected>Select</option>
-                    <option value="yes">Yes</option>
-                    <option value="no">No</option>
-                  </select>
-                  <div *ngIf="signupForm.submitted && dogVaccinatedModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                    Dog vaccination info is required
-                    </div>
-                </div>
+
                 </div>
 
                 <div class="d-flex justify-content-between pt-3 border-top">
@@ -341,14 +335,21 @@
                 <div class="flex-grow-1">
 
                 <div class="mb-2">
-                    <label class="form-label">Health Conditions</label>
-                    <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
-                  </div>
+                  <label class="form-label">Vaccinated Against Rabies?</label>
+                  <select class="form-select" [(ngModel)]="dog.rabiesVaccinated" name="dogVaccinated-{{i}}" required #dogVaccinatedModel="ngModel">
+                    <option value="" disabled selected>Select</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                  <div *ngIf="signupForm.submitted && dogVaccinatedModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog vaccination info is required
+                    </div>
+                </div>
 
                 <!-- Behavioral Traits -->
                 <div class="mb-3">
                   <label class="form-label fw-bold">Behavioral Traits</label>
-                  <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                  <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
                     <div *ngFor="let trait of behavioralTraitsList">
                       <input type="checkbox" class="form-check-input me-1" [value]="trait" (change)="onBehavioralTraitChange($event, i)">
                       {{ trait }}
@@ -367,7 +368,7 @@
                   <div class="flex-grow-1">
                   <div class="mb-3">
                     <label class="form-label fw-bold">Favorite Activities</label>
-                    <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                    <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
                       <div *ngFor="let activity of favoriteActivitiesList">
                         <input type="checkbox" class="form-check-input me-1" [value]="activity" (change)="onFavoriteActivityChange($event, i)">
                         {{ activity }}
@@ -375,7 +376,10 @@
                     </div>
                   </div>
 
-
+                  <div class="mb-2">
+                    <label class="form-label">Health Conditions</label>
+                    <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
+                  </div>
 
                   <div class="mb-2">
                     <label class="form-label">Anything Else?</label>

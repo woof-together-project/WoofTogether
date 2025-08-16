@@ -34,6 +34,7 @@ export class NavbarComponent {
   loading = true;
   isComplete = false;
 
+
   // async ngOnInit() {
   //   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
 
