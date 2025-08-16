@@ -6,13 +6,15 @@ import { environment } from './../../../environments/environment';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 import { NavigationService } from '../../shared/navigation/navigation.service';
 import { TokenService } from '../../shared/auth/tokenService';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 type Intent = 'login' | 'signup';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule,MatIconModule, MatButtonModule],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
@@ -304,6 +306,8 @@ export class NavbarComponent {
   redirectToHome() {
     this.router.navigate(['/']);
   }
+
+
 
   logout(): void {
     // 1) clear local state/tokens

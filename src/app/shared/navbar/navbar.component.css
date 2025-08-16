@@ -13,7 +13,7 @@ nav.navbar {
   position: fixed;
   background-color: transparent;
   backdrop-filter: blur(3px);               /* subtle blur effect */
-  padding: 0.5rem 1rem;
+  padding: 0.2rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -117,3 +117,20 @@ nav.navbar {
 .nav-actions .login-btn:hover {
   background: #608f39;
 }
+
+.navbar { display:flex; align-items:center; }
+.navbar-spacer { flex:1 1 auto; }
+.ml-2 { margin-left:0; }
+
+.icon-btn {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px; height:48px;          /* bigger */
+  color:#365020;
+  border-radius:9999px;
+}
+.icon-btn svg { width:28px; height:28px; }
+.icon-btn:hover { background: rgba(54,80,32,0.08); }
+.icon-btn:focus-visible { outline:2px solid #365020; outline-offset:2px; }
+
