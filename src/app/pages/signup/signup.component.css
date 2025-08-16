@@ -91,7 +91,61 @@
   display: block;
 }
 
+/* let flex children scroll */
+.container-fluid.vh-100.d-flex { min-height: 0; }
 
+/* one scrollbar for the left column */
+.form-scroll-area{
+  height: calc(100dvh - 64px);   /* adjust 64px to your navbar height if needed */
+  overflow-y: auto;
+  overflow-x: hidden;             /* prevents tiny horizontal bar */
+  padding-right: .5rem;
+  min-height: 0;
+}
 
+/* the form itself must NOT scroll */
+.form-scroll-area > form{
+  overflow: visible;
+}
+
+/* cards never create their own scrollbars */
+.notebook-card,
+.notebook-card .card-body{
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* action bar stays INSIDE the card */
+.card-footer.actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:.5rem;
+  background:#fff;
+  border-top:1px solid #e9ecef;
+  padding:.75rem 1rem;
+}
+
+/* keep inputs from pushing past the card */
+.form-scroll-area .card,
+.form-scroll-area .card-header,
+.form-scroll-area .card-body,
+.form-scroll-area .card-footer{
+  width:100%;
+  box-sizing:border-box;
+}
+
+/* photo row */
+.file-row{
+  display:flex;
+  align-items:center;
+  gap:.75rem;
+  flex-wrap:wrap;
+}
+.img-preview{
+  width:40px;
+  height:40px;
+  object-fit:cover;
+  border-radius:50%;
+}
 
 

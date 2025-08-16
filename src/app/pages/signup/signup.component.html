@@ -38,7 +38,7 @@
               </div>
             </div>
 
-            <div class="mb-3">
+            <!-- <div class="mb-3">
               <label for="profilePic" class="form-label">Profile Picture</label>
               <input
               type="file"
@@ -50,7 +50,7 @@
                 <div *ngIf="signupForm.submitted && !profilePicFile" class="text-danger small mb-1 text-end fade-in-error">
                 Profile picture is required
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
 
@@ -84,6 +84,17 @@
           <ng-container [ngSwitch]="currentSitterPage">
             <div *ngSwitchCase="0" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 0">
               <div class="flex-grow-1">
+                 <!-- NEW: Sitter Photo -->
+                    <div class="mb-3">
+                      <label class="form-label">Sitter Photo</label>
+                      <div class="d-flex align-items-center gap-3">
+                        <input type="file" class="form-control" (change)="onSitterPicSelected($event)" accept="image/*" style="max-width: 320px;">
+                        <img *ngIf="sitterImageUrl" [src]="sitterImageUrl" alt="sitter preview" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+                      </div>
+                      <div *ngIf="signupForm.submitted && !sitterImageUrl" class="text-danger small mb-1 text-end fade-in-error">
+                        Sitter photo is required
+                      </div>
+                    </div>
               <div class="mb-3">
                 <label for="gender" class="form-label">Gender</label>
                 <select id="gender" class="form-select" name="gender" [(ngModel)]="gender" required>
@@ -209,6 +220,18 @@
             <ng-container [ngSwitch]="currentDogPage[i]">
               <div *ngSwitchCase="0" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 0">
                 <div class="flex-grow-1">
+                  <!-- NEW: Dog Photo -->
+                  <div class="mb-3">
+                    <label class="form-label">Dog Photo</label>
+                    <div class="d-flex align-items-center gap-3">
+                      <input type="file" class="form-control" (change)="onDogPicSelected($event, i)" accept="image/*" style="max-width: 320px;">
+                      <img *ngIf="dogs[i].imageUrl" [src]="dogs[i].imageUrl" alt="dog preview"
+                          style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+                    </div>
+                    <div *ngIf="signupForm.submitted && !dogs[i].imageUrl" class="text-danger small mb-1 text-end fade-in-error">
+                      Dog photo is required
+                    </div>
+                  </div>
                 <div class="mb-2">
                   <label class="form-label">Dog's Name</label>
                   <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required #dogNameModel="ngModel">

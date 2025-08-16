@@ -45,10 +45,10 @@ export class SignupComponent {
   gender: string = '';
   selectedSitterExperience: string[] = [];
   selectedSitterServices: string[] = [];
-
+  
   // dog data
   dogs: any[] = [
-  { name: '', breed: '', gender: '', fixed: '', size: '', weight: null, age: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
+  { name: '', breed: '', gender: '', imageUrl: '' , fixed: '', size: '', weight: null, age: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
   ];
 
   showGeneralInfo: boolean = true;
@@ -61,7 +61,8 @@ export class SignupComponent {
 
   currentSitterPage: number = 0; // 0 = About Me, 1 = Experience, etc.
   currentDogPage: number[] = [0]; // One page index per dog
-
+  sitterImageUrl: string = '';
+  sitterImageFile: File | null = null;
   experienceWithOptions = [
   'Elder Dogs', 'Young Dogs', 'Cubs', 'Reactive Dogs',
   'Aggressive to Other Animals', 'Aggressive to People',
@@ -121,7 +122,8 @@ export class SignupComponent {
       behavioralTraits: [],
       favoriteActivities: [],
       health: '',
-      moreDetails: ''
+      moreDetails: '',
+      imageUrl: '' 
     });
     this.currentDogPage.push(0);
     this.showDogSections.push(true);
@@ -257,7 +259,7 @@ export class SignupComponent {
       phone: this.phone,
       city: this.city,
       street: this.street,
-      profilePic: this.profilePic, // for now just the file name or base64 if needed
+      //profilePic: this.profilePic, // for now just the file name or base64 if needed
       isSitter: this.isSitter,
       addDog: this.addDog,
       sitterDetails: this.isSitter ? {
@@ -267,7 +269,8 @@ export class SignupComponent {
         rate: this.rate,
         availability: this.availability,
         experienceWith: this.selectedSitterExperience,
-        services: this.selectedSitterServices
+        services: this.selectedSitterServices,
+        imageUrl: this.sitterImageUrl 
       } : null,
       dogs: this.addDog ? this.dogs.map(d => ({
         name: d.name,
@@ -281,66 +284,108 @@ export class SignupComponent {
         behavioralTraits: d.behavioralTraits,
         favoriteActivities: d.favoriteActivities,
         fixed: d.fixed === 'yes',
-        rabiesVaccinated: d.rabiesVaccinated === 'yes'
+        rabiesVaccinated: d.rabiesVaccinated === 'yes',
+        imageUrl: d.imageUrl 
       })) : []
 
     };
   }
 
 
-onProfilePicSelected(event: Event): void {
-  console.log('[onProfilePicSelected] Event triggered:', event);
+// onProfilePicSelected(event: Event): void {
+//   console.log('[onProfilePicSelected] Event triggered:', event);
 
+//   const input = event.target as HTMLInputElement;
+//   const file = input.files?.[0];
+
+//   if (!file) {
+//     console.warn('[onProfilePicSelected] No file selected.');
+//     return;
+//   }
+
+//   console.log('[onProfilePicSelected] File selected:', {
+//     name: file.name,
+//     type: file.type,
+//     size: file.size
+//   });
+
+//   const profilePicFile = file;
+//   this.profilePic = file.name;
+
+//   const lambdaUrl = SignupComponent.uploadProfilePicURL;
+//   console.log('[onProfilePicSelected] Sending request to Lambda for presigned URL:', {
+//     fileName: file.name,
+//     fileType: file.type
+//   });
+
+//   this.http.post<any>(lambdaUrl, {
+//     fileName: file.name,
+//     fileType: file.type
+//   }).subscribe({
+//     next: (res) => {
+//       console.log('[Lambda Response] Presigned URL and Public URL received:', res);
+
+//       const presignedUrl = res.url;
+//       const publicUrl = res.publicUrl;
+
+//       console.log('[S3 Upload] Uploading file to S3 via presigned URL...');
+//       this.http.put(presignedUrl, file, {
+//         headers: { 'Content-Type': file.type }
+//       }).subscribe({
+//         next: () => {
+//           console.log('[S3 Upload] Upload successful');
+//           this.profilePic = publicUrl;
+//           console.log('[S3 Upload] Stored public URL:', publicUrl);
+//         },
+//         error: (err) => {
+//           console.error('[S3 Upload] Upload to S3 failed:', err);
+//         }
+//       });
+//     },
+//     error: (err) => {
+//       console.error('[Lambda Error] Failed to get presigned URL:', err);
+//     }
+//   });
+// }
+
+onSitterPicSelected(event: Event): void {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
+  if (!file) return;
 
-  if (!file) {
-    console.warn('[onProfilePicSelected] No file selected.');
-    return;
-  }
-
-  console.log('[onProfilePicSelected] File selected:', {
-    name: file.name,
-    type: file.type,
-    size: file.size
+  this.sitterImageFile = file;
+  this.uploadImageToS3(file, (url) => {
+    this.sitterImageUrl = url;
   });
+}
 
-  const profilePicFile = file;
-  this.profilePic = file.name;
+onDogPicSelected(event: Event, index: number): void {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
 
+  this.uploadImageToS3(file, (url) => {
+    this.dogs[index].imageUrl = url;
+  });
+}
+  private uploadImageToS3(file: File, done: (publicUrl: string) => void, fail?: (e:any)=>void) {
   const lambdaUrl = SignupComponent.uploadProfilePicURL;
-  console.log('[onProfilePicSelected] Sending request to Lambda for presigned URL:', {
-    fileName: file.name,
-    fileType: file.type
-  });
 
   this.http.post<any>(lambdaUrl, {
     fileName: file.name,
     fileType: file.type
   }).subscribe({
     next: (res) => {
-      console.log('[Lambda Response] Presigned URL and Public URL received:', res);
-
       const presignedUrl = res.url;
       const publicUrl = res.publicUrl;
 
-      console.log('[S3 Upload] Uploading file to S3 via presigned URL...');
-      this.http.put(presignedUrl, file, {
-        headers: { 'Content-Type': file.type }
-      }).subscribe({
-        next: () => {
-          console.log('[S3 Upload] Upload successful');
-          this.profilePic = publicUrl;
-          console.log('[S3 Upload] Stored public URL:', publicUrl);
-        },
-        error: (err) => {
-          console.error('[S3 Upload] Upload to S3 failed:', err);
-        }
-      });
+      this.http.put(presignedUrl, file, { headers: { 'Content-Type': file.type } })
+        .subscribe({
+          next: () => done(publicUrl),
+          error: (err) => { console.error('[S3 Upload] failed', err); fail?.(err); }
+        });
     },
-    error: (err) => {
-      console.error('[Lambda Error] Failed to get presigned URL:', err);
-    }
+    error: (err) => { console.error('[Lambda Error] presigned URL failed', err); fail?.(err); }
   });
 }
 
