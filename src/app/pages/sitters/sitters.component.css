@@ -485,3 +485,430 @@ app-map, #mapElement {
 }
 
 
+/* ========== Card shell ========== */
+.criteria-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 1rem 1rem 0.75rem;
+}
+
+/* Header */
+.criteria-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .25rem .25rem .75rem;
+  border-bottom: 1px dashed #e6eadf;
+  margin-bottom: .75rem;
+}
+.criteria-header .bi { color: #2c6e49; font-size: 1.1rem; }
+.criteria-title { font-weight: 700; letter-spacing: .3px; }
+
+/* Footer */
+.criteria-footer {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .75rem .25rem 1rem;
+  border-top: 1px dashed #e6eadf;
+  margin-top: .25rem;
+}
+
+/* ========== Grid ========== */
+.criteria-grid {
+  display: grid;
+  gap: 1rem 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  padding: .25rem;
+}
+
+.crit-section {
+  background: #f8fbf6;
+  border: 1px solid #e6eadf;
+  border-radius: 12px;
+  padding: .9rem;
+}
+
+.crit-label {
+  font-weight: 700;
+  color: #2c6e49;
+  margin-bottom: .6rem;
+  display: flex;
+  align-items: center;
+}
+
+.crit-label .bi {
+  color: #2c6e49;
+}
+
+/* ========== Chips ========== */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .75rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e2e8da;
+  cursor: pointer;
+  transition: box-shadow .15s ease, transform .05s ease;
+  user-select: none;
+}
+
+.chip:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chip input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.chip span { font-weight: 600; color: #3a3f32; }
+
+.chip input:checked + span,
+.chip input:checked ~ span {
+  color: #1f4d34;
+}
+.chip input:checked ~ span::before {
+  content: "✓";
+  margin-right: .4rem;
+  font-weight: 800;
+  color: #2c6e49;
+}
+
+.scrollable { max-height: 160px; overflow: auto; padding-right: .25rem; }
+.scrollable::-webkit-scrollbar { width: 8px; }
+.scrollable::-webkit-scrollbar-thumb { background: #c9d4c4; border-radius: 8px; }
+
+/* ========== Segmented control (gender) ========== */
+.segmented {
+  display: inline-flex;
+  border: 1px solid #dfe6d8;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.segment {
+  position: relative;
+  padding: .4rem .85rem;
+  min-width: 90px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 600;
+  color: #465241;
+}
+
+.segment input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.segment span {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+}
+
+.segment input:checked + span,
+.segment input:checked ~ span {
+  background: #e9f4ee;
+  color: #1f4d34;
+  border-radius: 999px;
+  padding: .25rem .6rem;
+  box-shadow: inset 0 0 0 1px #b7d2c2;
+}
+
+/* ========== Range (rate) ========== */
+.rate-section .range-wrap { padding: .25rem .25rem 0; }
+
+.stylish-range {
+  --thumb-size: 18px;
+  --track-height: 8px;
+  width: 100%;
+  height: var(--track-height);
+  background: linear-gradient(90deg, #2c6e49 0%, #b0bea9 100%);
+  border-radius: 20px;
+  appearance: none;
+  outline: none;
+}
+
+/* WebKit */
+.stylish-range::-webkit-slider-runnable-track {
+  height: var(--track-height);
+  background: #dfe6d8;
+  border-radius: 20px;
+}
+.stylish-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 50%;
+  background: #2c6e49;
+  border: 3px solid #ffffff;
+  margin-top: calc((var(--track-height) - var(--thumb-size)) / 2);
+  box-shadow: 0 2px 8px rgba(44, 110, 73, 0.25);
+}
+
+/* Firefox */
+.stylish-range::-moz-range-track {
+  height: var(--track-height);
+  background: #dfe6d8;
+  border-radius: 20px;
+}
+.stylish-range::-moz-range-thumb {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 50%;
+  background: #2c6e49;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(44, 110, 73, 0.25);
+}
+
+.range-labels {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-top: .35rem;
+  color: #66725e;
+  font-weight: 600;
+  font-size: .95rem;
+}
+
+.range-badge {
+  background: #e9f4ee;
+  color: #1f4d34;
+  border: 1px solid #b7d2c2;
+  border-radius: 999px;
+  padding: .2rem .6rem;
+}
+
+/* Buttons inside header/footer */
+.criteria-card .btn-success {
+  background: #2c6e49;
+  border-color: #2c6e49;
+}
+.criteria-card .btn-success:hover {
+  background: #1f4d34;
+  border-color: #1f4d34;
+}
+.criteria-card .btn-outline-secondary:hover {
+  background: #f3f6f1;
+}
+
+/* Responsive niceties */
+@media (max-width: 576px) {
+  .criteria-header, .criteria-footer { flex-direction: column; align-items: stretch; gap: .5rem; }
+  .criteria-footer .ms-auto { margin-left: 0 !important; }
+}
+
+/* make the 0 / 150 hug the slider ends */
+.range-wrap { position: relative; padding-bottom: .25rem; }
+.range-labels {
+  position: relative;
+  display: block;
+  height: 1.2rem;
+  margin-top: .35rem;
+}
+.range-labels .min,
+.range-labels .max {
+  position: absolute;
+  bottom: 0;
+  color: #66725e;
+  font-weight: 600;
+  font-size: .95rem;
+}
+.range-labels .min { left: 0; }
+.range-labels .max { right: 0; }
+
+/* keep the middle badge centered */
+.range-badge {
+  display: inline-block;
+  background: #e9f4ee;
+  color: #1f4d34;
+  border: 1px solid #b7d2c2;
+  border-radius: 999px;
+  padding: .2rem .6rem;
+}
+
+/* ensure Apply buttons have white text (overrides your base .btn) */
+.criteria-card .btn-success {
+  background: #2c6e49;
+  border-color: #2c6e49;
+  color: #fff !important;             /* <- white text */
+}
+.criteria-card .btn-success:hover {
+  background: #1f4d34;
+  border-color: #1f4d34;
+  color: #fff !important;
+}
+
+/* ---------- Range shell ---------- */
+.range-wrap {
+  position: relative;
+  padding-top: .25rem;
+  padding-bottom: 1.4rem; /* space for badge */
+  --thumb-size: 18px;     /* keep in sync with your thumb size */
+  --min: 0;               /* default fallbacks; Angular overrides */
+  --max: 150;
+  --val: 75;
+}
+
+/* Edge labels (₪0 / ₪max) */
+.range-edges {
+  position: absolute;
+  top: -1.1rem;
+  left: 0;
+  width: 100%;
+  font-weight: 600;
+  color: #66725e;
+  font-size: .9rem;
+  pointer-events: none;
+}
+.range-edges .min { position: absolute; left: 0; }
+.range-edges .max { position: absolute; right: 0; }
+
+/* Badge centered under the thumb, regardless of min/max/value */
+.range-badge {
+  position: absolute;
+  top: calc(100% - .2rem);
+  left: calc(
+    (
+      (var(--val) - var(--min)) *
+      (100% - var(--thumb-size)) /
+      max(1, (var(--max) - var(--min)))   /* avoid /0 */
+    ) + (var(--thumb-size) / 2)
+  );
+  transform: translateX(-50%);
+  background: #e9f4ee;
+  color: #1f4d34;
+  border: 1px solid #b7d2c2;
+  border-radius: 999px;
+  padding: .2rem .6rem;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Your existing stylish slider (kept) */
+.stylish-range {
+  --track-height: 8px;
+  width: 100%;
+  height: var(--track-height);
+  background: transparent;
+  border-radius: 20px;
+  appearance: none;
+  outline: none;
+}
+.stylish-range::-webkit-slider-runnable-track {
+  height: var(--track-height);
+  background: #dfe6d8;
+  border-radius: 20px;
+}
+.stylish-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 50%;
+  background: #2c6e49;
+  border: 3px solid #ffffff;
+  margin-top: calc((var(--track-height) - var(--thumb-size)) / 2);
+  box-shadow: 0 2px 8px rgba(44,110,73,.25);
+}
+.stylish-range::-moz-range-track {
+  height: var(--track-height);
+  background: #dfe6d8;
+  border-radius: 20px;
+}
+.stylish-range::-moz-range-thumb {
+  width: var(--thumb-size);
+  height: var(--thumb-size);
+  border-radius: 50%;
+  background: #2c6e49;
+  border: 3px solid #ffffff;
+  box-shadow: 0 2px 8px rgba(44,110,73,.25);
+}
+
+/* Ensure Apply buttons read well (white text) */
+.criteria-card .btn-success {
+  background: #2c6e49;
+  border-color: #2c6e49;
+  color: #fff !important;
+}
+.criteria-card .btn-success:hover {
+  background: #1f4d34;
+  border-color: #1f4d34;
+  color: #fff !important;
+}
+
+/* Taller cards overall */
+.criteria-card { padding: 1.25rem 1.25rem 1rem; }
+
+/* Default: give every box some height */
+.crit-section { min-height: 210px; }
+
+/* Desktop+ : 4 columns with roomier boxes, no scroll in "Experienced With" */
+@media (min-width: 1200px) {
+  .criteria-grid {
+    /* 4 columns (service / gender / experienced / rate) with a wider middle column */
+    grid-template-columns: 1.15fr 1fr 1.7fr 1.15fr;
+    gap: 1.25rem 1.5rem;
+  }
+
+  /* make all boxes a bit taller */
+  .crit-section { min-height: 260px; }
+
+  /* the 3rd section is "Experienced With" in your layout — give it extra height */
+  .criteria-grid > .crit-section:nth-child(3) { min-height: 300px; }
+
+  /* remove the inner scroller so chips wrap naturally */
+  .criteria-card .scrollable { max-height: none; overflow: visible; }
+}
+
+/* Tablet: still taller than before */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  .crit-section { min-height: 240px; }
+  .criteria-card .scrollable { max-height: none; overflow: visible; }
+}
+
+.radius-row { display: flex; align-items: center; gap: .75rem; }
+
+.input-with-suffix {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: #f4f7f1;
+  border: 1px solid #e2e8da;
+  border-radius: 10px;
+  padding: .35rem .6rem;
+  min-width: 180px;
+}
+.radius-input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-weight: 700;
+  color: #1f4d34;
+}
+.input-with-suffix .suffix {
+  margin-left: .4rem;
+  font-weight: 700;
+  color: #66725e;
+}
+.radius-input:disabled { color: #9aa69b; }
+.input-with-suffix:has(.radius-input:disabled) { opacity: .65; }
+.radius-input::-webkit-outer-spin-button,
+.radius-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.radius-input[type="number"] { -moz-appearance: textfield; }
+
+.radius-presets { margin-top: .5rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+.btn-chip { background: #fff; border: 1px solid #e2e8da; color: #1f4d34; font-weight: 600; padding: .25rem .6rem; border-radius: 999px; line-height: 1.1; }
+.btn-chip:hover { background: #f4fbf7; border-color: #cfe2d6; }
+
+

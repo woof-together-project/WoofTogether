@@ -9,21 +9,63 @@ export interface UserDetails {
   isComplete?: boolean;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class UserContextService {
+  private readonly STORAGE_KEY = 'wt_user';
+
   private currentUser = new BehaviorSubject<UserDetails | null>(null);
   private _ready$ = new BehaviorSubject<boolean>(false);
-  ready$ = this._ready$.asObservable();
+  readonly ready$ = this._ready$.asObservable();
 
-  constructor() {}
+  constructor() {
+    // Hydrate from localStorage so a refresh keeps the session + completion flag
+    const raw = localStorage.getItem(this.STORAGE_KEY);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as UserDetails;
+        this.currentUser.next(parsed);
+      } catch {
+        // bad JSON → clear
+        localStorage.removeItem(this.STORAGE_KEY);
+      }
+    }
+  }
 
+  /** Set user from ID token claims; keeps previous isComplete value if present. */
   setUser(email: string | null, nickname: string | null, username: string | null, sub: string | null) {
-  const user: UserDetails = { email, nickname, username, sub, isComplete: false };
-  this.currentUser.next(user);
-  console.log('[UserContextService] setUser called. Emitted:', user);
-}
+    const prev = this.currentUser.value;
+    const user: UserDetails = {
+      email, nickname, username, sub,
+      isComplete: prev?.isComplete ?? false
+    };
+    this.currentUser.next(user);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(user));
+    console.log('[UserContextService] setUser called. Emitted:', user);
+  }
+
+  /** Update only the completion flag (e.g., from backend status on boot or after signup). */
+  setUserCompleteStatus(isComplete: boolean) {
+    const cur = this.currentUser.value;
+    const next: UserDetails = cur
+      ? { ...cur, isComplete }
+      : { email: null, nickname: null, username: null, sub: null, isComplete }; // safe fallback
+    this.currentUser.next(next);
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(next));
+    console.log('[UserContextService] setUserCompleteStatus called. Updated user:', next);
+  }
+
+  /** Clear all user state (e.g., on logout). */
+  clearUser(): void {
+    this.currentUser.next(null);
+    localStorage.removeItem(this.STORAGE_KEY);
+    console.log('[UserContextService] clearUser called. User cleared.');
+  }
+
+  // ------- Getters / helpers -------
+
+  getUserObservable() {
+    return this.currentUser.asObservable();
+  }
 
   getCurrentUserValue(): UserDetails | null {
     const user = this.currentUser.value;
@@ -31,54 +73,26 @@ export class UserContextService {
     return user;
   }
 
-  getUserObservable() {
-    return this.currentUser.asObservable();
-  }
-
   getUserEmail(): string | null {
-    const user = this.getCurrentUserValue();
-    const email = user ? user.email : null;
-    return email;
-  }
-
-  setUserCompleteStatus(isComplete: boolean) {
-    const currentUser = this.getCurrentUserValue();
-    if (currentUser) {
-      const updatedUser: UserDetails = { ...currentUser, isComplete };
-      this.currentUser.next(updatedUser);
-      console.log('[UserContextService] setUserCompleteStatus called. Updated user:', updatedUser);
-    } else {
-      console.warn('[UserContextService] setUserCompleteStatus called but no current user found.');
-    }
-  }
-
-  /** Signal that auth/init is finished (code exchange + DB check or no-code path). */
-  markReady() {
-    this._ready$.next(true);
-  }
-
-  /** (Optional) If you re-run login flow, call this first. */
-  markNotReady() {
-    this._ready$.next(false);
-  }
-
-  /** Guards / components can await this to avoid racing auth state. */
-  async waitUntilReady(): Promise<void> {
-    await firstValueFrom(this.ready$.pipe(filter(Boolean), take(1)));
-  }
-
-  isReady(): boolean {
-    // add inside UserContextService
-    return this._ready$.value;
-  }
-
-  clearUser(): void {
-    this.currentUser.next(null);
-    console.log('[UserContextService] clearUser called. User cleared.');
+    return this.currentUser.value?.email ?? null;
   }
 
   isAuthenticated(): boolean {
     const u = this.currentUser.value;
     return !!(u && u.sub && u.email);
   }
+
+  // ------- Readiness (useful to avoid auth races in guards/components) -------
+
+  /** Signal that auth/init is finished (e.g., after code exchange + DB check). */
+  markReady() { this._ready$.next(true); }
+
+  /** If you re-run login flow, call this first. */
+  markNotReady() { this._ready$.next(false); }
+
+  async waitUntilReady(): Promise<void> {
+    await firstValueFrom(this.ready$.pipe(filter(Boolean), take(1)));
+  }
+
+  isReady(): boolean { return this._ready$.value; }
 }

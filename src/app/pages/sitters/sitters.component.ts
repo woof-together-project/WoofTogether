@@ -30,6 +30,7 @@ export class SittersComponent implements OnInit {
     radius: 15           
   };
 
+  
    //cognito data
   useremail: string = '';
   nickname: string = '';
@@ -46,6 +47,9 @@ export class SittersComponent implements OnInit {
   selectedGender: string = "any";
   minRate: number = 0;
   maxRate: number = 150;
+  radiusMin = 1;   // km
+  radiusMax = 50;  // km 
+
   selectedSitter: Sitter | null = null;
   selectedSitterId: number | null = null;
   experienceWithOptions: string[] = [];
@@ -211,7 +215,6 @@ newReview = { rating: 5, comment: '' };
     
     this.http.post<Sitter[]>(url, payload).subscribe({
       next: (data) => {
-        //this.sitters = data;     
        this.sitters = data.map(sitter => ({
         ...sitter,
         imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
@@ -248,7 +251,7 @@ newReview = { rating: 5, comment: '' };
   loadSittersByLocation(): void {
   const url = SittersComponent.getSittersUrl;
   const payload = this.buildFilterPayload();
-  console.log("✅ Loading sitters with payload:", payload);
+  console.log("Loading sitters with payload:", payload);
 
   this.http.post<Sitter[]>(url, payload).subscribe({
     next: (data) => {
@@ -293,7 +296,7 @@ newReview = { rating: 5, comment: '' };
       label: 'You' 
   });
 
-    console.log("✅ Markers created:", this.markers); 
+    console.log("Markers created:", this.markers); 
   }
 
   withinRadius(s: Sitter): boolean {
@@ -323,15 +326,14 @@ newReview = { rating: 5, comment: '' };
 
   this.setMapView(m.lat, m.lng, 16);
 
-  // open the sitter card
   const s = this.sitters.find(si => si.sitterId === sitterId);
   if (s) this.selectedSitterId = s.sitterId;
 
-  this.selectedSitter = s || null;   // if you have selectedSitter property
+  this.selectedSitter = s || null;   
 }
 
 private setMapView(lat: number, lng: number, zoom: number) {
-  this.center = { lat, lng };  // new object triggers change detection
+  this.center = { lat, lng };  
   this.zoom = zoom;
 }
 
@@ -412,24 +414,21 @@ onCitySearch(): void {
   }).subscribe({
     next: (sittersRes) => {
       if (!sittersRes || sittersRes.length === 0) {
-        // show error banner
         this.cityError = `No sitters found in "${city}". Showing all nearby sitters.`;
         console.log('[CitySearch] no results -> show error');
 
-        // let Angular render it before clearing
         setTimeout(() => {
           this.searchCity = '';
           this.filteredCities = [...this.allCities];
           this.showSuggestions = false;
-          this.loadSittersByLocation(); // reload full list
+          this.loadSittersByLocation(); 
           this.cityError = null;
         }, 2000);
         return;
       }
 
-      // success case
       this.cityError = null;
-      this.clearFilters(false); // keep filters cleared, don't reload sitters
+      this.clearFilters(false); 
       this.sitters = sittersRes.map(sitter => ({
         ...sitter,
         imageUrl: sitter.profilePictureUrl
@@ -461,7 +460,7 @@ selectCity(city: string): void {
 hideSuggestionsWithDelay(): void {
   setTimeout(() => {
     this.showSuggestions = false;
-  }, 150); // short delay to allow click to register
+  }, 150); 
 }
 
 clearCitySearch(): void {
@@ -540,7 +539,7 @@ submitReview() {
       this.reviewSubmitting = false;
       this.showAddReviewModal = false;
 
-      console.log("✅ Review added successfully");
+      console.log("Review added successfully");
     },
     error: (err) => {
       console.error('Failed to submit review:', err);
@@ -555,11 +554,9 @@ submitReview() {
   }
 
   focusOnSitter(sitter: Sitter): void {
-  // try coordinates on the sitter first
   let lat = sitter.latitude ?? sitter.latitude ?? null;
   let lng = sitter.longitude ?? sitter.longitude ?? null;
 
-  // fallback: find the sitter's marker (you said marker.id === sitterId)
   if (lat == null || lng == null) {
     const m = this.markers.find(mm => mm.id === sitter.sitterId);
     if (m) { lat = m.lat; lng = m.lng; }

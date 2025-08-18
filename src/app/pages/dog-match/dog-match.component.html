@@ -193,115 +193,160 @@
           </div>
         </ng-container>
 
-        <!-- CRITERIA TAB -->
+     <!-- CRITERIA TAB -->
         <ng-container *ngIf="selectedTab === 'criteria'">
-          <form (ngSubmit)="applyFilters()" class="p-3">
-            <div class="row">
-              <div class="col-md-4 mb-3">
-                <label class="fw-bold">Size</label>
-                <select class="form-select" [(ngModel)]="filters.size" name="size">
-                  <option *ngFor="let s of sizeOptions" [value]="s">{{ s }}</option>
-                </select>
-              </div>
+          <form (ngSubmit)="applyFilters()" class="criteria-form">
 
-              <div class="col-md-4 mb-3">
-                <label class="fw-bold">Breed</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  [(ngModel)]="filters.breed"
-                  name="breed"
-                  placeholder="Enter breed"
-                />
-              </div>
-            </div>
+            <div class="criteria-panel">
 
-            <div class="row">
-              <div class="col-md-3 mb-3">
-                <label class="fw-bold">Age Min</label>
-                <input type="number" class="form-control" [(ngModel)]="filters.ageMin" name="ageMin" />
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="fw-bold">Age Max</label>
-                <input type="number" class="form-control" [(ngModel)]="filters.ageMax" name="ageMax" />
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="fw-bold">Weight Min</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="filters.weightMin"
-                  name="weightMin"
-                />
-              </div>
-              <div class="col-md-3 mb-3">
-                <label class="fw-bold">Weight Max</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="filters.weightMax"
-                  name="weightMax"
-                />
-              </div>
-            </div>
+              <!-- Row 1: Size & Breed -->
+              <div class="criteria-grid">
+                <div class="criteria-card">
+                  <label class="criteria-label">Size</label>
+                  <select class="form-select" [(ngModel)]="filters.size" name="size">
+                    <option *ngFor="let s of sizeOptions" [value]="s">{{ s }}</option>
+                  </select>
+                </div>
 
-            <div class="row">
-              <div class="col-md-6 mb-3">
-                <div class="form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [(ngModel)]="filters.vaccinated"
-                    name="vaccinated"
-                  />
-                  <label class="form-check-label fw-bold">Rabies Vaccinated</label>
+                <div class="criteria-card">
+                  <label class="criteria-label">Breed</label>
+                  <input type="text" class="form-control"
+                        [(ngModel)]="filters.breed" name="breed"
+                        placeholder="Enter breed" />
                 </div>
               </div>
-              <div class="col-md-6 mb-3">
-                <div class="form-check">
-                  <input
-                    type="checkbox"
-                    class="form-check-input"
-                    [(ngModel)]="filters.neutered"
-                    name="neutered"
-                  />
-                  <label class="form-check-label fw-bold">Neutered</label>
+
+              <!-- Row 2: Ages & Weights -->
+              <div class="criteria-grid">
+                <div class="criteria-card">
+                  <label class="criteria-label">Age Min</label>
+                  <input type="number" class="form-control"
+                        [(ngModel)]="filters.ageMin" name="ageMin" />
+                </div>
+                <div class="criteria-card">
+                  <label class="criteria-label">Age Max</label>
+                  <input type="number" class="form-control"
+                        [(ngModel)]="filters.ageMax" name="ageMax" />
+                </div>
+                <div class="criteria-card">
+                  <label class="criteria-label">Weight Min</label>
+                  <input type="number" class="form-control"
+                        [(ngModel)]="filters.weightMin" name="weightMin" />
+                </div>
+                <div class="criteria-card">
+                  <label class="criteria-label">Weight Max</label>
+                  <input type="number" class="form-control"
+                        [(ngModel)]="filters.weightMax" name="weightMax" />
                 </div>
               </div>
-            </div>
 
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="fw-bold">Radius (km)</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  [(ngModel)]="location.radius"
-                  name="radius"
-                  [disabled]="disableRadius"
-                />
-              </div>
-              <div class="col-md-6 mt-4">
-                <div class="form-check">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [(ngModel)]="disableRadius"
-                    name="disableRadius"
-                  />
-                  <label class="form-check-label">Don't filter by radius</label>
+              <!-- Row 3: Checkboxes -->
+              <div class="criteria-grid">
+                <div class="criteria-card checkbox-card">
+                  <label class="checkbox">
+                    <input type="checkbox"
+                          class="form-check-input"
+                          [(ngModel)]="filters.vaccinated"
+                          name="vaccinated" />
+                    <span>Rabies Vaccinated</span>
+                  </label>
+                </div>
+                <div class="criteria-card checkbox-card">
+                  <label class="checkbox">
+                    <input type="checkbox"
+                          class="form-check-input"
+                          [(ngModel)]="filters.neutered"
+                          name="neutered" />
+                    <span>Neutered</span>
+                  </label>
                 </div>
               </div>
-            </div>
 
-            <div class="text-center">
-              <button type="submit" class="btn btn-success me-2">Apply Filters</button>
-              <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">
-                Clear Filters
-              </button>
+              <!-- Row 4: Radius + Behavioral Traits (side-by-side) -->
+              <div class="criteria-grid two-col">
+               <!-- Radius -->
+                <div class="criteria-card radius-card">
+                  <div class="criteria-title">📏 Radius (km)</div>
+
+                  <!-- Preset buttons -->
+                  <div class="radius-presets mb-2">
+                    <button type="button" class="btn btn-outline-secondary"
+                            (click)="location.radius = 2" [disabled]="disableRadius">2 km</button>
+                    <button type="button" class="btn btn-outline-secondary"
+                            (click)="location.radius = 5" [disabled]="disableRadius">5 km</button>
+                    <button type="button" class="btn btn-outline-secondary"
+                            (click)="location.radius = 10" [disabled]="disableRadius">10 km</button>
+                  </div>
+
+                  <!-- Custom input -->
+                  <div class="radius-row">
+                    <input type="number" class="form-control radius-input"
+                          [(ngModel)]="location.radius" name="radius"
+                          [disabled]="disableRadius" />
+                    <span class="radius-unit">km</span>
+                  </div>
+
+                  <!-- Disable checkbox -->
+                  <label class="checkbox mt-2">
+                    <input type="checkbox" class="form-check-input"
+                          [(ngModel)]="disableRadius" name="disableRadius" />
+                    <span>Don't filter by radius</span>
+                  </label>
+                </div>
+
+
+                <!-- Behavioral Traits -->
+                <div class="criteria-card">
+                  <div class="criteria-title">Behavioral Traits</div>
+                  <div class="chips">
+                    <button
+                      type="button"
+                      class="btn btn-chip"
+                      *ngFor="let trait of behavioralTraitsOptions"
+                      [class.active]="filters.behavioralTraits.includes(trait)"
+                      (click)="onTraitToggle(trait)"
+                    >
+                      {{ trait }}
+                    </button>
+                  </div>
+                  <div class="criteria-hint">Tip: you can pick multiple traits.</div>
+                </div>
+              </div>
+
+              <!-- Row 5: Favorite Activities (full width) -->
+              <div class="criteria-card mt-3">
+                <div class="criteria-title">🎾 Favorite Activities</div>
+                <div class="chips">
+                  <button
+                    type="button"
+                    class="btn btn-chip"
+                    *ngFor="let act of favoriteActivitiesOptions"
+                    [class.active]="filters.favoriteActivities.includes(act)"
+                    (click)="onActivityToggle(act)"
+                  >
+                    {{ act }}
+                  </button>
+                </div>
+                <div class="criteria-hint">Tip: you can pick multiple activities.</div>
+              </div>
+
+              <!-- Actions -->
+              <div class="criteria-actions">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        (click)="clearFilters()">
+                  Clear Filters
+                </button>
+                <button type="submit" class="apply-filters">
+                  Apply Filters
+                </button>
+              </div>
+
             </div>
           </form>
         </ng-container>
+
+
       </div>
     </div>
   </div>

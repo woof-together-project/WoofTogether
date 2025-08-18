@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 type Intent = 'login' | 'signup';
+type UserStatus = { userExists: boolean; isComplete: boolean };
 
 @Component({
   selector: 'app-navbar',
@@ -34,130 +35,170 @@ export class NavbarComponent {
   loading = true;
   isComplete = false;
 
-
-  // async ngOnInit() {
-  //   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
-
-  //   this.tokenSvc.loadFromStorage();
-
-  //   if (this.tokenSvc.getIdToken()) {
-  //     if (this.tokenSvc.isExpired() && this.tokenSvc.getRefreshToken()) {
-  //       await this.tokenSvc.refreshIfPossible();
-  //     }
-  //     this.hydrateFromIdToken(this.tokenSvc.getIdToken());
-  //   }
-
-  //   const url = new URL(window.location.href);
-  //   const code = url.searchParams.get('code');
-  //   const rawState = url.searchParams.get('state');
-
-  //   // Defaults if state missing/bad
-  //   let intent: Intent = 'login';
-  //   let returnTo = '/';
-
-  //   if (rawState) {
-  //     try {
-  //       const obj = JSON.parse(atob(rawState));
-  //       intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
-  //       returnTo = obj.returnTo || '/';
-  //     } catch {
-  //       // ignore parse errors, keep defaults
-  //     }
-  //   }
-
-  //   if (code) {
-  //     try {
-  //       const tokens = await this.exchangeCodeForTokens(code);
-  //       if (tokens && tokens.id_token) {
-  //         this.tokenSvc.setTokens(tokens);
-
-  //         // hydrate UI/user context
-  //         this.hydrateFromIdToken(tokens.id_token);
-
-  //         // optional: sync user to backend only once per user
-  //         await this.sendDataToBackendOnce();
-
-  //         // route decision based on intent
-  //         if (intent === 'signup') {
-  //           await this.router.navigate(['/signup']);
-  //         } else {
-  //           await this.router.navigate([returnTo || '/']);
-  //         }
-
-  //         // clean the URL so refresh doesn't retrigger
-  //         url.searchParams.delete('code');
-  //         url.searchParams.delete('state');
-  //         window.history.replaceState({}, '', url.toString());
-  //       }
-  //     } catch (error) {
-  //       console.error('Error exchanging code for tokens:', error);
-  //     }
-  //   }
-
-  //   this.loading = false;
-  // }
-
   async ngOnInit() {
   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
 
+  // 1) Load tokens from storage (whatever your TokenService does)
   this.tokenSvc.loadFromStorage();
 
-  // ✅ Only hydrate if token is still valid. Do NOT refresh on boot.
-  const status = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
-  console.log('Token status on boot:', status);
-
-  if (status === 'VALID') {
-    this.hydrateFromIdToken(this.tokenSvc.getIdToken());
-  } else {
-    // show as signed out until user actively logs in
-    this.username = null;
-  }
-
-  // --- handle OAuth callback (unchanged) ---
+  // 2) OAuth callback handling (has ?code=...)
   const url = new URL(window.location.href);
   const code = url.searchParams.get('code');
   const rawState = url.searchParams.get('state');
 
-  let intent: Intent = 'login';
   let returnTo = '/';
-
-  if (rawState) {
-    try {
+  try {
+    if (rawState) {
       const obj = JSON.parse(atob(rawState));
-      intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
       returnTo = obj.returnTo || '/';
-    } catch {}
-  }
+    }
+  } catch {}
 
   if (code) {
     try {
       const tokens = await this.exchangeCodeForTokens(code);
       if (tokens?.id_token) {
+        // Persist tokens, then set user from ID token
         this.tokenSvc.setTokens(tokens);
-        this.hydrateFromIdToken(tokens.id_token);
+        this.hydrateFromIdToken(tokens.id_token);   // <-- does NOTHING if id_token is falsy
 
-        await this.sendDataToBackendOnce();
+        // ✅ Get truth from backend and store it (NO defaulting to false)
+        try {
+          const status = await this.getUserStatus(); // { userExists, isComplete }
+          this.userContext.setUserCompleteStatus(status.isComplete);
 
-        if (intent === 'signup') {
-          await this.router.navigate(['/signup']);
-        } else {
-          await this.router.navigate([returnTo || '/']);
+          const shouldGoToSignup = !status.userExists || !status.isComplete;
+          await this.router.navigate([shouldGoToSignup ? '/signup' : (returnTo || '/')]);
+        } catch (e) {
+          console.warn('[Auth] getUserStatus failed on callback; keeping local flag.', e);
+          // Do nothing—keep whatever local isComplete currently is
         }
 
+        // Clean URL once
         url.searchParams.delete('code');
         url.searchParams.delete('state');
         window.history.replaceState({}, '', url.toString());
       }
-    } catch (error) {
-      console.error('Error exchanging code for tokens:', error);
+    } catch (err) {
+      console.error('Error exchanging code for tokens:', err);
     }
+    this.loading = false;
+    return; // ⛔️ IMPORTANT: don’t fall through to boot path on same tick
+  }
+
+  // 3) Normal boot path (no code in URL)
+  const tokenStatus = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
+  console.log('Token status on boot:', tokenStatus);
+
+  if (tokenStatus === 'VALID') {
+    const idToken = this.tokenSvc.getIdToken();
+    if (idToken) {
+      this.hydrateFromIdToken(idToken);           // <-- sets user; preserves previous isComplete
+      // Pull server truth and update flag
+      try {
+        const backend = await this.getUserStatus(); // { userExists, isComplete }
+        this.userContext.setUserCompleteStatus(backend.isComplete);
+      } catch (e) {
+        console.warn('[Auth] getUserStatus failed on boot; keeping local flag.', e);
+      }
+    } else {
+      // No ID token in storage — do NOT call setUser; just show signed out
+      this.username = null;
+      console.warn('[Auth] VALID status but missing idToken; not setting user.');
+    }
+  } else {
+    // EXPIRED/NONE
+    this.username = null;
+    // Do NOT call setUser() here. Wait for explicit login.
   }
 
   this.loading = false;
 }
 
 
-  // ---- AUTH FLOW ----
+//   async ngOnInit() {
+//   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
+
+//   this.tokenSvc.loadFromStorage();
+
+//   const status = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
+//   console.log('Token status on boot:', status);
+
+//   // if (status === 'VALID') {
+//   //   this.hydrateFromIdToken(this.tokenSvc.getIdToken());
+//   // } else {
+//   //   this.username = null;
+//   // }
+
+//   if (status === 'VALID') {
+//   this.hydrateFromIdToken(this.tokenSvc.getIdToken());
+
+//   try {
+//     const backend = await this.getUserStatus();  
+//     this.userContext.setUserCompleteStatus(backend.isComplete);
+//   } catch (e) {
+//     console.warn('[Auth] Failed to get user status on boot:', e);
+//   }
+// } else {
+//   this.username = null;
+// }
+
+
+//   const url = new URL(window.location.href);
+//   const code = url.searchParams.get('code');
+//   const rawState = url.searchParams.get('state');
+
+//   let intent: Intent = 'login';
+//   let returnTo = '/';
+
+//   if (rawState) {
+//     try {
+//       const obj = JSON.parse(atob(rawState));
+//       intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
+//       returnTo = obj.returnTo || '/';
+//     } catch {}
+//   }
+
+//   if (code) {
+//     try {
+//       const tokens = await this.exchangeCodeForTokens(code);
+//       if (tokens?.id_token) {
+//         // this.tokenSvc.setTokens(tokens);
+//         // this.hydrateFromIdToken(tokens.id_token);
+
+//         // await this.sendDataToBackendOnce();
+
+//         // if (intent === 'signup') {
+//         //   await this.router.navigate(['/signup']);
+//         // } else {
+//         //   await this.router.navigate([returnTo || '/']);
+//         // }
+
+//        this.tokenSvc.setTokens(tokens);
+//         this.hydrateFromIdToken(tokens.id_token);
+
+//         const status = await this.getUserStatus();
+//         const shouldGoToSignup = !status.userExists || !status.isComplete;
+//         console.log('[Auth] Routing – shouldGoToSignup:', shouldGoToSignup, status);
+
+//         if (shouldGoToSignup) {
+//           await this.router.navigate(['/signup']);
+//         } else {
+//           await this.router.navigate([returnTo || '/']);
+// }
+
+//         url.searchParams.delete('code');
+//         url.searchParams.delete('state');
+//         window.history.replaceState({}, '', url.toString());
+//       }
+//     } catch (error) {
+//       console.error('Error exchanging code for tokens:', error);
+//     }
+//   }
+
+//   this.loading = false;
+// }
+
 
   async exchangeCodeForTokens(code: string) {
     const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
@@ -194,7 +235,10 @@ export class NavbarComponent {
   }
 
   redirectToLogin(): void {
-    window.location.href = environment.loginUrl;
+    //window.location.href = environment.loginUrl;
+    
+      window.location.href = this.buildHostedUiUrl(this.router.url || '/');
+
   }
 
   login(): void {
@@ -277,12 +321,12 @@ export class NavbarComponent {
 
       const result = await response.json().catch(() => ({}));
       if (response.ok) {
-        if (result.userExists === true) {
-          this.userContext.setUserCompleteStatus(true);
-          console.log('User already exists in the database.');
-        } else {
-          console.log('User created successfully.');
-        }
+        // if (result.userExists === true) {
+        //   this.userContext.setUserCompleteStatus(true);
+        //   console.log('User already exists in the database.');
+        // } else {
+        //   console.log('User created successfully.');
+        // }
       } else {
         console.error('Lambda responded with error:', result);
       }
@@ -343,4 +387,52 @@ export class NavbarComponent {
     // Standard Cognito Hosted UI logout
     return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
   }
+
+///////////////////////////////////////////////////////////////
+
+
+  private buildHostedUiUrl(returnTo = '/'): string {
+  const domain = environment.cognitoDomain.replace(/\/+$/, '');
+  const clientId = encodeURIComponent(environment.clientId);
+  const redirectUri = encodeURIComponent(environment.redirectUri);
+  const scope = encodeURIComponent('openid email profile');
+
+  // single button: just mark where to return after onboarding/login
+  const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
+
+  // If you want the Hosted UI to open on the sign-up form preselected,
+  // you can use the /signup path instead of /authorize (Cognito supports it).
+  // Otherwise use /login; both still end at your same callback.
+  return `${domain}/login?client_id=${clientId}` +
+         `&redirect_uri=${redirectUri}` +
+         `&response_type=code&scope=${scope}&state=${state}`;
+  }
+
+private async getUserStatus(): Promise<{ userExists: boolean; isComplete: boolean }> {
+  const currentUser = this.userContext.getCurrentUserValue();
+  if (!currentUser) return { userExists: false, isComplete: false };
+
+  const payload = {
+    user: {
+      name: currentUser.username,
+      email: currentUser.email,
+      nickname: currentUser.nickname,
+      provider: 'COGNITO',
+      providerId: currentUser.sub
+    }
+  };
+  console.log('[Auth] getUserStatus payload:', payload);
+
+  const res = await fetch(NavbarComponent.insertUserToDBURL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json().catch(() => ({}));
+  console.log('[Auth] getUserStatus response:', data);
+  return { userExists: !!data.userExists, isComplete: !!data.isComplete };
 }
+
+
+}
+

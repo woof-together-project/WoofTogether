@@ -104,7 +104,7 @@
   <!-- Small toolbar above the map -->
       <div class="map-toolbar d-flex align-items-center gap-2 mb-2">
         <button class="btn btn-outline-dark btn-sm" (click)="resetMapView()">
-          Return to Default View
+          Return to Default View In Map
         </button>
         <div class="ms-auto small text-muted">
           Zoom: {{ zoom }} | Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
@@ -123,87 +123,157 @@
           </div>
         </ng-container>
 
- <ng-container *ngIf="selectedTab === 'criteria'">
-          <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="w-100">
-            <div class="row px-4">
- 
-              <!-- Service Options -->
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-bold">Service Options</label>
-                <div *ngFor="let option of serviceOptions" class="d-flex align-items-center mb-1" style="margin-left: 118px;">
-                  <input
-                    type="checkbox"
-                    class="form-check-input me-2"
-                    [id]="'service-' + option"
-                    [value]="option"
-                    [checked]="selectedServiceOptions.includes(option)"
-                    (change)="onServiceOptionChange($event)"
-                    name="serviceOptions"
-                  />
-                  <label [for]="'service-' + option" class="form-check-label mb-0">
-                    {{ option }}
-                  </label>
-                </div>
-              </div>
+<ng-container *ngIf="selectedTab === 'criteria'">
+  <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
 
-              <!-- Gender -->
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-bold">Sitter Gender</label>
-                <div *ngFor="let gender of ['any', 'female', 'male']" class="d-flex align-items-center mb-1" style="margin-left: 128px;">
-                  <input
-                    type="radio"
-                    class="form-check-input me-2"
-                    [value]="gender"
-                    [(ngModel)]="selectedGender"
-                    [id]="'gender-' + gender"ד
-                    name="gender"
-                  />
-                  <label [for]="'gender-' + gender" class="form-check-label mb-0">
-                    {{ gender.charAt(0).toUpperCase() + gender.slice(1) }}
-                  </label>
-                </div>
-              </div>
+    <!-- Header -->
+    <div class="criteria-header">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-funnel-fill"></i>
+        <span class="criteria-title">Refine your search</span>
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <!-- <button type="button" class="btn btn-link btn-sm text-decoration-none" (click)="clearFilters()">
+          Clear all
+        </button>
+        <button type="submit" class="btn btn-success btn-sm">
+          Apply
+        </button> -->
+      </div>
+    </div>
 
-              <!-- Experienced With (single vertical list) -->
-              <div class="col-md-4 mb-3">
-                <label class="form-label fw-bold">Experienced With</label>
-                <div class="form-check d-flex align-items-center mb-1" style="margin-left: 113px;" *ngFor="let type of experienceWithOptions">
-                  <input
-                    type="checkbox"
-                    class="form-check-input me-2"
-                    [value]="type"
-                    [checked]="filters.experiencedWith.includes(type)"
-                    (change)="onExperienceChange($event)"
-                    id="exp-{{ type }}"
-                  />
-                  <label class="form-check-label" [for]="'exp-' + type" style="margin: 0;">
-                    {{ type }}
-                  </label>
-                </div>
-              </div>
-            </div>
+    <!-- Grid -->
+    <div class="criteria-grid">
+      <!-- Service Options -->
+      <section class="crit-section">
+        <h6 class="crit-label"><i class="bi bi-briefcase me-1"></i>Service Options</h6>
+        <div class="chip-group">
+          <label class="chip" *ngFor="let option of serviceOptions">
+            <input
+              type="checkbox"
+              [value]="option"
+              [checked]="selectedServiceOptions.includes(option)"
+              (change)="onServiceOptionChange($event)"
+              name="serviceOptions"
+            />
+            <span>{{ option }}</span>
+          </label>
+        </div>
+      </section>
 
-            <!-- Rate -->
-            <div class="row" style="margin: -80px 400px 10px 0px;">
-              <label class="form-label fw-bold">Max Rate (₪)</label>
-              <input
-                type="range"
-                class="form-range"
-                style="width: 450px; margin-left: 190px;"
-                min="0"
-                max="150"
-                step="5"
-                [(ngModel)]="filters.rateMax"
-                name="rateMax"
-              />
-              <div class="text-center small"  style="margin-top: 10px;">Up to ₪{{ filters.rateMax }}</div>
-            </div>
+      <!-- Sitter Gender -->
+      <section class="crit-section">
+        <h6 class="crit-label"><i class="bi bi-gender-ambiguous me-1"></i>Sitter Gender</h6>
+        <div class="segmented">
+          <label class="segment" *ngFor="let gender of ['any', 'female', 'male']">
+            <input
+              type="radio"
+              [value]="gender"
+              [(ngModel)]="selectedGender"
+              name="gender"
+              [id]="'gender-' + gender"
+            />
+            <span>{{ gender | titlecase }}</span>
+          </label>
+        </div>
+      </section>
 
-            <!-- Buttons -->
-            <div class="text-center mt-4 mb-3 d-flex justify-content-center gap-3">
-              <button type="submit" class="btn btn-success">Apply Filters</button>
-              <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
-            </div>
+      <!-- Experienced With -->
+      <section class="crit-section">
+        <h6 class="crit-label"><i class="bi bi-dog me-1"></i>Experienced With</h6>
+        <div class="chip-group scrollable">
+          <label class="chip" *ngFor="let type of experienceWithOptions">
+            <input
+              type="checkbox"
+              [value]="type"
+              [checked]="filters.experiencedWith.includes(type)"
+              (change)="onExperienceChange($event)"
+              [id]="'exp-' + type"
+            />
+            <span>{{ type }}</span>
+          </label>
+        </div>
+      </section>
+
+      <section class="crit-section rate-section">
+  <h6 class="crit-label"><i class="bi bi-cash-stack me-1"></i>Max Rate</h6>
+  <div class="range-wrap">
+    <input
+      type="range"
+      class="form-range stylish-range"
+      min="0"
+      max="150"
+      step="5"
+      [(ngModel)]="filters.rateMax"
+      name="rateMax"
+      aria-label="Maximum hourly rate"
+    />
+    <div class="range-labels">
+      <span class="min">₪0</span>
+      <span class="range-badge">Up to ₪{{ filters.rateMax }}</span>
+      <span class="max">₪150</span>
+    </div>
+  </div>
+</section>
+
+<section class="crit-section radius-section">
+  <h6 class="crit-label">
+    <i class="bi bi-geo-alt me-1"></i>Radius (km)
+  </h6>
+
+  <div class="radius-row">
+    <label class="visually-hidden" for="radiusKmInput">Search radius in kilometers</label>
+    <div class="input-with-suffix">
+      <input
+        id="radiusKmInput"
+        type="number"
+        class="radius-input"
+        [min]="radiusMin"
+        [max]="radiusMax"
+        step="1"
+        [(ngModel)]="location.radius"    
+        name="radiusKm"
+        [disabled]="disableRadius"      
+        placeholder="e.g. 10"
+      />
+      <span class="suffix">km</span>
+    </div>
+
+    <label class="form-check ms-3 dont-radius">
+      <input
+        type="checkbox"
+        class="form-check-input me-2"
+        [(ngModel)]="disableRadius"       
+        name="ignoreRadius"
+      />
+      <span>Don't filter by radius</span>
+    </label>
+  </div>
+
+  <div class="radius-presets" *ngIf="!disableRadius">
+    <button type="button" class="btn btn-chip" (click)="location.radius = 2">2</button>
+    <button type="button" class="btn btn-chip" (click)="location.radius = 5">5</button>
+    <button type="button" class="btn btn-chip" (click)="location.radius = 10">10</button>
+    <button type="button" class="btn btn-chip" (click)="location.radius = 20">20</button>
+  </div>
+</section>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="criteria-footer">
+      <div class="small text-muted">
+        Tip: You can combine multiple “Experienced with” chips.
+      </div>
+      <div class="ms-auto d-flex gap-2">
+        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
+        <button type="submit" class="btn btn-success">Apply Filters</button>
+      </div>
+    </div>
+  </form>
+</ng-container>
+
+
 
 <!-- ========== REVIEWS MODAL ========== -->
 <div class="modal-backdrop-custom" *ngIf="showReviewModal" (click)="closeReviews()"></div>

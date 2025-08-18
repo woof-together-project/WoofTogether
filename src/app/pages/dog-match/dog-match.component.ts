@@ -73,7 +73,7 @@ export class DogMatchComponent implements OnInit {
   // Map markers
   markers: { id: number; lat: number; lng: number; label?: string }[] = [];
 
-  // Filters for dog search (temperaments removed)
+  // Filters for dog search
   filters = {
     size: 'Any',
     breed: 'Any',
@@ -82,8 +82,36 @@ export class DogMatchComponent implements OnInit {
     weightMin: 0,
     weightMax: 100,
     vaccinated: null as boolean | null, // RabiesVaccinated
-    neutered: null as boolean | null    // Fixed
+    neutered: null as boolean | null,
+    behavioralTraits: [] as string[],
+    favoriteActivities: [] as string[]    
   };
+
+  behavioralTraitsOptions: string[] = [
+  'Reactive',
+  'Aggressive to Other Animals',
+  'Aggressive to People',
+  'Anxious',
+  'Afraid of Men',
+  'Afraid of Women',
+  'Gets Along with Everyone',
+  'Gets Along with People',
+  'Gets Along with Other Dogs',
+  'Gets Along with Other Animals',
+  'Hyper',
+  'Chill',
+  'Protective',
+  'Territorial',
+  'Playful',
+  'Friendly'
+];
+
+favoriteActivitiesOptions: string[] = [
+  'Fetching Balls', 'Playing with Toys', 'Running', 'Sleeping', 'Lying in the Sun',
+  'Eating', 'Cuddling', 'Traveling', 'Sniffing Everything', 'Swimming',
+  'Agility Courses', 'Chasing Squirrels', 'Going to the Park'
+];
+
 
   async ngOnInit(): Promise<void> {
     try {
@@ -139,8 +167,6 @@ export class DogMatchComponent implements OnInit {
       longitude: this.location.longitude,
       radius: this.location.radius,
       noRadiusFilter: this.disableRadius,
-
-      // match backend field names it expects
       Size:
         this.filters.size && this.filters.size !== 'Any'
           ? [String(this.filters.size).toLowerCase()]
@@ -154,14 +180,12 @@ export class DogMatchComponent implements OnInit {
       AgeMax: this.filters.ageMax ?? null,
       WeightMin: this.filters.weightMin ?? null,
       WeightMax: this.filters.weightMax ?? null,
-
       RabiesVaccinated: this.filters.vaccinated ?? null,
       Fixed: this.filters.neutered ?? null,
-
       City: (this.searchCity || '').trim(),
-
-      // exclude current user’s listings
-      excludeEmail: this.currentUserEmail || ''
+      excludeEmail: this.currentUserEmail || '',
+      BehavioralTraits: this.filters.behavioralTraits ?? [],
+      FavoriteActivities: this.filters.favoriteActivities ?? [] 
     };
   }
 
@@ -193,7 +217,9 @@ export class DogMatchComponent implements OnInit {
       weightMin: 0,
       weightMax: 100,
       vaccinated: null,
-      neutered: null
+      neutered: null,
+      behavioralTraits: [],
+      favoriteActivities: []
     };
     this.loadDogsByLocation();
   }
@@ -451,6 +477,20 @@ focusOnDog(dog: Dog) {
 resetMapView() {
   this.center =  { lat: 32.0853, lng: 34.7818 }; // default to Tel Aviv 
   this.zoomLevel = 13;
+}
+
+onTraitToggle(trait: string) {
+  const list = this.filters.behavioralTraits;
+  const i = list.indexOf(trait);
+  if (i === -1) list.push(trait);
+  else list.splice(i, 1);
+}
+
+onActivityToggle(activity: string): void {
+  const arr = this.filters.favoriteActivities;
+  const i = arr.indexOf(activity);
+  if (i > -1) arr.splice(i, 1);
+  else arr.push(activity);
 }
 
 }

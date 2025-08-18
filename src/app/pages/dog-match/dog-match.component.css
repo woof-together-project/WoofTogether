@@ -144,5 +144,315 @@
   line-height: 1.2;
   box-shadow: 0 2px 8px rgba(0,0,0,.25);
 }
+.dm-crit.tray{background:#fff;border:1px solid #e4eee7;border-radius:14px;padding:16px;box-shadow:0 6px 14px rgba(0,0,0,.04);margin-top:6px}
+.dm-crit-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:10px}
+.dm-crit-row--checks{grid-template-columns:repeat(2,1fr)}
+.dm-crit-field{display:flex;flex-direction:column}
+.dm-crit-label{font-weight:800;color:#284d3a;margin-bottom:4px}
+
+/* --- pretty inline checkboxes --- */
+.dm-crit-check{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#f6fbf7;border:1px solid #e2eee6;border-radius:10px;
+  padding:.55rem .8rem;color:#2e4b3b;user-select:none
+}
+.dm-check{
+  appearance:none;width:18px;height:18px;border:2px solid #8fb39c;border-radius:4px;
+  background:#fff;position:relative;display:inline-block;vertical-align:middle;flex:0 0 18px
+}
+.dm-check:checked{background:#2c6e49;border-color:#2c6e49}
+.dm-check:checked::after{
+  content:'';position:absolute;left:4px;top:0px;width:6px;height:10px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)
+}
+
+/* --- radius rectangle --- */
+.dm-crit-radius{border:1px dashed #dfeae3;border-radius:12px;background:#fbfdfc;padding:1rem 1.25rem;margin-top:6px}
+.dm-crit-radius__title{margin:0 0 .5rem;color:#2c4f3b;font-weight:800}
+.dm-crit-radius__inner{display:grid;grid-template-columns:230px 260px 1fr;align-items:center;gap:1rem}
+.dm-crit-radius__toggle{justify-self:start}
+
+.dm-crit-input-suffix{
+  position:relative;display:inline-flex;align-items:center;min-width:210px;
+  background:#f4f7f1;border:1px solid #e2e8da;border-radius:10px;padding:.35rem .6rem
+}
+.dm-crit-radius__input{border:none;background:transparent;outline:none;width:100%;font-weight:700;color:#1f4d34}
+.dm-crit-input-suffix__unit{margin-left:.4rem;font-weight:700;color:#66725e}
+
+/* quick radius chips */
+.dm-chip{
+  background:#fff !important;border:1px solid #e2e8da;color:#1f4d34 !important;
+  font-weight:700;padding:.25rem .6rem;border-radius:999px;cursor:pointer
+}
+.dm-chip:hover{background:#f4fbf7 !important;border-color:#cfe2d6}
+
+/* --- distinct action buttons, override your global .btn --- */
+.dm-crit-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.25rem}
+.btn-apply{
+  background:#2c6e49 !important;border:1px solid #2c6e49 !important;color:#fff !important;
+  padding:.45rem 1rem;border-radius:8px;font-weight:700
+}
+.btn-apply:hover{background:#24583c !important;border-color:#24583c !important}
+.btn-clear{
+  background:#fff !important;border:1px solid #cfd7cc !important;color:#495057 !important;
+  padding:.45rem 1rem;border-radius:8px;font-weight:700
+}
+.btn-clear:hover{background:#f7faf8 !important;border-color:#b9c6bb !important}
+
+/* number input spinners off */
+.dm-crit-radius__input::-webkit-outer-spin-button,
+.dm-crit-radius__input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.dm-crit-radius__input[type="number"]{-moz-appearance:textfield}
+
+/* responsive */
+@media (max-width: 991.98px){
+  .dm-crit-row{grid-template-columns:1fr 1fr}
+  .dm-crit-row--checks{grid-template-columns:1fr}
+  .dm-crit-radius__inner{grid-template-columns:1fr}
+}
+@media (max-width: 575.98px){
+  .dm-crit-row{grid-template-columns:1fr}
+}
+
+/* block wrapper (same vibe as radius card) */
+.dm-crit-block {
+  border: 1px dashed #dfeae3;
+  border-radius: 12px;
+  background: #fbfdfc;
+  padding: 1rem 1.25rem;
+  margin-top: 6px;
+}
+.dm-crit-block__title {
+  margin: 0 0 .5rem;
+  color: #2c4f3b;
+  font-weight: 800;
+}
+
+/* chips grid */
+.dm-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem .5rem;
+}
+
+/* accessible chip toggle */
+.dm-chip-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+.dm-chip-toggle__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.dm-chip-toggle__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: .35rem .75rem;
+  border-radius: 999px;
+  background: #fff;
+  border: 1px solid #e2e8da;
+  color: #1f4d34;
+  font-weight: 700;
+  line-height: 1;
+  transition: background .15s, border-color .15s, color .15s, box-shadow .15s;
+}
+.dm-chip-toggle__pill:hover {
+  background: #f4fbf7;
+  border-color: #cfe2d6;
+}
+
+/* active state when checked */
+.dm-chip-toggle__input:checked + .dm-chip-toggle__pill {
+  background: #e6f3ec;
+  border-color: #2c6e49;
+  color: #2c6e49;
+  box-shadow: inset 0 0 0 1px #2c6e49;
+}
+
+.dm-crit-hint {
+  margin-top: .5rem;
+  font-size: .85rem;
+  color: #6b776d;
+}
+
+@media (max-width: 575.98px){
+  .dm-chip-grid { gap: .4rem; }
+  .dm-chip-toggle__pill { padding: .3rem .65rem; }
+}
+.btn-chip,
+.btn-chip.active,
+.btn-chip.selected {
+  font-weight: 200 !important;  
+}
+
+.chip,
+.chip.active,
+.chip.selected {
+  font-weight: 200 !important;
+}
+
+.criteria-card {
+  background: #f7fbf5;
+  border: 1px dashed #d6e4d1;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.criteria-title {
+  font-weight: 600;
+  color: #3a4a36;
+  margin-bottom: 8px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.btn-chip {
+  border: 1px solid #c9d7c2;
+  background: #fff;
+  color: #2b3a2a;          /* not bold */
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+  font-weight: 500;        /* keep medium, not bold */
+}
+
+.btn-chip.active {
+  background: #e6f1e3;
+  border-color: #86b486;
+}
+
+.criteria-hint {
+  margin-top: 6px;
+  font-size: .85rem;
+  color: #6e7b68;
+}
+
+/* Panel */
+.criteria-form .criteria-panel {
+  background: #ffffff;
+  border: 1px solid #e6efe2;
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+}
+
+/* Grid */
+.criteria-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.criteria-grid.two-col {
+  grid-template-columns: 1.2fr 2.8fr; /* radius + traits proportion */
+}
+@media (max-width: 992px) {
+  .criteria-grid, .criteria-grid.two-col { grid-template-columns: 1fr; }
+}
+
+/* Cards & labels */
+.criteria-card {
+  background: #f7fbf5;
+  border: 1px dashed #d6e4d1;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.criteria-label { display: block; margin-bottom: 6px; color: #3a4a36; font-weight: 600; }
+.criteria-title { font-weight: 600; color: #3a4a36; margin-bottom: 8px; }
+
+/* Radius */
+.radius-card { display: flex; flex-direction: column; }
+.radius-row { display: flex; align-items: center; gap: 8px; }
+.radius-input { max-width: 140px; }
+.radius-unit {
+  display: inline-block;
+  padding: 6px 10px;
+  background: #e9f2e6;
+  border: 1px solid #cfe0c8;
+  border-radius: 8px;
+  font-size: .95rem;
+  color: #2b3a2a;
+}
+
+/* Checkbox line */
+.checkbox {
+  display: inline-flex; align-items: center; gap: 8px;
+  user-select: none; cursor: pointer;
+}
+.checkbox > input { position: relative; top: 1px; }
+
+/* Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn-chip {
+  border: 1px solid #c9d7c2;
+  background: #fff;
+  color: #2b3a2a;    /* not bold */
+  padding: 6px 10px;
+  border-radius: 999px;
+  line-height: 1;
+  font-weight: 500;
+}
+.btn-chip.active {
+  background: #e6f1e3;
+  border-color: #86b486;
+}
+
+/* Hints */
+.criteria-hint {
+  margin-top: 6px;
+  font-size: .85rem;
+  color: #6e7b68;
+}
+
+/* Actions – pushed down a bit and separated */
+.criteria-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;       /* <- moves buttons a little down */
+  padding-top: 8px;
+  border-top: 1px solid #edf3ea;
+}
+
+.criteria-actions .btn-success { color: #fff; }
+.criteria-actions .btn-outline-secondary {
+  background: #f7f7f7;
+  border-color: #cfd8d3;
+  color: #2f3b33;
+}
+.criteria-actions .btn-outline-secondary:hover {
+  background: #eceff0;
+}
+
+button.apply-filters {
+  background-color: #006400 !important; /* dark green */
+  color: white !important;
+  border: none;
+}
+
+button.apply-filters:hover {
+  background-color: #004d00 !important; /* darker on hover */
+}
+.radius-presets button {
+  margin-right: 6px;
+  margin-bottom: 6px;
+}
+
+button.apply-filters {
+  background-color: #006400 !important; 
+  color: white !important;
+  border: none;
+}
+
+button.apply-filters:hover {
+  background-color: #004d00 !important; 
+}
 
 
