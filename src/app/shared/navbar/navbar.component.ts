@@ -37,7 +37,10 @@ export class NavbarComponent {
 
   async ngOnInit() {
   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
-
+  this.userContext.getUserObservable().subscribe(u => {
+    this.username   = u?.nickname ?? null;
+    this.isComplete = !!u?.isComplete;
+  });
   // 1) Load tokens from storage (whatever your TokenService does)
   this.tokenSvc.loadFromStorage();
 
@@ -66,6 +69,7 @@ export class NavbarComponent {
         try {
           const status = await this.getUserStatus(); // { userExists, isComplete }
           this.userContext.setUserCompleteStatus(status.isComplete);
+          this.isComplete = status.isComplete;
 
           const shouldGoToSignup = !status.userExists || !status.isComplete;
           await this.router.navigate([shouldGoToSignup ? '/signup' : (returnTo || '/')]);
@@ -96,6 +100,7 @@ export class NavbarComponent {
       try {
         const backend = await this.getUserStatus(); 
         this.userContext.setUserCompleteStatus(backend.isComplete);
+        this.isComplete = backend.isComplete;
       } catch (e) {
         console.warn('[Auth] getUserStatus failed on boot; keeping local flag.', e);
       }
@@ -132,7 +137,7 @@ export class NavbarComponent {
 //   this.hydrateFromIdToken(this.tokenSvc.getIdToken());
 
 //   try {
-//     const backend = await this.getUserStatus();  
+//     const backend = await this.getUserStatus();
 //     this.userContext.setUserCompleteStatus(backend.isComplete);
 //   } catch (e) {
 //     console.warn('[Auth] Failed to get user status on boot:', e);
@@ -234,7 +239,7 @@ export class NavbarComponent {
 
   redirectToLogin(): void {
     //window.location.href = environment.loginUrl;
-    
+
       window.location.href = this.buildHostedUiUrl(this.router.url || '/');
 
   }
