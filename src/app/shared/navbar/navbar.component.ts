@@ -27,7 +27,7 @@ export class NavbarComponent {
     private router: Router,
     private userContext: UserContextService,
     private navigationService: NavigationService,
-    private tokenSvc: TokenService
+    private tokenSvc: TokenService,
   ) {}
 
   username: string | null = null;
@@ -83,20 +83,18 @@ export class NavbarComponent {
       console.error('Error exchanging code for tokens:', err);
     }
     this.loading = false;
-    return; // ⛔️ IMPORTANT: don’t fall through to boot path on same tick
+    return; 
   }
 
-  // 3) Normal boot path (no code in URL)
   const tokenStatus = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
   console.log('Token status on boot:', tokenStatus);
 
   if (tokenStatus === 'VALID') {
     const idToken = this.tokenSvc.getIdToken();
     if (idToken) {
-      this.hydrateFromIdToken(idToken);           // <-- sets user; preserves previous isComplete
-      // Pull server truth and update flag
+      this.hydrateFromIdToken(idToken);          
       try {
-        const backend = await this.getUserStatus(); // { userExists, isComplete }
+        const backend = await this.getUserStatus(); 
         this.userContext.setUserCompleteStatus(backend.isComplete);
       } catch (e) {
         console.warn('[Auth] getUserStatus failed on boot; keeping local flag.', e);
@@ -245,7 +243,6 @@ export class NavbarComponent {
     this.redirectToLogin();
   }
 
-  // ---- USER HYDRATION ----
 
   private hydrateFromIdToken(idToken: string | null) {
     if (!idToken) return;
@@ -335,7 +332,6 @@ export class NavbarComponent {
     }
   }
 
-  // ---- ROUTING HELPERS ----
 
   handleProtectedRoute(event: Event, targetRoute: string): void {
     event.preventDefault();
@@ -433,6 +429,21 @@ private async getUserStatus(): Promise<{ userExists: boolean; isComplete: boolea
   return { userExists: !!data.userExists, isComplete: !!data.isComplete };
 }
 
+private buildHostedUiLoginUrl(returnTo: string = '/'): string {
+  const domain = environment.cognitoDomain.replace(/\/+$/, '');
+  const clientId = encodeURIComponent(environment.clientId);
+  const redirectUri = encodeURIComponent(environment.redirectUri);
+  const scope = encodeURIComponent('openid email profile');
+  const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
+  return `${domain}/login?client_id=${clientId}`
+       + `&redirect_uri=${redirectUri}`
+       + `&response_type=code&scope=${scope}&state=${state}`;
+}
+
+
+goToLogin(returnTo: string = '/'): void {
+  window.location.href = this.buildHostedUiLoginUrl(returnTo);
+}
 
 }
 

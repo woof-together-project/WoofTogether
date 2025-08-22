@@ -1,33 +1,23 @@
 <nav class="navbar">
   <div class="logo">🐶</div>
-  <ul class="nav-links">
+  <!-- <ul class="nav-links">
     <li><a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
     <li><a href="#" (click)="handleProtectedRoute($event, '/sitters')">Sitters</a>
     </li>
     <li>
       <a href="#" (click)="handleProtectedRoute($event, '/dog-match')">Dog Match</a>
     </li>
-    <!-- <li><a routerLink="/sitters" routerLinkActive="active-link">Sitters</a></li>
-    <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li> -->
     <li><a href="#" (click)="handleProtectedRoute($event, '/ask-us')">Ask Us</a></li>
-  </ul>
+  </ul> -->
+ <ul class="nav-links">
+  <li><a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
+  <li><a routerLink="/sitters"   routerLinkActive="active-link">Sitters</a></li>
+  <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li>
+  <li><a routerLink="/ask-us"    routerLinkActive="active-link">Ask Us</a></li>
+</ul>
+
 
    <div class="nav-actions">
-      <!-- <input
-        type="text"
-        [(ngModel)]="searchText"
-        placeholder="Search..."
-        class="search-box" /> -->
-      <!-- <div *ngIf="username as name; else showLogin" class="hello-text bold-text">
-        Hello {{ name }} 👋
-      </div>
-      <button class="login-btn" (click)="logout()" style="margin-left: 8px">Logout</button>
-
-    <ng-template #showLogin>
-      <button class="login-btn" (click)="login()">Login</button>
-    </ng-template>
-  </div> -->
-
   <ng-container *ngIf="username as name; else showLogin">
     <div class="hello-text bold-text">
       Hello {{ name }} 👋
