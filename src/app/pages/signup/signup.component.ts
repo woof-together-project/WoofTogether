@@ -130,7 +130,8 @@ export class SignupComponent {
   cityCenter: { lat: number; lng: number } | null = null;
   cityName: string | null = null;
   cityRect: { sw: { lat: number; lng: number }, ne: { lat: number; lng: number } } | null = null;
-
+  cityActiveIndex = 0;
+  addressActiveIndex = 0;
 
 
   toggleSitterCard() {
@@ -447,12 +448,14 @@ onCityInput(v: string) {
   this.city = v;
   this.cityQuery$.next(v);
   this.addressSuggestions = [];
+  this.cityActiveIndex = 0;
 }
 
 onStreetInput(v: string) {
   this.street = v;
   this.addressQuery$.next(v);
   this.citySuggestions = [];
+  this.addressActiveIndex = 0;
 }
 
 pickAddress(s: { description: string; place_id: string }) {
@@ -489,6 +492,82 @@ private extractCityName(components?: AddressComponent[] | null): string | null {
   return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
 }
 
+private scrollCityIntoView() {
+  setTimeout(() => document.querySelector<HTMLElement>(`#city-opt-${this.cityActiveIndex}`)?.scrollIntoView({block:'nearest'}));
+}
+private scrollAddressIntoView() {
+  setTimeout(() => document.querySelector<HTMLElement>(`#addr-opt-${this.addressActiveIndex}`)?.scrollIntoView({block:'nearest'}));
+}
+
+onCityKeydown(ev: KeyboardEvent) {
+  const n = this.citySuggestions?.length ?? 0;
+  if (!n) return;                            // let caret move normally if list closed
+
+  if (ev.key === 'ArrowDown') {
+    ev.preventDefault();
+    this.cityActiveIndex = (this.cityActiveIndex + 1) % n;
+    this.scrollCityIntoView();
+  } else if (ev.key === 'ArrowUp') {
+    ev.preventDefault();
+    this.cityActiveIndex = (this.cityActiveIndex - 1 + n) % n;
+    this.scrollCityIntoView();
+  } else if (ev.key === 'Enter') {
+    ev.preventDefault();                     // stop form submit
+    const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
+    if (s) this.pickCity(s);
+  } else if (ev.key === 'Escape') {
+    this.citySuggestions = [];
+  }
+}
+
+onStreetKeydown(ev: KeyboardEvent) {
+  const n = this.addressSuggestions?.length ?? 0;
+  if (!n) return;
+
+  if (ev.key === 'ArrowDown') {
+    ev.preventDefault();
+    this.addressActiveIndex = (this.addressActiveIndex + 1) % n;
+    this.scrollAddressIntoView();
+  } else if (ev.key === 'ArrowUp') {
+    ev.preventDefault();
+    this.addressActiveIndex = (this.addressActiveIndex - 1 + n) % n;
+    this.scrollAddressIntoView();
+  } else if (ev.key === 'Enter') {
+    ev.preventDefault();
+    const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
+    if (s) this.pickAddress(s);
+  } else if (ev.key === 'Escape') {
+    this.addressSuggestions = [];
+  }
+}
+
+onCityArrow(dir: 1|-1, ev: Event) {
+  ev.preventDefault(); ev.stopPropagation();
+  const n = this.citySuggestions?.length ?? 0;
+  if (!n) return;
+  this.cityActiveIndex = (this.cityActiveIndex + dir + n) % n;
+  this.scrollCityIntoView();
+}
+
+onStreetArrow(dir: 1|-1, ev: Event) {
+  ev.preventDefault(); ev.stopPropagation();
+  const n = this.addressSuggestions?.length ?? 0;
+  if (!n) return;
+  this.addressActiveIndex = (this.addressActiveIndex + dir + n) % n;
+  this.scrollAddressIntoView();
+}
+
+onCityEnter(ev: Event) {
+  ev.preventDefault(); ev.stopPropagation();
+  const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
+  if (s) this.pickCity(s);
+}
+
+onStreetEnter(ev: Event) {
+  ev.preventDefault(); ev.stopPropagation();
+  const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
+  if (s) this.pickAddress(s);
+}
 
 }
 

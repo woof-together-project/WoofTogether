@@ -167,4 +167,40 @@
 .autocomplete-list li:hover { background: #f5f5f5; }
 
 
+/* Base list item */
+.autocomplete-list li {
+  padding: .5rem .75rem;
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+
+.autocomplete-list li.active {
+  font-weight: 700;          /* ← bold */
+}
+
+/* Optional: subtle left bar for the active row */
+.autocomplete-list li.active {
+  position: relative;
+}
+.autocomplete-list li.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: #0d6efd;       /* Bootstrap primary */
+  opacity: .9;
+}
+
+.mb-3.position-relative .autocomplete-list li.active {
+  font-weight: 700;
+}
+
+.autocomplete-list li.active,
+.autocomplete-list li:hover {
+  background: #f5f5f5;
+}
+.autocomplete-list li.active {
+  font-weight: 700;
+}
 
