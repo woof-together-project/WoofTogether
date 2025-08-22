@@ -173,10 +173,17 @@
                   Please select your gender, some dogs might be picky!
                 </div>
               </div>
-              <div class="mb-2">
+              <!--<div class="mb-2">
                 <label for="sitterBio" class="form-label">About Me</label>
                 <textarea class="form-control" id="sitterBio" rows="3" placeholder="Let us know about yourself and your experience.." name="sitterBio" ngModel #sitterBioModel="ngModel"></textarea>
-              </div>
+              </div>-->
+                <textarea class="form-control"
+                  id="sitterBio"
+                  rows="3"
+                  placeholder="Let us know about yourself and your experience.."
+                  name="sitterBio"
+                  [(ngModel)]="sitterBio"
+                  [ngModelOptions]="{standalone:true}"></textarea>
 
               </div>
               <div class="d-flex justify-content-end pt-3 border-top">
@@ -215,7 +222,7 @@
             </div>
 
             <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 2">
-              <div class="mb-3">
+              <!--<div class="mb-3">
                 <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
                 <div class="border p-2 rounded" style="max-height: 175px; overflow-y: auto;">
                   <div *ngFor="let type of experienceWithOptions">
@@ -227,9 +234,24 @@
                     {{ type }}
                   </div>
                 </div>
+              </div>-->
+
+              <div class="mb-3">
+                <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
+                <div class="border p-2 rounded" style="max-height: 175px; overflow-y: auto;">
+                  <div *ngFor="let type of experienceWithOptions; let j = index">
+                    <input type="checkbox"
+                           name="exp-{{j}}"
+                           [ngModel]="selectedSitterExperience.includes(type)"
+                           (ngModelChange)="selectedSitterExperience = toggleIn(selectedSitterExperience, type, $event)"
+                           [ngModelOptions]="{standalone:true}"
+                           class="form-check-input me-1">
+                    {{ type }}
+                  </div>
+                </div>
               </div>
 
-            <div class="flex-grow-1">
+            <!--<div class="flex-grow-1">
               <div class="mb-3">
                 <label class="form-label fw-bold">Service Options</label>
                 <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
@@ -241,6 +263,21 @@
                       class="form-check-input me-1">
                     {{ service }}
                   </div>
+                </div>
+              </div>
+            </div>-->
+
+            <div class="mb-3">
+              <label class="form-label fw-bold">Service Options</label>
+              <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
+                <div *ngFor="let service of serviceOptions; let k = index">
+                  <input type="checkbox"
+                         name="srv-{{k}}"
+                         [ngModel]="selectedSitterServices.includes(service)"
+                         (ngModelChange)="selectedSitterServices = toggleIn(selectedSitterServices, service, $event)"
+                         [ngModelOptions]="{standalone:true}"
+                         class="form-check-input me-1">
+                  {{ service }}
                 </div>
               </div>
             </div>
@@ -414,11 +451,27 @@
                 </div>
 
                 <!-- Behavioral Traits -->
-                <div class="mb-3">
+                <!--<div class="mb-3">
                   <label class="form-label fw-bold">Behavioral Traits</label>
                   <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
                     <div *ngFor="let trait of behavioralTraitsList">
                       <input type="checkbox" class="form-check-input me-1" [value]="trait" (change)="onBehavioralTraitChange($event, i)">
+                      {{ trait }}
+                    </div>
+                  </div>
+                </div>-->
+
+
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Behavioral Traits</label>
+                  <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
+                    <div *ngFor="let trait of behavioralTraitsList; let t = index">
+                      <input type="checkbox"
+                             name="dog{{i}}-trait-{{t}}"
+                             [ngModel]="(dog.behavioralTraits || []).includes(trait)"
+                             (ngModelChange)="dog.behavioralTraits = toggleIn(dog.behavioralTraits, trait, $event)"
+                             [ngModelOptions]="{standalone:true}"
+                             class="form-check-input me-1">
                       {{ trait }}
                     </div>
                   </div>
@@ -433,7 +486,7 @@
 
                 <div *ngSwitchCase="3" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 3">
                   <div class="flex-grow-1">
-                  <div class="mb-3">
+                  <!--<div class="mb-3">
                     <label class="form-label fw-bold">Favorite Activities</label>
                     <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
                       <div *ngFor="let activity of favoriteActivitiesList">
@@ -441,7 +494,22 @@
                         {{ activity }}
                       </div>
                     </div>
+                  </div>-->
+
+                <div class="mb-3">
+                  <label class="form-label fw-bold">Favorite Activities</label>
+                  <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
+                    <div *ngFor="let activity of favoriteActivitiesList; let a = index">
+                      <input type="checkbox"
+                             name="dog{{i}}-act-{{a}}"
+                             [ngModel]="(dog.favoriteActivities || []).includes(activity)"
+                             (ngModelChange)="dog.favoriteActivities = toggleIn(dog.favoriteActivities, activity, $event)"
+                             [ngModelOptions]="{standalone:true}"
+                             class="form-check-input me-1">
+                      {{ activity }}
+                    </div>
                   </div>
+                </div>
 
                   <div class="mb-2">
                     <label class="form-label">Health Conditions</label>

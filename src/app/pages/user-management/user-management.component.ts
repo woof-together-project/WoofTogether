@@ -155,7 +155,6 @@ export class UserManagementComponent {
   city = '';
   street = '';
   profilePic = '';
-  gender = '';
 
   /* ---- Sitter ---- */
   isSitter = false;
@@ -245,7 +244,6 @@ export class UserManagementComponent {
           this.city = user.City ?? '';
           this.street = user.Street ?? '';
           this.profilePic = user.ProfilePictureUrl ?? '';
-          this.gender = user.Gender ?? '';
           this.email = user.Email ?? this.email;
           this.username = user.Name ?? this.username;
         }

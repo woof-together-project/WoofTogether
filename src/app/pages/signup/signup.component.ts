@@ -18,8 +18,8 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
   formatted_address: string;
   name: string;
   place_id: string;
-  address_components?: AddressComponent[];             
-  geometry?: { viewport?: ViewportA | ViewportB };      
+  address_components?: AddressComponent[];
+  geometry?: { viewport?: ViewportA | ViewportB };
 }
 
 @Component({
@@ -60,7 +60,7 @@ export class SignupComponent {
   gender: string = '';
   selectedSitterExperience: string[] = [];
   selectedSitterServices: string[] = [];
-  
+
   // dog data
   dogs: any[] = [
   { name: '', breed: '', gender: '', imageUrl: '' , fixed: '', size: '', weight: null, age: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
@@ -151,7 +151,7 @@ export class SignupComponent {
       favoriteActivities: [],
       health: '',
       moreDetails: '',
-      imageUrl: '' 
+      imageUrl: ''
     });
     this.currentDogPage.push(0);
     this.showDogSections.push(true);
@@ -187,8 +187,8 @@ export class SignupComponent {
       'address',
       {
         cityCenter: this.cityCenter ?? undefined,
-        cityRect: this.cityRect ?? undefined,   
-        cityName: this.cityName ?? undefined    
+        cityRect: this.cityRect ?? undefined,
+        cityName: this.cityName ?? undefined
       }
     ))
   )
@@ -271,6 +271,12 @@ export class SignupComponent {
     }
   }
 
+  toggleIn<T>(arr: T[] | undefined, val: T, on: boolean): T[] {
+    const s = new Set(arr ?? []);
+    on ? s.add(val) : s.delete(val);
+    return Array.from(s);
+  }
+
  submitForm() {
   console.log('Form submitted with the following data:');
   console.log('Email:', this.email);
@@ -325,7 +331,7 @@ export class SignupComponent {
         availability: this.availability,
         experienceWith: this.selectedSitterExperience,
         services: this.selectedSitterServices,
-        imageUrl: this.sitterImageUrl 
+        imageUrl: this.sitterImageUrl
       } : null,
       dogs: this.addDog ? this.dogs.map(d => ({
         name: d.name,
@@ -340,7 +346,7 @@ export class SignupComponent {
         favoriteActivities: d.favoriteActivities,
         fixed: d.fixed === 'yes',
         rabiesVaccinated: d.rabiesVaccinated === 'yes',
-        imageUrl: d.imageUrl 
+        imageUrl: d.imageUrl
       })) : []
 
     };
