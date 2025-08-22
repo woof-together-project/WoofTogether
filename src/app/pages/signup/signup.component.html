@@ -35,57 +35,84 @@
             </div>
           </div>
 
-          <!-- City -->
-          <div class="mb-3 position-relative">
-            <label for="city" class="form-label">City</label>
-            <input type="text"
-                   id="city"
-                   class="form-control"
-                   name="city"
-                   [ngModel]="city"
-                   (ngModelChange)="onCityInput($event)"
-                   required
-                   #cityModel="ngModel"
-                   autocomplete="off">
+         <!-- City -->
+<div class="mb-3 position-relative">
+  <label for="city" class="form-label">City</label>
+  <input
+    type="text"
+    id="city"
+    class="form-control"
+    name="city"
+    [ngModel]="city"
+    (ngModelChange)="onCityInput($event)"
+    (keydown.arrowdown)="onCityArrow(1, $any($event))"
+    (keydown.arrowup)="onCityArrow(-1, $any($event))"
+    (keydown.enter)="onCityEnter($any($event))"
+    (keydown.escape)="citySuggestions=[]"
+    required
+    #cityModel="ngModel"
+    autocomplete="off"
+    role="combobox"
+    [attr.aria-expanded]="citySuggestions.length>0"
+    [attr.aria-activedescendant]="'city-opt-' + cityActiveIndex" />
 
-            <!-- Suggestions -->
-            <ul class="autocomplete-list" *ngIf="citySuggestions.length">
-              <li *ngFor="let s of citySuggestions" (click)="pickCity(s)">
-                {{ s.description }}
-              </li>
-            </ul>
+      <ul class="autocomplete-list" *ngIf="citySuggestions.length" role="listbox" aria-label="City suggestions">
+      <li *ngFor="let s of citySuggestions; let i = index"
+          [id]="'city-opt-' + i"
+          [class.active]="i === cityActiveIndex"
+          (mouseenter)="cityActiveIndex = i"
+          (mousedown)="pickCity(s)"
+          role="option"
+          [attr.aria-selected]="i === cityActiveIndex">
+        {{ s.description }}
+      </li>
+    </ul>
 
-            <div *ngIf="signupForm.submitted && cityModel.invalid"
-                 class="text-danger small mb-1 text-end fade-in-error">
-              City is required
-            </div>
-          </div>
 
-          <!-- Street -->
-          <div class="mb-3 position-relative">
-            <label for="street" class="form-label">Street</label>
-            <input type="text"
-                   id="street"
-                   class="form-control"
-                   name="street"
-                   [ngModel]="street"
-                   (ngModelChange)="onStreetInput($event)"
-                   required
-                   #streetModel="ngModel"
-                   autocomplete="off">
+  <div *ngIf="signupForm.submitted && cityModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+    City is required
+  </div>
+</div>
 
-            <!-- Suggestions -->
-            <ul class="autocomplete-list" *ngIf="addressSuggestions.length">
-              <li *ngFor="let s of addressSuggestions" (click)="pickAddress(s)">
-                {{ s.description }}
-              </li>
-            </ul>
+<!-- Street -->
+<div class="mb-3 position-relative">
+  <label for="street" class="form-label">Street</label>
+  <input
+    type="text"
+    id="street"
+    class="form-control"
+    name="street"
+    [ngModel]="street"
+    (ngModelChange)="onStreetInput($event)"
+    (keydown.arrowdown)="onStreetArrow(1, $any($event))"
+    (keydown.arrowup)="onStreetArrow(-1, $any($event))"
+    (keydown.enter)="onStreetEnter($any($event))"
+    (keydown.escape)="addressSuggestions=[]"
+    required
+    #streetModel="ngModel"
+    autocomplete="off"
+    role="combobox"
+    [attr.aria-expanded]="addressSuggestions.length>0"
+    [attr.aria-activedescendant]="'addr-opt-' + addressActiveIndex" />
 
-            <div *ngIf="signupForm.submitted && streetModel.invalid"
-                 class="text-danger small mb-1 text-end fade-in-error">
-              Street is required
-            </div>
-          </div>
+      <ul class="autocomplete-list" *ngIf="addressSuggestions.length" role="listbox" aria-label="Street suggestions">
+      <li *ngFor="let s of addressSuggestions; let i = index"
+          [id]="'addr-opt-' + i"
+          [class.active]="i === addressActiveIndex"
+          (mouseenter)="addressActiveIndex = i"
+          (mousedown)="pickAddress(s)"
+          role="option"
+          [attr.aria-selected]="i === addressActiveIndex">
+        {{ s.description }}
+      </li>
+    </ul>
+
+
+  <div *ngIf="signupForm.submitted && streetModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+    Street is required
+  </div>
+</div>
+
         </div>
       </div>
 
