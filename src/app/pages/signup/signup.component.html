@@ -1,76 +1,116 @@
 <div class="container-fluid vh-100 d-flex">
-    <!-- Right Form Section (2/3) -->
-    <div class="col-md-6 form-scroll-area">
-      <h2 class="mb-3">Welcome to WoofTogether!</h2>
-      <h2 class="mb-3">We're glad you've decided to join us.</h2>
-      <p>Please note that joining our community requires having at least one dog (the more the merrier) or being a dogsitter.</p>
+  <!-- Left Form Section -->
+  <div class="col-md-6 form-scroll-area">
+    <h2 class="mb-3">Welcome to WoofTogether!</h2>
+    <h2 class="mb-3">We're glad you've decided to join us.</h2>
+    <p>Please note that joining our community requires having at least one dog (the more the merrier) or being a dogsitter.</p>
 
-      <!-- General User Details -->
-      <form #signupForm="ngForm" (ngSubmit)="submitForm()">
-        <div class="card mb-4">
-          <div class="card-header d-flex justify-content-between align-items-center" (click)="showGeneralInfo = !showGeneralInfo" style="cursor: pointer;">
-            <div class="d-flex align-items-center gap-2">
-              <i class="bi" [ngClass]="{'bi-chevron-down': showGeneralInfo, 'bi-chevron-right': !showGeneralInfo}"></i>
-              <h5 class="mb-0">General Information</h5>
-            </div>
-          </div>
-          <div class="card-body" *ngIf="showGeneralInfo">
-            <div class="mb-3">
-              <label for="phone" class="form-label">Phone number</label>
-              <input type="text" id="phone" class="form-control" name="phone" [(ngModel)]="phone" required #phoneModel="ngModel">
-              <div *ngIf="signupForm.submitted && phoneModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                Phone number is required
-              </div>
-            </div>
-            <div class="mb-3">
-              <label for="city" class="form-label">City</label>
-              <input type="text" id="city" class="form-control" name="city" [(ngModel)]="city" required #cityModel="ngModel">
-              <div *ngIf="signupForm.submitted && cityModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                City is required
-              </div>
-            </div>
-
-            <div class="mb-3">
-              <label for="street" class="form-label">Street</label>
-              <input type="text" id="street" class="form-control" name="street" [(ngModel)]="street" required #streetModel="ngModel">
-              <div *ngIf="signupForm.submitted && streetModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                Street is required
-              </div>
-            </div>
-
-            <!-- <div class="mb-3">
-              <label for="profilePic" class="form-label">Profile Picture</label>
-              <input
-              type="file"
-              id="profilePic"
-              class="form-control"
-              name="profilePic"
-              (change)="onProfilePicSelected($event)"
-              required>
-                <div *ngIf="signupForm.submitted && !profilePicFile" class="text-danger small mb-1 text-end fade-in-error">
-                Profile picture is required
-              </div>
-            </div> -->
+    <!-- SINGLE form -->
+    <form #signupForm="ngForm" (ngSubmit)="submitForm()">
+      <!-- General Information Card -->
+      <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center"
+             (click)="showGeneralInfo = !showGeneralInfo"
+             style="cursor: pointer;">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi" [ngClass]="{'bi-chevron-down': showGeneralInfo, 'bi-chevron-right': !showGeneralInfo}"></i>
+            <h5 class="mb-0">General Information</h5>
           </div>
         </div>
 
-        <!-- Role Checkboxes -->
-        <div class="form-check mb-2">
-          <input type="checkbox" class="form-check-input" id="isSitter"
-                 [(ngModel)]="isSitter" name="isSitter"
-                 (change)="showGeneralInfo = false; showSitterSection = isSitter">
-          <label class="form-check-label" for="isSitter">I'm joining as a dog sitter</label>
+        <div class="card-body" *ngIf="showGeneralInfo">
+          <!-- Phone -->
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone number</label>
+            <input type="text"
+                   id="phone"
+                   class="form-control"
+                   name="phone"
+                   [(ngModel)]="phone"
+                   required
+                   #phoneModel="ngModel">
+            <div *ngIf="signupForm.submitted && phoneModel.invalid"
+                 class="text-danger small mb-1 text-end fade-in-error">
+              Phone number is required
+            </div>
+          </div>
+
+          <!-- City -->
+          <div class="mb-3 position-relative">
+            <label for="city" class="form-label">City</label>
+            <input type="text"
+                   id="city"
+                   class="form-control"
+                   name="city"
+                   [ngModel]="city"
+                   (ngModelChange)="onCityInput($event)"
+                   required
+                   #cityModel="ngModel"
+                   autocomplete="off">
+
+            <!-- Suggestions -->
+            <ul class="autocomplete-list" *ngIf="citySuggestions.length">
+              <li *ngFor="let s of citySuggestions" (click)="pickCity(s)">
+                {{ s.description }}
+              </li>
+            </ul>
+
+            <div *ngIf="signupForm.submitted && cityModel.invalid"
+                 class="text-danger small mb-1 text-end fade-in-error">
+              City is required
+            </div>
+          </div>
+
+          <!-- Street -->
+          <div class="mb-3 position-relative">
+            <label for="street" class="form-label">Street</label>
+            <input type="text"
+                   id="street"
+                   class="form-control"
+                   name="street"
+                   [ngModel]="street"
+                   (ngModelChange)="onStreetInput($event)"
+                   required
+                   #streetModel="ngModel"
+                   autocomplete="off">
+
+            <!-- Suggestions -->
+            <ul class="autocomplete-list" *ngIf="addressSuggestions.length">
+              <li *ngFor="let s of addressSuggestions" (click)="pickAddress(s)">
+                {{ s.description }}
+              </li>
+            </ul>
+
+            <div *ngIf="signupForm.submitted && streetModel.invalid"
+                 class="text-danger small mb-1 text-end fade-in-error">
+              Street is required
+            </div>
+          </div>
         </div>
+      </div>
 
-        <div class="form-check mb-4">
-          <input type="checkbox" class="form-check-input" id="addDog"
-                 [(ngModel)]="addDog" name="addDog"
-                 (change)="onCheckboxChange()">
-          <label class="form-check-label" for="addDog">I want to add a dog</label>
-        </div>
+      <!-- Role Checkboxes -->
+      <div class="form-check mb-2">
+        <input type="checkbox"
+               class="form-check-input"
+               id="isSitter"
+               [(ngModel)]="isSitter"
+               name="isSitter"
+               (change)="showGeneralInfo = false; showSitterSection = isSitter">
+        <label class="form-check-label" for="isSitter">I'm joining as a dog sitter</label>
+      </div>
 
+      <div class="form-check mb-4">
+        <input type="checkbox"
+               class="form-check-input"
+               id="addDog"
+               [(ngModel)]="addDog"
+               name="addDog"
+               (change)="onCheckboxChange()">
+        <label class="form-check-label" for="addDog">I want to add a dog</label>
+      </div>
 
-        <!-- Sitter Section -->
+       <!-- Sitter Section -->
         <!-- Sitter Card Header -->
         <div *ngIf="isSitter && showSitterSection" class="card p-0 mb-4 notebook-card">
           <div class="card-header d-flex justify-content-between align-items-center"
@@ -411,5 +451,3 @@
     <img src="assets/images/signupDog.jpg" alt="WoofTogether welcome image" />
   </div>
 
-
-  </div>

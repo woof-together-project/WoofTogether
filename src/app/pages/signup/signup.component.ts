@@ -5,7 +5,22 @@ import { HttpClient } from '@angular/common/http';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { NavigationService } from '../../shared/navigation/navigation.service';
+import { PlacesService } from '../../shared/map/places/PlacesService';
+import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 
+  type AddressComponent = { long_name: string; short_name: string; types: string[] };
+  type ViewportA = { south: number; west: number; north: number; east: number };
+  type ViewportB = { southwest: { lat: number; lng: number }, northeast: { lat: number; lng: number } };
+
+  export interface PlaceDetails {
+  lat: number;
+  lng: number;
+  formatted_address: string;
+  name: string;
+  place_id: string;
+  address_components?: AddressComponent[];             
+  geometry?: { viewport?: ViewportA | ViewportB };      
+}
 
 @Component({
   selector: 'app-signup',
@@ -21,7 +36,7 @@ export class SignupComponent {
   // static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; //signup lambda function URL in final user
   // static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
   constructor(private http: HttpClient, private userContext: UserContextService,
-        private snackBar: MatSnackBar,  private navigationService: NavigationService
+        private snackBar: MatSnackBar,  private navigationService: NavigationService, private places: PlacesService
 ) {}
 
   //cognito data
@@ -106,6 +121,18 @@ export class SignupComponent {
     'Going to the Park'
   ];
 
+  private placesToken = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+  cityQuery$ = new Subject<string>();
+  addressQuery$ = new Subject<string>();
+  citySuggestions: { description: string; place_id: string }[] = [];
+  addressSuggestions: { description: string; place_id: string }[] = [];
+
+  cityCenter: { lat: number; lng: number } | null = null;
+  cityName: string | null = null;
+  cityRect: { sw: { lat: number; lng: number }, ne: { lat: number; lng: number } } | null = null;
+
+
+
   toggleSitterCard() {
     this.sitterCardOpen = !this.sitterCardOpen;
   }
@@ -137,7 +164,36 @@ export class SignupComponent {
     this.nickname = currentUser?.nickname ?? '';
     this.sub = currentUser?.sub ?? '';
   });
-  }
+
+   this.cityQuery$
+    .pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(q => this.places.autocomplete(q, this.placesToken, 'city'))
+    )
+    .subscribe({
+      next: res => { this.citySuggestions = res.predictions; },
+      error: err => { console.error('[CITY AUTOCOMPLETE] HTTP error', err); }
+    });
+
+  this.addressQuery$
+  .pipe(
+    debounceTime(200),
+    distinctUntilChanged(),
+    switchMap(q => this.places.autocomplete(
+      q,
+      this.placesToken,
+      'address',
+      {
+        cityCenter: this.cityCenter ?? undefined,
+        cityRect: this.cityRect ?? undefined,   
+        cityName: this.cityName ?? undefined    
+      }
+    ))
+  )
+  .subscribe(res => this.addressSuggestions = res.predictions);
+
+}
 
   removeDog(index: number) {
     this.dogs.splice(index, 1);
@@ -205,13 +261,11 @@ export class SignupComponent {
       this.showGeneralInfo = false;
     }
 
-    // If user just checked addDog, reset showDogSections properly
     if (this.addDog && this.showDogSections.length !== this.dogs.length) {
       this.showDogSections = this.dogs.map(() => true);
     }
 
     if (this.addDog) {
-      // Make sure all dog sections are expanded
       this.showDogSections = this.dogs.map(() => true);
     }
   }
@@ -389,7 +443,61 @@ onDogPicSelected(event: Event, index: number): void {
   });
 }
 
+onCityInput(v: string) {
+  this.city = v;
+  this.cityQuery$.next(v);
+  this.addressSuggestions = [];
 }
+
+onStreetInput(v: string) {
+  this.street = v;
+  this.addressQuery$.next(v);
+  this.citySuggestions = [];
+}
+
+pickAddress(s: { description: string; place_id: string }) {
+  this.street = s.description;
+  this.addressSuggestions = [];
+}
+
+pickCity(s: { description: string; place_id: string }) {
+  this.city = s.description;
+  this.citySuggestions = [];
+
+  this.street = '';
+  this.addressSuggestions = [];
+
+  this.places.details(s.place_id, this.placesToken).subscribe((d: any) => {
+  this.cityCenter = { lat: d.lat, lng: d.lng };
+  this.cityName = extractCityName(d.address_components) || this.city; // e.g., "Tel Aviv-Yafo"
+  const vp = d.geometry?.viewport;
+  if (vp?.south !== undefined) {
+    this.cityRect = { sw: { lat: vp.south, lng: vp.west }, ne: { lat: vp.north, lng: vp.east } };
+  } else if (vp?.southwest) {
+    this.cityRect = { sw: { lat: vp.southwest.lat, lng: vp.southwest.lng },
+                      ne: { lat: vp.northeast.lat, lng: vp.northeast.lng } };
+  } else {
+    this.cityRect = null;
+  }
+});
+
+}
+
+private extractCityName(components?: AddressComponent[] | null): string | null {
+  if (!components) return null;
+  const get = (t: string) => components.find(c => c.types?.includes(t))?.long_name || null;
+  return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
+}
+
+
+}
+
+function extractCityName(components?: any[]): string | null {
+  if (!components) return null;
+  const get = (t: string) => components.find(c => c.types?.includes(t))?.long_name || null;
+  return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
+}
+
 
 
 
