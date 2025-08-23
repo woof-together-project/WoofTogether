@@ -22,7 +22,7 @@
         <button *ngIf="isEditing('general','phone')" class="pill cancel" (click)="cancelField('general','phone')">Cancel</button>
       </div>
 
-      <div class="row">
+      <!--<div class="row">
         <label>City</label>
         <span *ngIf="!isEditing('general','city')">{{ city || '—' }}</span>
         <input *ngIf="isEditing('general','city')" [(ngModel)]="city" />
@@ -31,9 +31,51 @@
         </button>
         <button *ngIf="isEditing('general','city')" class="pill save" (click)="saveField('general','city')">Save</button>
         <button *ngIf="isEditing('general','city')" class="pill cancel" (click)="cancelField('general','city')">Cancel</button>
-      </div>
+      </div>-->
 
       <div class="row">
+        <label>City</label>
+
+        <span *ngIf="!isEditing('general','city')">{{ city || '—' }}</span>
+
+        <div *ngIf="isEditing('general','city')" class="position-relative w-100">
+          <input
+            type="text"
+            class="form-control"
+            name="city"
+            [ngModel]="city"
+            (ngModelChange)="onCityInput($event)"
+            (keydown.arrowdown)="onCityArrow(1, $any($event))"
+            (keydown.arrowup)="onCityArrow(-1, $any($event))"
+            (keydown.enter)="onCityEnter($any($event))"
+            (keydown.escape)="citySuggestions=[]"
+            autocomplete="off"
+            role="combobox"
+            [attr.aria-expanded]="citySuggestions.length>0"
+            [attr.aria-activedescendant]="'city-opt-' + cityActiveIndex" />
+
+          <ul class="autocomplete-list" *ngIf="citySuggestions.length" role="listbox" aria-label="City suggestions">
+            <li *ngFor="let s of citySuggestions; let i = index"
+                [id]="'city-opt-' + i"
+                [class.active]="i === cityActiveIndex"
+                (mouseenter)="cityActiveIndex = i"
+                (mousedown)="pickCity(s)"
+                role="option"
+                [attr.aria-selected]="i === cityActiveIndex">
+              {{ s.description }}
+            </li>
+          </ul>
+        </div>
+
+        <button class="icon-btn" (click)="toggleEdit('general','city')">
+          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </button>
+        <button *ngIf="isEditing('general','city')" class="pill save" (click)="saveField('general','city')">Save</button>
+        <button *ngIf="isEditing('general','city')" class="pill cancel" (click)="cancelField('general','city')">Cancel</button>
+      </div>
+
+
+      <!--<div class="row">
         <label>Street</label>
         <span *ngIf="!isEditing('general','street')">{{ street || '—' }}</span>
         <input *ngIf="isEditing('general','street')" [(ngModel)]="street" />
@@ -42,19 +84,62 @@
         </button>
         <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
         <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
-      </div>
+      </div>-->
 
       <div class="row">
-        <label>Profile Picture</label>
-        <span class="pic-cell">
-          <img *ngIf="profilePic" [src]="profilePic" alt="Profile" />
-          <span *ngIf="!profilePic">—</span>
-        </span>
-        <button class="icon-btn" (click)="startProfilePicEdit(fileInput)">
+        <label>Street</label>
+
+        <span *ngIf="!isEditing('general','street')">{{ street || '—' }}</span>
+
+        <div *ngIf="isEditing('general','street')" class="position-relative w-100">
+          <input
+            id="street-input"
+            #streetInput
+            type="text"
+            class="form-control"
+            name="street"
+            [ngModel]="street"
+            (ngModelChange)="onStreetInput($event)"
+            (keydown.arrowdown)="onStreetArrow(1, $any($event))"
+            (keydown.arrowup)="onStreetArrow(-1, $any($event))"
+            (keydown.enter)="onStreetEnter($any($event))"
+            (keydown.escape)="addressSuggestions=[]"
+            autocomplete="off"
+            role="combobox"
+            [attr.aria-expanded]="addressSuggestions.length>0"
+            [attr.aria-activedescendant]="'addr-opt-' + addressActiveIndex"
+            [attr.aria-controls]="'addr-listbox'"
+          />
+
+          <ul
+            id="addr-listbox"
+            class="autocomplete-list"
+            *ngIf="addressSuggestions.length"
+            role="listbox"
+            aria-label="Street suggestions"
+          >
+            <li *ngFor="let s of addressSuggestions; let i = index"
+                [id]="'addr-opt-' + i"
+                [class.active]="i === addressActiveIndex"
+                (mouseenter)="addressActiveIndex = i"
+                (mousedown)="pickAddress(s)"
+                role="option"
+                [attr.aria-selected]="i === addressActiveIndex">
+              {{ s.description }}
+            </li>
+          </ul>
+        </div>
+
+
+        <button class="icon-btn" (click)="toggleEdit('general','street')">
           <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
         </button>
-        <input #fileInput type="file" accept="image/*" (change)="onProfilePicSelected($event)" hidden />
+        <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
+        <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
       </div>
+
+
+
     </section>
 
     <!-- Sitter Card -->
@@ -75,6 +160,21 @@
       </div>
 
        <div class="sitter-fields" [class.disabled]="!sitterActive" [attr.aria-disabled]="!sitterActive">
+         <div class="row">
+          <label>Photo</label>
+          <div class="avatar-row">
+            <img [src]="sitterProfilePic" class="avatar" alt="sitter" />
+            <input #sitterPicInput type="file" accept="image/*" hidden (change)="onSitterPicSelected($event)" />
+            <button class="pill btn-change" (click)="startSitterPicEdit(sitterPicInput)" [disabled]="!sitterActive">Change</button>
+          </div>
+        </div>
+
+       <div class="row">
+        <label>Gender</label>
+        <span *ngIf="!isEditing('sitter','rate')">{{ gender ?? '—' }}</span>
+        <input *ngIf="isEditing('sitter','gender')" [(ngModel)]="gender" />
+      </div>
+
         <div class="row">
           <label>Rate</label>
           <span *ngIf="!isEditing('sitter','rate')">{{ rate ?? '—' }}</span>
@@ -179,6 +279,15 @@
         </div>
 
         <div class="dog-accordion-body" *ngIf="dogOpen[i]">
+          <div class="row">
+            <label>Dog Photo</label>
+            <div class="avatar-row">
+              <img [src]="d.profilePictureUrl" class="avatar" alt="dog" />
+              <input #dogPicInput type="file" accept="image/*" hidden (change)="onDogPicSelected($event, i)" />
+              <button class="pill btn-change" (click)="startDogPicEdit(i, dogPicInput)">Change</button>
+            </div>
+          </div>
+
           <div class="row">
             <label>Name</label>
             <span *ngIf="!isEditingDog(i,'name')">{{ d.name || '—' }}</span>

@@ -383,4 +383,135 @@ select.select--sm { padding: 6px 32px 6px 10px; border-radius: 8px; font-size: .
 .ta-medium { min-height: 110px; }
 .ta-large  { min-height: 160px; }
 
+/* --- Reusable avatar helpers --- */
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;      /* <— makes it round */
+  object-fit: cover;       /* crop to fill the circle */
+  background: #f4f6f8;
+  border: 1px solid #e4e7eb;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.03) inset;
+}
 
+.avatar--xs { width: 28px; height: 28px; }
+.avatar--sm { width: 36px; height: 36px; }
+.avatar--lg { width: 56px; height: 56px; }
+
+/* Optional: tiny camera dot when photo is editable */
+.avatar-wrap {
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
+}
+.avatar-wrap input[type="file"] { display: none; }
+.avatar-wrap .cam {
+  position: absolute; right: -4px; bottom: -4px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: #fff; border: 1px solid #e4e7eb;
+  font-size: 11px; line-height: 18px; text-align: center;
+}
+.avatar--button { cursor: pointer; }
+
+.avatar-row{
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+/* right-align the specific Change button */
+.avatar-row .btn-change {
+  margin-left: auto;
+}
+
+/* light-green pill */
+.btn-change {
+  background: #d9f7df;           /* light green */
+  color: #0f5132;                /* dark green text */
+  border: 1px solid #a3e4b5;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-weight: 600;
+  transition: background .15s ease, box-shadow .15s ease, transform .05s ease;
+}
+
+.btn-change:hover {
+  background: #c7f2d2;           /* a bit darker on hover */
+  box-shadow: 0 2px 8px rgba(16, 185, 129, .15);
+}
+
+.btn-change:active {
+  transform: translateY(1px);
+}
+
+.btn-change:focus-visible {
+  outline: 3px solid rgba(16,185,129,.35);
+  outline-offset: 2px;
+}
+
+/* make the avatar line fill the row and lay out horizontally */
+.avatar-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  width:100%;
+}
+
+/* push the Change button to the right edge */
+.avatar-row .pill{ margin-left:auto; }
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  z-index: 1050;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: .375rem;
+  margin-top: 2px;
+  padding: 0;
+  list-style: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,.08);
+}
+
+.autocomplete-list li { padding: .5rem .75rem; cursor: pointer; }
+.autocomplete-list li:hover { background: #f5f5f5; }
+
+
+/* Base list item */
+.autocomplete-list li {
+  padding: .5rem .75rem;
+  cursor: pointer;
+  transition: background-color .12s ease, color .12s ease;
+}
+
+
+.autocomplete-list li.active {
+  font-weight: 700;          /* ← bold */
+}
+
+/* Optional: subtle left bar for the active row */
+.autocomplete-list li.active {
+  position: relative;
+}
+.autocomplete-list li.active::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: #0d6efd;       /* Bootstrap primary */
+  opacity: .9;
+}
+
+.mb-3.position-relative .autocomplete-list li.active {
+  font-weight: 700;
+}
+
+.autocomplete-list li.active,
+.autocomplete-list li:hover {
+  background: #f5f5f5;
+}
+.autocomplete-list li.active {
+  font-weight: 700;
+}

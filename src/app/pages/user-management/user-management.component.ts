@@ -1,9 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, ElementRef} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 import { MatSnackBar, MatSnackBarModule, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter, switchMap, tap, catchError } from 'rxjs/operators';
+import { NavigationService } from '../../shared/navigation/navigation.service';
+import { PlacesService } from '../../shared/map/places/PlacesService';
+
+type AddressComponent = { long_name: string; short_name: string; types: string[] };
 
 /* ---------------- Types (top-level) ---------------- */
 interface DogVM {
@@ -20,6 +26,7 @@ interface DogVM {
   rabiesVaccinated: '' | 'yes' | 'no';
   favoriteActivities: string[];
   behavioralTraits: string[];
+  profilePictureUrl?: string;
 }
 
 type DogField =
@@ -34,7 +41,8 @@ type DogField =
   | 'fixed'
   | 'rabiesVaccinated'
   | 'favoriteActivities'
-  | 'behavioralTraits';
+  | 'behavioralTraits'
+  | 'profilePictureUrl';
 
 type MultiSection = 'sitter' | 'dog';
 type MultiField =
@@ -72,11 +80,30 @@ export class UserManagementComponent {
   constructor(
     private http: HttpClient,
     private userContext: UserContextService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private navigationService: NavigationService,
+    private places: PlacesService
   ) {
     // initialize newDog safely here (no "this" issues in field initializers)
     this.newDog = this.blankDog();
   }
+
+  @ViewChild('streetInput') streetInput?: ElementRef<HTMLInputElement>;
+  private placesToken =
+  (crypto as any).randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+
+    cityQuery$ = new Subject<string>();
+    addressQuery$ = new Subject<string>();
+
+    citySuggestions: { description: string; place_id: string }[] = [];
+    addressSuggestions: { description: string; place_id: string }[] = [];
+
+    cityCenter: { lat: number; lng: number } | null = null;
+    cityName: string | null = null;
+    cityRect: { sw: { lat: number; lng: number }, ne: { lat: number; lng: number } } | null = null;
+
+    cityActiveIndex = 0;
+    addressActiveIndex = 0;
 
     // --- One-toast-per-action / in-flight guard ---
   private ops = new Set<string>();
@@ -166,6 +193,8 @@ export class UserManagementComponent {
   experienceDetails: string[] = [];
   serviceOptions: string[] = [];
   confirmDeactivateOpen = false;
+  sitterProfilePic = '';
+  gender = '';
 
   /* ---- Dogs ---- */
   dogs: DogVM[] = [];
@@ -215,7 +244,8 @@ export class UserManagementComponent {
       fixed: '',
       rabiesVaccinated: '',
       favoriteActivities: [],
-      behavioralTraits: []
+      behavioralTraits: [],
+      profilePictureUrl: ''
     };
   }
 
@@ -224,14 +254,49 @@ export class UserManagementComponent {
       this.email = u?.email ?? '';
       this.username = u?.username ?? '';
       this.sub = u?.sub ?? '';
-      if (this.sub) this.loadProfile();
+      if (this.email) this.loadProfile();
     });
+
+    this.cityQuery$
+    .pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(q => this.places.autocomplete(q, this.placesToken, 'city'))
+    )
+    .subscribe({
+      next: res => { this.citySuggestions = res.predictions ?? []; },
+      error: err => console.error('[CITY AUTOCOMPLETE] HTTP error', err)
+    });
+
+  // STREET suggestions (biased by chosen city)
+  this.addressQuery$
+    .pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(q => this.places.autocomplete(
+        q,
+        this.placesToken,
+        'address',
+        {
+          cityCenter: this.cityCenter ?? undefined,
+          cityRect:   this.cityRect   ?? undefined,
+          cityName:   this.cityName   ?? undefined
+        }
+      ))
+    )
+    .subscribe(res => this.addressSuggestions = res.predictions ?? []);
+  }
+
+  private extractCityName(components?: AddressComponent[] | null): string | null {
+    if (!components) return null;
+    const get = (t: string) => components.find(c => c.types?.includes(t))?.long_name || null;
+    return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
   }
 
   /* ---------- Load profile ---------- */
   private loadProfile(): void {
-    const url = `${UserManagementComponent.profileURL}?sub=${encodeURIComponent(
-      this.sub
+    const url = `${UserManagementComponent.profileURL}?email=${encodeURIComponent(
+      this.email
     )}`;
     this.http.get<any>(url).subscribe({
       next: (res) => {
@@ -243,7 +308,6 @@ export class UserManagementComponent {
           this.phone = user.Phone ?? '';
           this.city = user.City ?? '';
           this.street = user.Street ?? '';
-          this.profilePic = user.ProfilePictureUrl ?? '';
           this.email = user.Email ?? this.email;
           this.username = user.Name ?? this.username;
         }
@@ -257,6 +321,8 @@ export class UserManagementComponent {
           this.experienceYears = sitter.ExperienceYears ?? '';
           this.experienceDetails = this.toStringArray(sitter.ExperienceDetails);
           this.serviceOptions    = this.toStringArray(sitter.ServiceOptions);
+          this.gender = sitter.Gender ?? '';
+          this.sitterProfilePic = sitter.ProfilePictureUrl ?? '';
         }
 
         this.dogs = dogs.map((d: any) => ({
@@ -273,6 +339,7 @@ export class UserManagementComponent {
           rabiesVaccinated: d.RabiesVaccinated ? 'yes' : 'no',
           favoriteActivities: this.toStringArray(d.FavoriteActivities),
           behavioralTraits:  this.toStringArray(d.BehavioralTraits),
+          profilePictureUrl: d.ProfilePictureUrl ?? ''
         }));
 
         // match accordion state to dogs list
@@ -345,7 +412,7 @@ export class UserManagementComponent {
     });
   } */
 
-  saveField(section: 'general' | 'sitter', field: string) {
+  /* saveField(section: 'general' | 'sitter', field: string) {
     if (section === 'sitter' && !this.sitterActive) return;
 
     const value = (this as any)[field];
@@ -360,7 +427,7 @@ export class UserManagementComponent {
     const key = `field:${section}:${field}`;
     if (!this.lock(key)) return;            // <-- prevent double submit
 
-    const payload = { sub: this.sub, section, field, value };
+    const payload = { email: this.email, section, field, value };
     this.http.post(UserManagementComponent.updateURL, payload).subscribe({
       next: () => {
         this.editState[section][field] = false;
@@ -374,7 +441,67 @@ export class UserManagementComponent {
         this.unlock(key);
       }
     });
+  } */
+
+  saveField(section: 'general' | 'sitter', field: string) {
+    if (section === 'sitter' && !this.sitterActive) return;
+
+    const value = (this as any)[field];
+    const err = this.validateSingleField(section, field, value);
+    if (err) {
+      (this as any)[field] = this.originals[section][field];
+      this.editState[section][field] = false;
+      this.warn(this.msgFrom(err));
+      return;
+    }
+
+    // capture old city before we overwrite edit state
+    const wasCityChange =
+      section === 'general' &&
+      field === 'city' &&
+      String(this.originals.general['city'] ?? '').trim() !== String(this.city ?? '').trim();
+    const prevCity = this.originals.general['city'];
+
+    const key = `field:${section}:${field}`;
+    if (!this.lock(key)) return;
+
+    const payload = { email: this.email, section, field, value };
+    this.http.post(UserManagementComponent.updateURL, payload).subscribe({
+      next: () => {
+        this.editState[section][field] = false;
+        this.ok('Saved');
+        this.unlock(key);
+
+        // ⬇️ If city changed, force street update
+        if (wasCityChange) {
+          // clear street to avoid mismatched address
+          this.street = '';
+          // open street inline editor
+          this.editState.general['street'] = true;
+
+          // reset address biasing so suggestions match the new city
+          this.cityCenter = null;
+          this.cityRect   = null;
+          this.cityName   = this.city || null;
+          this.addressSuggestions = [];
+          this.editState.general['street'] = true;
+          this.ok('City updated. Please update your street.');
+          // focus the street input
+          setTimeout(() => this.streetInput?.nativeElement?.focus(), 0);
+
+          // tell the user
+          this.warn('City changed — please update your street');
+        }
+      },
+      error: (err) => {
+        (this as any)[field] = this.originals[section][field];
+        this.editState[section][field] = false;
+        this.warn(this.msgFrom(err));
+        this.unlock(key);
+      }
+    });
   }
+
 
   toggleSitterActive() {
     const confirmMsg = this.sitterActive
@@ -392,7 +519,7 @@ export class UserManagementComponent {
     this.sitterActive = next;
 
     this.http.post(UserManagementComponent.updateURL, {
-      sub: this.sub, section: 'sitter', field: 'active', value: next
+      email: this.email, section: 'sitter', field: 'active', value: next
     }).subscribe({
       next: () => { this.ok(next ? 'Sitter activated' : 'Sitter deactivated'); this.unlock(key); },
       error: (err) => {
@@ -503,8 +630,8 @@ export class UserManagementComponent {
 
     const dogId = this.dogs[i].id;
     const payload = dogId != null
-      ? { sub: this.sub, entity: 'dog', dogId, field, value }
-      : { sub: this.sub, entity: 'dog', index: i, field, value };
+      ? { email: this.email, entity: 'dog', dogId, field, value }
+      : { email: this.email, entity: 'dog', index: i, field, value };
 
     this.http.post(UserManagementComponent.updateURL, payload).subscribe({
       next: () => {
@@ -530,8 +657,8 @@ export class UserManagementComponent {
     if (!this.lock(key)) return;
 
     const payload = d.id != null
-      ? { sub: this.sub, entity: 'dog', action: 'delete', dogId: d.id }
-      : { sub: this.sub, entity: 'dog', action: 'delete', index: i };
+      ? { email: this.email, entity: 'dog', action: 'delete', dogId: d.id }
+      : { email: this.email, entity: 'dog', action: 'delete', index: i };
 
     const snapshotDogs = [...this.dogs];
     const snapshotOpen = [...this.dogOpen];
@@ -558,54 +685,82 @@ export class UserManagementComponent {
   }
 
   /* ---------- Profile picture upload ---------- */
-  startProfilePicEdit(fileInput: HTMLInputElement) {
-    fileInput.click();
+  /* ===== Sitter photo ===== */
+  startSitterPicEdit(input: HTMLInputElement) {
+    if (!this.sitterActive) return;
+    input.click();
   }
 
-  onProfilePicSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
+  onSitterPicSelected(ev: Event) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
-    this.http
-      .post<any>(UserManagementComponent.uploadProfilePicURL, {
-        fileName: file.name,
-        fileType: file.type
-      })
-      .subscribe({
-        next: (res) => {
-          const { url, publicUrl } = res;
-          this.http
-            .put(url, file, { headers: { 'Content-Type': file.type } })
-            .subscribe({
-              next: () => {
-                this.profilePic = publicUrl;
-                this.http
-                  .post(UserManagementComponent.updateURL, {
-                    sub: this.sub,
-                    section: 'general',
-                    field: 'profilePic',
-                    value: publicUrl
-                  })
-                  .subscribe({
-                    next: () =>
-                      this.ok('Profile picture updated'),
-                    error: () =>
-                      this.warn('Failed to save picture URL')
-                  });
-              },
-              error: (err) => {
-                console.error('S3 upload failed', err);
-                this.warn('Upload failed');
-              }
+    const key = 'sitter:pic';
+    if (!this.lock(key)) return;
+
+    this.http.post<any>(UserManagementComponent.uploadProfilePicURL, {
+      fileName: file.name,
+      fileType: file.type
+    }).subscribe({
+      next: (res) => {
+        this.http.put(res.url, file, { headers: { 'Content-Type': file.type } }).subscribe({
+          next: () => {
+            this.sitterProfilePic = res.publicUrl;
+            this.http.post(UserManagementComponent.updateURL, {
+              email: this.email,
+              section: 'sitter',                 // sitter section
+              field: 'profilePictureUrl',        // <-- field name on your backend
+              value: res.publicUrl
+            }).subscribe({
+              next: () => { this.ok('Sitter photo updated'); this.unlock(key); },
+              error: (err) => { this.warn(this.msgFrom(err)); this.unlock(key); }
             });
-        },
-        error: (err) => {
-          console.error('Presigned URL error', err);
-          this.warn('Upload failed');
-        }
-      });
+          },
+          error: () => { this.warn('Upload failed'); this.unlock(key); }
+        });
+      },
+      error: () => { this.warn('Upload failed'); this.unlock(key); }
+    });
   }
+
+  /* ===== Dog photo (per dog) ===== */
+  startDogPicEdit(_i: number, input: HTMLInputElement) {
+    input.click();
+  }
+
+  onDogPicSelected(ev: Event, i: number) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file || !this.dogs[i]) return;
+
+    const key = `dog:pic:${i}`;
+    if (!this.lock(key)) return;
+
+    this.http.post<any>(UserManagementComponent.uploadProfilePicURL, {
+      fileName: file.name,
+      fileType: file.type
+    }).subscribe({
+      next: (res) => {
+        this.http.put(res.url, file, { headers: { 'Content-Type': file.type } }).subscribe({
+          next: () => {
+            this.dogs[i].profilePictureUrl = res.publicUrl;
+            this.http.post(UserManagementComponent.updateURL, {
+              email: this.email,
+              entity: 'dog',                      // dog entity
+              dogId: this.dogs[i].id,             // (or index if new/unsaved)
+              field: 'profilePictureUrl',         // <-- field name on your backend
+              value: res.publicUrl
+            }).subscribe({
+              next: () => { this.ok('Dog photo updated'); this.unlock(key); },
+              error: (err) => { this.warn(this.msgFrom(err)); this.unlock(key); }
+            });
+          },
+          error: () => { this.warn('Upload failed'); this.unlock(key); }
+        });
+      },
+      error: () => { this.warn('Upload failed'); this.unlock(key); }
+    });
+  }
+
 
   openDeactivateConfirm() {
     this.confirmDeactivateOpen = true;
@@ -668,7 +823,7 @@ export class UserManagementComponent {
       if (!this.lock(key)) return;
 
       this.http.post(UserManagementComponent.updateURL, {
-        sub: this.sub, section: 'sitter', field, value: values
+        email: this.email, section: 'sitter', field, value: values
       }).subscribe({
         next: () => { this.ok('Saved'); this.closeMultiEdit(); this.unlock(key); },
         error: (err) => { this.warn(this.msgFrom(err)); this.unlock(key); }
@@ -685,7 +840,7 @@ export class UserManagementComponent {
       if (!this.lock(key)) return;
 
       this.http.post(UserManagementComponent.updateURL, {
-        sub: this.sub, entity: 'dog', dogId: this.dogs[i].id, field, value: values
+        email: this.email, entity: 'dog', dogId: this.dogs[i].id, field, value: values
       }).subscribe({
         next: () => { this.ok('Saved'); this.closeMultiEdit(); this.unlock(key); },
         error: (err) => { this.warn(this.msgFrom(err)); this.unlock(key); }
@@ -955,7 +1110,7 @@ export class UserManagementComponent {
     const key = 'dog:create';
     if (!this.lock(key)) return;
 
-    const payload = { sub: this.sub, entity: 'dog', action: 'create', dog: this.newDog };
+    const payload = { email: this.email, entity: 'dog', action: 'create', dog: this.newDog };
     this.http.post<any>(UserManagementComponent.updateURL, payload).subscribe({
       next: (res) => {
         const assignedId = res?.dogId ?? res?.id ?? res?.dog?.Id ?? undefined;
@@ -992,7 +1147,101 @@ export class UserManagementComponent {
     if (Array.isArray(input)) return input.map(x => String(x).trim()).filter(Boolean);
     if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
     return [];
-}
+  }
 
+  // CITY suggestions
+
+
+  onCityInput(v: string) {
+    this.city = v;
+    this.cityQuery$.next(v);
+    this.addressSuggestions = [];
+    this.cityActiveIndex = 0;
+  }
+
+  onStreetInput(v: string) {
+    this.street = v;
+    this.addressQuery$.next(v);
+    this.citySuggestions = [];
+    this.addressActiveIndex = 0;
+  }
+
+  pickAddress(s: { description: string; place_id: string }) {
+    this.street = s.description;
+    this.addressSuggestions = [];
+  }
+
+  pickCity(s: { description: string; place_id: string }) {
+    this.city = s.description;
+    this.citySuggestions = [];
+    this.street = '';
+    this.addressSuggestions = [];
+
+    this.places.details(s.place_id, this.placesToken).subscribe((d: any) => {
+      this.cityCenter = { lat: d.lat, lng: d.lng };
+      this.cityName = this.extractCityName(d.address_components) || this.city;
+      const vp = d.geometry?.viewport;
+      if (vp?.south !== undefined) {
+        this.cityRect = { sw: { lat: vp.south, lng: vp.west }, ne: { lat: vp.north, lng: vp.east } };
+      } else if (vp?.southwest) {
+        this.cityRect = { sw: { lat: vp.southwest.lat, lng: vp.southwest.lng },
+                          ne: { lat: vp.northeast.lat, lng: vp.northeast.lng } };
+      } else {
+        this.cityRect = null;
+      }
+    });
+  }
+
+  private scrollCityIntoView() {
+    setTimeout(() =>
+      document.querySelector<HTMLElement>(`#city-opt-${this.cityActiveIndex}`)
+        ?.scrollIntoView({ block: 'nearest' })
+    );
+  }
+  private scrollAddressIntoView() {
+    setTimeout(() =>
+      document.querySelector<HTMLElement>(`#addr-opt-${this.addressActiveIndex}`)
+        ?.scrollIntoView({ block: 'nearest' })
+    );
+  }
+
+  onCityKeydown(ev: KeyboardEvent) {
+    const n = this.citySuggestions?.length ?? 0;
+    if (!n) return;
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); this.cityActiveIndex = (this.cityActiveIndex + 1) % n; this.scrollCityIntoView(); }
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); this.cityActiveIndex = (this.cityActiveIndex - 1 + n) % n; this.scrollCityIntoView(); }
+    else if (ev.key === 'Enter') { ev.preventDefault(); const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0]; if (s) this.pickCity(s); }
+    else if (ev.key === 'Escape') { this.citySuggestions = []; }
+  }
+
+  onStreetKeydown(ev: KeyboardEvent) {
+    const n = this.addressSuggestions?.length ?? 0;
+    if (!n) return;
+    if (ev.key === 'ArrowDown') { ev.preventDefault(); this.addressActiveIndex = (this.addressActiveIndex + 1) % n; this.scrollAddressIntoView(); }
+    else if (ev.key === 'ArrowUp') { ev.preventDefault(); this.addressActiveIndex = (this.addressActiveIndex - 1 + n) % n; this.scrollAddressIntoView(); }
+    else if (ev.key === 'Enter') { ev.preventDefault(); const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0]; if (s) this.pickAddress(s); }
+    else if (ev.key === 'Escape') { this.addressSuggestions = []; }
+  }
+
+  onCityArrow(dir: 1|-1, ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const n = this.citySuggestions?.length ?? 0; if (!n) return;
+    this.cityActiveIndex = (this.cityActiveIndex + dir + n) % n; this.scrollCityIntoView();
+  }
+  onStreetArrow(dir: 1|-1, ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const n = this.addressSuggestions?.length ?? 0; if (!n) return;
+    this.addressActiveIndex = (this.addressActiveIndex + dir + n) % n; this.scrollAddressIntoView();
+  }
+  onCityEnter(ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
+    if (s) this.pickCity(s);
+  }
+  onStreetEnter(ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
+    if (s) this.pickAddress(s);
+  }
 
 }
