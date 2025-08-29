@@ -95,13 +95,17 @@ newReview = { rating: 5, comment: '' };
 
   async ngOnInit(): Promise<void> {
   try {
+    this.location.latitude = 32.0853;
+    this.location.longitude = 34.7818;
+    this.center = { lat: this.location.latitude, lng: this.location.longitude };
+    this.zoom = this.defaultZoom;
+    
     const coords = await this.getCurrentLocation();
     this.location.latitude = coords.latitude;
     this.location.longitude = coords.longitude;
     console.log('Location resolved:', coords);
     this.center = { lat: this.location.latitude, lng: this.location.longitude };
     this.zoom = this.defaultZoom;
-
     this.loadSittersByLocation();
 
   } catch (err) {
