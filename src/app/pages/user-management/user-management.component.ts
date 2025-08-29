@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef} from '@angular/core';
+import { Component, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -60,7 +60,7 @@ interface ModalVM {
   title: string;
   section: MultiSection | null;
   field: MultiField | null;
-  dogIndex: number; // -1 when not a dog field
+  dogIndex: number; //
   options: string[];
   selected: Set<string>;
 }
@@ -73,11 +73,12 @@ interface ModalVM {
   templateUrl: './user-management.component.html',
   styleUrls: ['./user-management.component.css']
 })
+
 export class UserManagementComponent {
   static readonly profileURL =
-    'https://oriosyqlioqnmqo7xyr4ojoara0ycilg.lambda-url.us-east-1.on.aws/'; // GET ?sub=...
+    'https://oriosyqlioqnmqo7xyr4ojoara0ycilg.lambda-url.us-east-1.on.aws/';
   static readonly updateURL =
-    'https://r4776sz54z52iqfj4zbea55nti0ssbgi.lambda-url.us-east-1.on.aws/'; // POST updates
+    'https://r4776sz54z52iqfj4zbea55nti0ssbgi.lambda-url.us-east-1.on.aws/';
   static readonly uploadProfilePicURL =
     'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/';
 
@@ -86,9 +87,9 @@ export class UserManagementComponent {
     private userContext: UserContextService,
     private snackBar: MatSnackBar,
     private navigationService: NavigationService,
-    private places: PlacesService
+    private places: PlacesService,
+    private cdRef: ChangeDetectorRef
   ) {
-    // initialize newDog safely here (no "this" issues in field initializers)
     this.newDog = this.blankDog();
   }
 
@@ -109,7 +110,6 @@ export class UserManagementComponent {
     cityActiveIndex = 0;
     addressActiveIndex = 0;
 
-    // --- One-toast-per-action / in-flight guard ---
   private ops = new Set<string>();
   private lock(key: string): boolean {
     if (this.ops.has(key)) return false;
@@ -119,9 +119,8 @@ export class UserManagementComponent {
   private unlock(key: string) {
     this.ops.delete(key);
   }
-  // --- single-message guard between client + server errors ---
-  private lastClientErrorAt = 0;
-  private readonly CLIENT_ERR_WINDOW_MS = 3500;
+  //private lastClientErrorAt = 0;
+  //private readonly CLIENT_ERR_WINDOW_MS = 3500;
   private snackRef?: MatSnackBarRef<SimpleSnackBar>;
 
   addDogAttempted = false;
@@ -143,17 +142,16 @@ export class UserManagementComponent {
 
   years: number[] = [];
 
-  /* ---- Option lists ---- */
   experienceWithOptions = [
-   'Elder Dogs',
-   'Young Dogs',
-   'Cubs',
-   'Reactive Dogs',
-  'Aggressive to Other Animals',
-  'Aggressive to People',
-  'Anxious Dogs',
-  'Big Dogs',
-  'Small Dogs'
+    'Elder Dogs',
+    'Young Dogs',
+    'Cubs',
+    'Reactive Dogs',
+    'Aggressive to Other Animals',
+    'Aggressive to People',
+    'Anxious Dogs',
+    'Big Dogs',
+    'Small Dogs'
   ];
 
   serviceOptionsMaster = ['Dog-Sitting', 'Dog-Walking', 'Dog-Boarding'];
@@ -219,7 +217,7 @@ export class UserManagementComponent {
 
   /* ---- Dogs ---- */
   dogs: DogVM[] = [];
-  dogOpen: boolean[] = []; // accordion state per-dog
+  dogOpen: boolean[] = [];
   deleteDogConfirmOpen = false;
   deleteDogIndex: number | null = null;
 
@@ -246,7 +244,6 @@ export class UserManagementComponent {
     selected: new Set<string>()
   };
 
-  /* ---- Add-dog wizard modal (match HTML names) ---- */
   addDogModalOpen = false;
   addDogPage = 0; // 0..3
   newDog!: DogVM;
@@ -294,7 +291,6 @@ export class UserManagementComponent {
       error: err => console.error('[CITY AUTOCOMPLETE] HTTP error', err)
     });
 
-  // STREET suggestions (biased by chosen city)
   this.addressQuery$
     .pipe(
       debounceTime(200),
@@ -319,7 +315,6 @@ export class UserManagementComponent {
     return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
   }
 
-  /* ---------- Load profile ---------- */
   private loadProfile(): void {
     const url = `${UserManagementComponent.profileURL}?email=${encodeURIComponent(
       this.email
@@ -368,7 +363,6 @@ export class UserManagementComponent {
           profilePictureUrl: d.ProfilePictureUrl ?? ''
         }));
 
-        // match accordion state to dogs list
         this.dogOpen = new Array(this.dogs.length).fill(false);
       },
       error: (err) => {
@@ -378,11 +372,11 @@ export class UserManagementComponent {
     });
   }
 
-  /* ---------- General / Sitter edit helpers ---------- */
   isEditing(section: 'general' | 'sitter', field: string) {
     if (section === 'sitter' && !this.sitterActive) return false;
     return !!this.editState[section][field];
   }
+
   toggleEdit(section: 'general' | 'sitter', field: string) {
     if (section === 'sitter' && !this.sitterActive) return;
     if (!this.editState[section][field]) {
@@ -390,84 +384,11 @@ export class UserManagementComponent {
     }
     this.editState[section][field] = !this.editState[section][field];
   }
+
   cancelField(section: 'general' | 'sitter', field: string) {
     (this as any)[field] = this.originals[section][field];
     this.editState[section][field] = false;
   }
-  /* saveField(section: 'general' | 'sitter', field: string) {
-    if (section === 'sitter' && !this.sitterActive) return;
-    const payload = { sub: this.sub, section, field, value: (this as any)[field] };
-    this.http.post(UserManagementComponent.updateURL, payload).subscribe({
-      next: () => {
-        this.editState[section][field] = false;
-        this.snackBar.open('Saved', 'Close', { duration: 900 });
-      },
-      error: (err) => {
-        console.error('Save failed:', err);
-        (this as any)[field] = this.originals[section][field];
-        this.editState[section][field] = false;
-        this.snackBar.open('Save failed', 'Close', { duration: 1200 });
-      }
-    });
-  } */
-  /* saveField(section: 'general' | 'sitter', field: string) {
-    if (section === 'sitter' && !this.sitterActive) return;
-
-    const value = (this as any)[field];
-    const err = this.validateSingleField(section, field, value);
-    if (err) {
-      // revert and inform the user
-      (this as any)[field] = this.originals[section][field];
-      this.editState[section][field] = false;
-      this.warn(this.msgFrom(err));
-      return;
-    }
-
-    const payload = { sub: this.sub, section, field, value };
-    this.http.post(UserManagementComponent.updateURL, payload).subscribe({
-      next: () => {
-        this.editState[section][field] = false;
-        this.ok('Saved');
-      },
-      error: (err) => {
-        console.error('Save failed:', err);
-        (this as any)[field] = this.originals[section][field];
-        this.editState[section][field] = false;
-        this.warn(this.msgFrom(err));
-      }
-    });
-  } */
-
-  /* saveField(section: 'general' | 'sitter', field: string) {
-    if (section === 'sitter' && !this.sitterActive) return;
-
-    const value = (this as any)[field];
-    const err = this.validateSingleField(section, field, value);
-    if (err) {
-      (this as any)[field] = this.originals[section][field];
-      this.editState[section][field] = false;
-      this.warn(this.msgFrom(err));
-      return;
-    }
-
-    const key = `field:${section}:${field}`;
-    if (!this.lock(key)) return;            // <-- prevent double submit
-
-    const payload = { email: this.email, section, field, value };
-    this.http.post(UserManagementComponent.updateURL, payload).subscribe({
-      next: () => {
-        this.editState[section][field] = false;
-        this.ok('Saved');
-        this.unlock(key);
-      },
-      error: (err) => {
-        (this as any)[field] = this.originals[section][field];
-        this.editState[section][field] = false;
-        this.warn(this.msgFrom(err));
-        this.unlock(key);
-      }
-    });
-  } */
 
   saveField(section: 'general' | 'sitter', field: string) {
     if (section === 'sitter' && !this.sitterActive) return;
@@ -481,7 +402,6 @@ export class UserManagementComponent {
       return;
     }
 
-    // capture old city before we overwrite edit state
     const wasCityChange =
       section === 'general' &&
       field === 'city' &&
@@ -498,24 +418,18 @@ export class UserManagementComponent {
         this.ok('Saved');
         this.unlock(key);
 
-        // ⬇️ If city changed, force street update
         if (wasCityChange) {
-          // clear street to avoid mismatched address
           this.street = '';
-          // open street inline editor
           this.editState.general['street'] = true;
 
-          // reset address biasing so suggestions match the new city
           this.cityCenter = null;
           this.cityRect   = null;
           this.cityName   = this.city || null;
           this.addressSuggestions = [];
           this.editState.general['street'] = true;
           this.ok('City updated. Please update your street.');
-          // focus the street input
           setTimeout(() => this.streetInput?.nativeElement?.focus(), 0);
-
-          // tell the user
+          this.openStreetForEdit({ clear: true });
           this.warn('City changed — please update your street');
         }
       },
@@ -527,7 +441,6 @@ export class UserManagementComponent {
       }
     });
   }
-
 
   toggleSitterActive() {
     const confirmMsg = this.sitterActive
@@ -556,12 +469,12 @@ export class UserManagementComponent {
     });
   }
 
-  /* ---------- Dogs edit helpers ---------- */
   trackByIndex = (i: number) => i;
 
   isEditingDog(i: number, field: DogField) {
     return !!this.editState.dogs[i]?.[field];
   }
+
   toggleDogEdit(i: number, field: DogField) {
     this.editState.dogs[i] =
       this.editState.dogs[i] || ({} as Record<DogField, boolean>);
@@ -571,6 +484,7 @@ export class UserManagementComponent {
     }
     this.editState.dogs[i][field] = !this.editState.dogs[i][field];
   }
+
   cancelDogField(i: number, field: DogField) {
     const orig = this.originals.dogs[i][field] as DogVM[typeof field];
     if (orig !== undefined) {
@@ -578,66 +492,6 @@ export class UserManagementComponent {
     }
     this.editState.dogs[i][field] = false;
   }
-  /* saveDogField(i: number, field: DogField) {
-    const value = this.getDogField(i, field);
-    const dogId = this.dogs[i].id;
-    const payload =
-      dogId != null
-        ? { sub: this.sub, entity: 'dog', dogId, field, value }
-        : { sub: this.sub, entity: 'dog', index: i, field, value };
-
-    this.http.post(UserManagementComponent.updateURL, payload).subscribe({
-      next: () => {
-        this.editState.dogs[i][field] = false;
-        this.snackBar.open('Saved', 'Close', { duration: 900 });
-      },
-      error: (err) => {
-        console.error('Save dog failed:', err);
-        const orig = this.originals.dogs[i][field] as DogVM[typeof field];
-        if (orig !== undefined) this.setDogField(i, field, orig);
-        this.editState.dogs[i][field] = false;
-        this.snackBar.open('Save failed', 'Close', { duration: 1200 });
-      }
-    });
-  } */
-
-  /* saveDogField(i: number, field: DogField) {
-    const value = this.getDogField(i, field);
-
-    // Validate first
-    const err = this.validateDogField(field, value);
-    if (err) {
-      // revert to the original value and close edit
-      const orig = this.originals.dogs[i]?.[field] as DogVM[typeof field];
-      if (orig !== undefined) this.setDogField(i, field, orig);
-      this.editState.dogs[i][field] = false;
-
-      // loud snackbar (uses your existing warn() helper + CSS)
-      this.warn('Save failed');
-      return;
-    }
-
-    // proceed with save
-    const dogId = this.dogs[i].id;
-    const payload =
-      dogId != null
-        ? { sub: this.sub, entity: 'dog', dogId, field, value }
-        : { sub: this.sub, entity: 'dog', index: i, field, value };
-
-    this.http.post(UserManagementComponent.updateURL, payload).subscribe({
-      next: () => {
-        this.editState.dogs[i][field] = false;
-        this.ok('Saved');
-      },
-      error: (err) => {
-        console.error('Save dog failed:', err);
-        const orig = this.originals.dogs[i]?.[field] as DogVM[typeof field];
-        if (orig !== undefined) this.setDogField(i, field, orig);
-        this.editState.dogs[i][field] = false;
-        this.warn('Save failed');
-      }
-    });
-  } */
 
   saveDogField(i: number, field: DogField) {
     const value = this.getDogField(i, field);
@@ -710,8 +564,6 @@ export class UserManagementComponent {
     this.performDogDelete(i);
   }
 
-  /* ---------- Profile picture upload ---------- */
-  /* ===== Sitter photo ===== */
   startSitterPicEdit(input: HTMLInputElement) {
     if (!this.sitterActive) return;
     input.click();
@@ -734,8 +586,8 @@ export class UserManagementComponent {
             this.sitterProfilePic = res.publicUrl;
             this.http.post(UserManagementComponent.updateURL, {
               email: this.email,
-              section: 'sitter',                 // sitter section
-              field: 'profilePictureUrl',        // <-- field name on your backend
+              section: 'sitter',
+              field: 'profilePictureUrl',
               value: res.publicUrl
             }).subscribe({
               next: () => { this.ok('Sitter photo updated'); this.unlock(key); },
@@ -749,7 +601,6 @@ export class UserManagementComponent {
     });
   }
 
-  /* ===== Dog photo (per dog) ===== */
   startDogPicEdit(_i: number, input: HTMLInputElement) {
     input.click();
   }
@@ -809,19 +660,15 @@ export class UserManagementComponent {
     });
   }
 
-
-
   openDeactivateConfirm() {
     this.confirmDeactivateOpen = true;
   }
 
   confirmDeactivate() {
-    // close the dialog and proceed with the existing toggle logic
     this.confirmDeactivateOpen = false;
     this.toggleSitterActive();
   }
 
-  /* ---------- Multi-select (existing) ---------- */
   displayList(list?: string[] | null): string {
     return Array.isArray(list) && list.length ? list.join(', ') : '—';
   }
@@ -897,13 +744,12 @@ export class UserManagementComponent {
     }
   }
 
-
-  /* ---------- Add-dog wizard: open/close/nav/save ---------- */
   openAddDogModal() {
     this.addDogModalOpen = true;
     this.addDogPage = 0;
     this.newDog = this.blankDog();
   }
+
   closeAddDogModal() {
     this.addDogModalOpen = false;
   }
@@ -912,7 +758,6 @@ export class UserManagementComponent {
     if (this.addDogPage > 0) this.addDogPage--;
   }
 
-  /** Called by wizard checkbox inputs in template */
   onWizardCheckChange(
     field: 'behavioralTraits' | 'favoriteActivities',
     value: string,
@@ -925,30 +770,6 @@ export class UserManagementComponent {
     this.newDog[field] = Array.from(curr);
   }
 
-  /** Save the newly created dog */
-  /* saveNewDog() {
-    const key = 'dog:create';
-    if (!this.lock(key)) return;
-
-    const payload = { sub: this.sub, entity: 'dog', action: 'create', dog: this.newDog };
-    this.http.post<any>(UserManagementComponent.updateURL, payload).subscribe({
-      next: (res) => {
-        const assignedId = res?.dogId ?? res?.id ?? res?.dog?.Id ?? undefined;
-        const created: DogVM = { ...this.newDog, id: assignedId };
-        this.dogs = [...this.dogs, created];
-        this.dogOpen = [...this.dogOpen, true];
-        this.ok('Dog added');
-        this.closeAddDogModal();
-        this.unlock(key);
-      },
-      error: (err) => {
-        this.warn(this.msgFrom(err));
-        this.unlock(key);
-      }
-    });
-  } */
-
-  /* ---------- Dog field accessors ---------- */
   private getDogField<K extends DogField>(i: number, key: K): DogVM[K] {
     return (this.dogs[i] as any)[key] as DogVM[K];
   }
@@ -973,13 +794,10 @@ export class UserManagementComponent {
     this.deleteDogIndex = null;
   }
 
-  // --- Inline-edit validation helpers + rules ---
-
   isBlank(v: any): boolean {
     return v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
   }
 
-  /** Required fields per section for inline editing */
   private requiredGeneralFields = new Set<string>([
     'phone', 'city', 'street', 'email' // adjust as you like
   ]);
@@ -988,7 +806,6 @@ export class UserManagementComponent {
     'rate', 'availability', 'sitterBio', 'experienceYears', 'experienceDetails', 'serviceOptions'// tweak as needed
   ]);
 
-  /** Field-specific validators (return an error string or null if OK) */
   private validateSingleField(
     section: 'general' | 'sitter',
     field: string,
@@ -1033,7 +850,6 @@ export class UserManagementComponent {
     return null;
   }
 
-  /** Required + type rules for existing-dog inline edits */
   private validateDogField(field: DogField, value: any): string | null {
     const isBlank = (v: any) =>
       v === undefined || v === null || (typeof v === 'string' && v.trim() === '');
@@ -1055,7 +871,6 @@ export class UserManagementComponent {
 
       case 'weight':
       case 'age': {
-        // Optional, but if provided must be a non-negative number
         if (value === '' || value === null || value === undefined) return null;
         const n = Number(value);
         if (Number.isNaN(n) || n < 0) return 'Enter a non-negative number';
@@ -1067,7 +882,6 @@ export class UserManagementComponent {
         if (value !== '' && value !== 'yes' && value !== 'no') return 'Select Yes or No';
         return null;
 
-      // free text / arrays – no strict rules:
       case 'healthConditions':
       case 'moreDetails':
       case 'favoriteActivities':
@@ -1097,8 +911,8 @@ export class UserManagementComponent {
     if (this.snackRef) {
       const prev = this.snackRef;
       this.snackRef = undefined;
-      prev.afterDismissed().subscribe(open); // wait for the exit animation
-      prev.dismiss();                        // start dismissing the current one
+      prev.afterDismissed().subscribe(open);
+      prev.dismiss();
     } else {
       open();
     }
@@ -1110,8 +924,6 @@ export class UserManagementComponent {
   private warn(message: string, ms = 2200) {
     this.showSnack(message, ['warn-snackbar'], ms);
   }
-
-  // --- Add at the top-level of the class ---
 
   private isBlankStr(v:any) {
     return v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
@@ -1138,12 +950,10 @@ export class UserManagementComponent {
     return e;
   }
 
-
   nextAddDogPage() {
     this.addDogAttempted = true;
     if ((this.addDogPage === 0 && this.page0Errors()) ||
         (this.addDogPage === 1 && this.page1Errors())) {
-      // do not advance; inline messages are visible now
       return;
     }
     this.addDogAttempted = false;
@@ -1153,7 +963,7 @@ export class UserManagementComponent {
   saveNewDog() {
     this.addDogAttempted = true;
     if (this.page0Errors() || this.page1Errors()) {
-      return; // inline errors are shown on pages 0/1
+      return;
     }
 
     const key = 'dog:create';
@@ -1163,7 +973,10 @@ export class UserManagementComponent {
     this.http.post<any>(UserManagementComponent.updateURL, payload).subscribe({
       next: (res) => {
         const assignedId = res?.dogId ?? res?.id ?? res?.dog?.Id ?? undefined;
-        const created: DogVM = { ...this.newDog, id: assignedId };
+        const created: DogVM = {
+        ...this.newDog,
+        id: assignedId,
+        age: this.computeAgeFromBirth(this.newDog.birthYear!, this.newDog.birthMonth!)};
         this.dogs = [...this.dogs, created];
         this.dogOpen = [...this.dogOpen, true];
         this.addDogAttempted = false;
@@ -1171,10 +984,32 @@ export class UserManagementComponent {
         this.unlock(key);
       },
       error: (_err: any) => {
-        // no snackbar; you can optionally surface server text inline somewhere in the modal header
         this.unlock(key);
       }
     });
+  }
+
+  isMonthDisabledForNewDog(month: number): boolean {
+    const y = this.newDog?.birthYear;
+    if (!y) return false;
+    const now = new Date();
+    const yNow = now.getFullYear();
+    const mNow = now.getMonth() + 1;
+    return (y > yNow) || (y === yNow && month > mNow);
+  }
+
+  onNewDogYearChange(y: number | null) {
+    this.newDog.birthYear = y;
+    if (this.newDog.birthMonth && this.isMonthDisabledForNewDog(this.newDog.birthMonth)) {
+      this.newDog.birthMonth = null;
+    }
+  }
+
+  private computeAgeFromBirth(year: number, month: number): number {
+    const now = new Date();
+    let age = now.getFullYear() - year;
+    if ((now.getMonth() + 1) < month) age -= 1;
+    return Math.max(0, age);
   }
 
   private isMissing(v: unknown) {
@@ -1186,6 +1021,7 @@ export class UserManagementComponent {
     || this.isMissing(d.profilePictureUrl) || this.isMissing(d.birthMonth)
         || this.isMissing(d.birthYear);
   }
+
   private page1Errors(): boolean {
     const d = this.newDog;
     return this.isMissing(d.size)
@@ -1215,15 +1051,11 @@ export class UserManagementComponent {
     return y > yNow || (y === yNow && m > mNow);
   }
 
-  // Put this inside the component class
   private toStringArray(input: any): string[] {
     if (Array.isArray(input)) return input.map(x => String(x).trim()).filter(Boolean);
     if (typeof input === 'string') return input.split(',').map(s => s.trim()).filter(Boolean);
     return [];
   }
-
-  // CITY suggestions
-
 
   onCityInput(v: string) {
     this.city = v;
@@ -1315,6 +1147,23 @@ export class UserManagementComponent {
     ev.preventDefault(); ev.stopPropagation();
     const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
     if (s) this.pickAddress(s);
+  }
+
+  private openStreetForEdit(options?: { clear?: boolean }) {
+    const clear = options?.clear ?? false;
+
+    if (clear) this.street = '';                 // wipe old street when city changed
+    this.editState.general['street'] = true;     // open inline editor
+
+    // reset biasing so suggestions match the new city
+    this.cityCenter = null;
+    this.cityRect   = null;
+    this.cityName   = this.city || null;
+    this.addressSuggestions = [];
+
+    // force a render tick, THEN focus
+    this.cdRef.detectChanges();
+    setTimeout(() => this.streetInput?.nativeElement?.focus(), 50);
   }
 
 }
