@@ -70,7 +70,7 @@ export class NavbarComponent {
           const shouldGoToSignup = !status.userExists || !status.isComplete;
           await this.router.navigate([shouldGoToSignup ? '/signup' : (returnTo || '/')]);
         } catch (e) {
-          console.warn('[Auth] getUserStatus failed on callback; keeping local flag.', e);
+          console.warn('getUserStatus function failed on callback; keeping local flag.', e);
         }
 
         // Clean URL once
@@ -97,11 +97,11 @@ export class NavbarComponent {
         this.userContext.setUserCompleteStatus(backend.isComplete);
         this.isComplete = backend.isComplete;
       } catch (e) {
-        console.warn('[Auth] getUserStatus failed on boot; keeping local flag.', e);
+        console.warn('getUserStatus function failed on boot; keeping local flag.', e);
       }
     } else {
       this.username = null;
-      console.warn('[Auth] VALID status but missing idToken; not setting user.');
+      console.warn('VALID status but missing idToken; not setting user.');
     }
   } else {
     this.username = null;
@@ -257,54 +257,35 @@ export class NavbarComponent {
 
 
   logout(): void {
-    // 1) clear local state/tokens
     this.localSignOut();
-
-    // 2) end Cognito Hosted UI session (so next login can choose another user)
-    const logoutUrl = this.buildCognitoLogoutUrl();
-    window.location.href = logoutUrl;
+    //const logoutUrl = this.buildCognitoLogoutUrl();
+    // window.location.href = logoutUrl;
+    this.router.navigate(['/']);
   }
 
   private localSignOut(): void {
-    // remove saved tokens + timers
     this.tokenSvc.clear();
 
-    // clear “synced to backend” flag for this user (optional)
     const sub = this.userContext.getCurrentUserValue?.()?.sub;
     if (sub) localStorage.removeItem(`userSynced:${sub}`);
-
-    // clear user context if your service exposes a clear/reset method
-    // (optional chaining in case it doesn’t exist)
     this.userContext.clearUser?.();
-
-    // update navbar UI immediately
     this.username = null;
   }
 
-  private buildCognitoLogoutUrl(): string {
-    const domain = environment.cognitoDomain.replace(/\/+$/, ''); // trim trailing slash
-    const clientId = encodeURIComponent(environment.clientId);
-    const logoutUri = encodeURIComponent(environment.signOutRedirectUri || environment.redirectUri);
-
-    // Standard Cognito Hosted UI logout
-    return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
-  }
-
-///////////////////////////////////////////////////////////////
-
+private buildCognitoLogoutUrl(): string {
+  const domain = environment.cognitoDomain.replace(/\/+$/, '');
+  const clientId = encodeURIComponent(environment.clientId);
+  const logoutUri = encodeURIComponent(environment.signOutRedirectUri || environment.redirectUri);
+  return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
+}
 
   private buildHostedUiUrl(returnTo = '/'): string {
   const domain = environment.cognitoDomain.replace(/\/+$/, '');
   const clientId = encodeURIComponent(environment.clientId);
   const redirectUri = encodeURIComponent(environment.redirectUri);
   const scope = encodeURIComponent('openid email profile');
-
-  // single button: just mark where to return after onboarding/login
   const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
 
-  // If you want the Hosted UI to open on the sign-up form preselected,
-  // you can use the /signup path instead of /authorize (Cognito supports it).
-  // Otherwise use /login; both still end at your same callback.
   return `${domain}/login?client_id=${clientId}` +
          `&redirect_uri=${redirectUri}` +
          `&response_type=code&scope=${scope}&state=${state}`;
