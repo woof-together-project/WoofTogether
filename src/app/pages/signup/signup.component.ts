@@ -363,7 +363,6 @@ export class SignupComponent {
       phone: this.phone,
       city: this.city,
       street: this.street,
-      //profilePic: this.profilePic, // for now just the file name or base64 if needed
       isSitter: this.isSitter,
       addDog: this.addDog,
       sitterDetails: this.isSitter ? {
@@ -396,63 +395,6 @@ export class SignupComponent {
 
     };
   }
-
-
-// onProfilePicSelected(event: Event): void {
-//   console.log('[onProfilePicSelected] Event triggered:', event);
-
-//   const input = event.target as HTMLInputElement;
-//   const file = input.files?.[0];
-
-//   if (!file) {
-//     console.warn('[onProfilePicSelected] No file selected.');
-//     return;
-//   }
-
-//   console.log('[onProfilePicSelected] File selected:', {
-//     name: file.name,
-//     type: file.type,
-//     size: file.size
-//   });
-
-//   const profilePicFile = file;
-//   this.profilePic = file.name;
-
-//   const lambdaUrl = SignupComponent.uploadProfilePicURL;
-//   console.log('[onProfilePicSelected] Sending request to Lambda for presigned URL:', {
-//     fileName: file.name,
-//     fileType: file.type
-//   });
-
-//   this.http.post<any>(lambdaUrl, {
-//     fileName: file.name,
-//     fileType: file.type
-//   }).subscribe({
-//     next: (res) => {
-//       console.log('[Lambda Response] Presigned URL and Public URL received:', res);
-
-//       const presignedUrl = res.url;
-//       const publicUrl = res.publicUrl;
-
-//       console.log('[S3 Upload] Uploading file to S3 via presigned URL...');
-//       this.http.put(presignedUrl, file, {
-//         headers: { 'Content-Type': file.type }
-//       }).subscribe({
-//         next: () => {
-//           console.log('[S3 Upload] Upload successful');
-//           this.profilePic = publicUrl;
-//           console.log('[S3 Upload] Stored public URL:', publicUrl);
-//         },
-//         error: (err) => {
-//           console.error('[S3 Upload] Upload to S3 failed:', err);
-//         }
-//       });
-//     },
-//     error: (err) => {
-//       console.error('[Lambda Error] Failed to get presigned URL:', err);
-//     }
-//   });
-// }
 
 onSitterPicSelected(event: Event): void {
   const input = event.target as HTMLInputElement;
@@ -552,7 +494,7 @@ private scrollAddressIntoView() {
 
 onCityKeydown(ev: KeyboardEvent) {
   const n = this.citySuggestions?.length ?? 0;
-  if (!n) return;                            // let caret move normally if list closed
+  if (!n) return;                           
 
   if (ev.key === 'ArrowDown') {
     ev.preventDefault();
@@ -563,7 +505,7 @@ onCityKeydown(ev: KeyboardEvent) {
     this.cityActiveIndex = (this.cityActiveIndex - 1 + n) % n;
     this.scrollCityIntoView();
   } else if (ev.key === 'Enter') {
-    ev.preventDefault();                     // stop form submit
+    ev.preventDefault();                    
     const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
     if (s) this.pickCity(s);
   } else if (ev.key === 'Escape') {

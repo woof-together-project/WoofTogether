@@ -8,7 +8,6 @@ body {
   background-color: rgba(204, 255, 204, 0.4); /* light green with transparency */
 }
 
-/* === NAVIGATION BAR === */
 nav.navbar {
   position: fixed;
   background-color: transparent;
@@ -39,7 +38,7 @@ nav.navbar {
   font-weight: bold;
   padding: 0.5rem 1.2rem;
   border: none;
-  border-radius: 50px; /* ✅ fully rounded pill style */
+  border-radius: 50px; 
   cursor: pointer;
   font-family: 'Comfortaa', sans-serif;
   transition: background-color 0.2s ease;
