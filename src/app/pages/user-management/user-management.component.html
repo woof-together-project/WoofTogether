@@ -303,11 +303,11 @@
             <label>Age</label>
             <span *ngIf="!isEditingDog(i,'age')">{{ d.age || '—' }}</span>
             <input *ngIf="isEditingDog(i,'age')" [(ngModel)]="dogs[i].age" />
-            <button class="icon-btn" (click)="toggleDogEdit(i,'age')">
+            <!--<button class="icon-btn" (click)="toggleDogEdit(i,'age')">
               <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
             </button>
             <button *ngIf="isEditingDog(i,'age')" class="pill save" (click)="saveDogField(i,'age')">Save</button>
-            <button *ngIf="isEditingDog(i,'age')" class="pill cancel" (click)="cancelDogField(i,'age')">Cancel</button>
+            <button *ngIf="isEditingDog(i,'age')" class="pill cancel" (click)="cancelDogField(i,'age')">Cancel</button>-->
           </div>
 
           <div class="row">
@@ -419,6 +419,19 @@
       <ng-container [ngSwitch]="addDogPage">
         <!-- Page 0 -->
         <div *ngSwitchCase="0" class="wizard-page">
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.profilePictureUrl)">
+            <label>Dog Photo</label>
+            <div class="avatar-row">
+              <img *ngIf="newDog.profilePictureUrl" [src]="newDog.profilePictureUrl" class="avatar" alt="dog" />
+              <input #newDogPicInput type="file" accept="image/*" hidden (change)="onNewDogPicSelected($event)" />
+              <button class="pill btn-change" (click)="newDogPicInput.click()">Upload</button>
+            </div>
+            <small class="field-error" *ngIf="addDogAttempted && isBlank(newDog.profilePictureUrl)">
+              Photo is required
+            </small>
+          </div>
+
           <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.name)">
             <label>Dog's Name</label>
             <input [(ngModel)]="newDog.name" />
@@ -434,6 +447,39 @@
               Breed is required
             </small>
           </div>
+
+        <!-- NEW: Birth month + year (replaces the Age input) -->
+            <div class="row simple"
+                 [class.invalid]="addDogAttempted && (!newDog.birthMonth || !newDog.birthYear || isFutureBirth(newDog.birthYear, newDog.birthMonth))">
+              <label>Dog's Birth</label>
+              <div class="d-flex gap-2" style="width: 80%">
+                <!-- Use ngValue so the model holds numbers, not strings -->
+                <select [(ngModel)]="newDog.birthMonth">
+                  <option [ngValue]="null" disabled>Month</option>
+                  <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+                </select>
+
+                <select [(ngModel)]="newDog.birthYear">
+                  <option [ngValue]="null" disabled>Year</option>
+                  <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+                </select>
+
+                <small *ngIf="newDog.birthMonth && newDog.birthYear" class="age-hint text-muted">
+                    ~ {{ getAgeString(newDog.birthYear, newDog.birthMonth) }}
+                  </small>
+              </div>
+
+              <small class="field-error" *ngIf="addDogAttempted && (!newDog.birthMonth || !newDog.birthYear)">
+                Birth month & year are required
+              </small>
+              <small class="field-error" *ngIf="addDogAttempted && isFutureBirth(newDog.birthYear, newDog.birthMonth)">
+                Birth cannot be in the future
+              </small>
+            </div>
+        </div>
+
+        <!-- Page 1 -->
+        <div *ngSwitchCase="1" class="wizard-page">
 
           <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.gender)">
             <label>Gender</label>
@@ -460,10 +506,7 @@
               This field is required
             </small>
           </div>
-        </div>
 
-        <!-- Page 1 -->
-        <div *ngSwitchCase="1" class="wizard-page">
           <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.size)">
             <label>Size</label>
             <select [(ngModel)]="newDog.size">
@@ -484,13 +527,6 @@
                    *ngIf="addDogAttempted && (newDog.weight == null)">Weight is required</small>
           </div>
 
-          <div class="row simple" [class.invalid]="addDogAttempted && (newDog.age == null)">
-            <label>Age</label>
-            <input type="number" min="0" [(ngModel)]="newDog.age" />
-            <small class="field-error"
-                   *ngIf="addDogAttempted && (newDog.age == null)">Age is required</small>
-          </div>
-
           <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.rabiesVaccinated)">
             <label>Vaccinated Against Rabies?</label>
             <select [(ngModel)]="newDog.rabiesVaccinated">
@@ -503,7 +539,6 @@
           </div>
         </div>
 
-        <!-- Page 2 -->
         <div *ngSwitchCase="2" class="wizard-page">
           <div class="row simple">
             <label>Health Conditions</label>

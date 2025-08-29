@@ -20,6 +20,8 @@ interface DogVM {
   size: string;
   weight: number | null;
   age: number | null;
+  birthMonth: number | null;
+  birthYear: number | null;
   healthConditions: string;
   moreDetails: string;
   fixed: '' | 'yes' | 'no';
@@ -36,6 +38,8 @@ type DogField =
   | 'size'
   | 'weight'
   | 'age'
+  | 'birthMonth'
+  | 'birthYear'
   | 'healthConditions'
   | 'moreDetails'
   | 'fixed'
@@ -121,6 +125,23 @@ export class UserManagementComponent {
   private snackRef?: MatSnackBarRef<SimpleSnackBar>;
 
   addDogAttempted = false;
+
+  months = [
+  { value: 1,  label: 'Jan' },
+  { value: 2,  label: 'Feb' },
+  { value: 3,  label: 'Mar' },
+  { value: 4,  label: 'Apr' },
+  { value: 5,  label: 'May' },
+  { value: 6,  label: 'Jun' },
+  { value: 7,  label: 'Jul' },
+  { value: 8,  label: 'Aug' },
+  { value: 9,  label: 'Sep' },
+  { value: 10, label: 'Oct' },
+  { value: 11, label: 'Nov' },
+  { value: 12, label: 'Dec' },
+];
+
+  years: number[] = [];
 
   /* ---- Option lists ---- */
   experienceWithOptions = [
@@ -239,6 +260,8 @@ export class UserManagementComponent {
       size: '',
       weight: null,
       age: null,
+      birthMonth: null,
+      birthYear: null,
       healthConditions: '',
       moreDetails: '',
       fixed: '',
@@ -254,6 +277,9 @@ export class UserManagementComponent {
       this.email = u?.email ?? '';
       this.username = u?.username ?? '';
       this.sub = u?.sub ?? '';
+      const thisYear = new Date().getFullYear();
+      const span = 25;                 // show 25 years back (adjust if you want)
+      this.years = Array.from({length: span + 1}, (_, i) => thisYear - i);
       if (this.email) this.loadProfile();
     });
 
@@ -761,6 +787,29 @@ export class UserManagementComponent {
     });
   }
 
+  onNewDogPicSelected(ev: Event) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const key = 'newdog:pic';
+    if (!this.lock(key)) return;
+
+    this.http.post<any>(UserManagementComponent.uploadProfilePicURL, {
+      fileName: file.name,
+      fileType: file.type
+    }).subscribe({
+      next: (res) => {
+        this.http.put(res.url, file, { headers: { 'Content-Type': file.type } })
+          .subscribe({
+            next: () => { this.newDog.profilePictureUrl = res.publicUrl; this.ok('Photo uploaded'); this.unlock(key); },
+            error: () => { this.warn('Upload failed'); this.unlock(key); }
+          });
+      },
+      error: () => { this.warn('Upload failed'); this.unlock(key); }
+    });
+  }
+
+
 
   openDeactivateConfirm() {
     this.confirmDeactivateOpen = true;
@@ -1133,13 +1182,37 @@ export class UserManagementComponent {
   }
   private page0Errors(): boolean {
     const d = this.newDog;
-    return this.isMissing(d.name) || this.isMissing(d.breed) ||
-           this.isMissing(d.gender) || this.isMissing(d.fixed);
+    return this.isMissing(d.name) || this.isMissing(d.breed)
+    || this.isMissing(d.profilePictureUrl) || this.isMissing(d.birthMonth)
+        || this.isMissing(d.birthYear);
   }
   private page1Errors(): boolean {
     const d = this.newDog;
-    return this.isMissing(d.size) || d.weight == null || d.age == null ||
-           this.isMissing(d.rabiesVaccinated);
+    return this.isMissing(d.size)
+        || d.weight == null
+        || this.isFutureBirth(d.birthYear as number, d.birthMonth as number)
+        || this.isMissing(d.rabiesVaccinated)
+        || this.isMissing(d.gender) || this.isMissing(d.fixed);
+  }
+
+  getAgeString(birthYear: number, birthMonth: number): string {
+    if (!birthYear || !birthMonth) return '';
+    const now = new Date();
+    let y = now.getFullYear() - birthYear;
+    let m = (now.getMonth() + 1) - birthMonth;
+    if (m < 0) { y -= 1; m += 12; }
+    if (y < 0) return '0 months';
+    const yPart = y > 0 ? `${y} year${y > 1 ? 's' : ''}` : '';
+    const mPart = m > 0 ? `${m} month${m > 1 ? 's' : ''}` : (y === 0 ? '0 months' : '');
+    return [yPart, mPart].filter(Boolean).join(', ');
+  }
+
+  isFutureBirth(y?: number | null, m?: number | null): boolean {
+    if (!y || !m) return false;
+    const now = new Date();
+    const yNow = now.getFullYear();
+    const mNow = now.getMonth() + 1;
+    return y > yNow || (y === yNow && m > mNow);
   }
 
   // Put this inside the component class

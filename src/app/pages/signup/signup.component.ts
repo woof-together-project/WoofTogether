@@ -20,7 +20,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
   place_id: string;
   address_components?: AddressComponent[];
   geometry?: { viewport?: ViewportA | ViewportB };
-}
+  }
 
 @Component({
   selector: 'app-signup',
@@ -38,6 +38,23 @@ export class SignupComponent {
   constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService, private places: PlacesService
 ) {}
+
+  months = [
+    { value: 1,  label: 'Jan' },
+    { value: 2,  label: 'Feb' },
+    { value: 3,  label: 'Mar' },
+    { value: 4,  label: 'Apr' },
+    { value: 5,  label: 'May' },
+    { value: 6,  label: 'Jun' },
+    { value: 7,  label: 'Jul' },
+    { value: 8,  label: 'Aug' },
+    { value: 9,  label: 'Sep' },
+    { value: 10, label: 'Oct' },
+    { value: 11, label: 'Nov' },
+    { value: 12, label: 'Dec' },
+    ];
+
+  years: number[] = [];
 
   //cognito data
   email: string = '';
@@ -63,7 +80,8 @@ export class SignupComponent {
 
   // dog data
   dogs: any[] = [
-  { name: '', breed: '', gender: '', imageUrl: '' , fixed: '', size: '', weight: null, age: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
+  { name: '', breed: '', gender: '', imageUrl: '' , fixed: '', size: '', weight: null, birthYear: null,
+  birthMonth: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
   ];
 
   showGeneralInfo: boolean = true;
@@ -151,7 +169,9 @@ export class SignupComponent {
       favoriteActivities: [],
       health: '',
       moreDetails: '',
-      imageUrl: ''
+      imageUrl: '',
+      birthYear: null,
+      birthMonth: null,
     });
     this.currentDogPage.push(0);
     this.showDogSections.push(true);
@@ -164,6 +184,9 @@ export class SignupComponent {
     this.username = currentUser?.username ?? '';
     this.nickname = currentUser?.nickname ?? '';
     this.sub = currentUser?.sub ?? '';
+    const thisYear = new Date().getFullYear();
+    const span = 25; // show 25 years back
+    this.years = Array.from({ length: span + 1 }, (_, i) => thisYear - i);
   });
 
    this.cityQuery$
@@ -339,7 +362,9 @@ export class SignupComponent {
         gender: d.gender,
         size: d.size,
         weight: d.weight,
-        age: d.age,
+        //age: d.age,
+        birthMonth: d.birthMonth,
+        birthYear: d.birthYear,
         healthConditions: d.health,
         moreDetails: d.moreDetails,
         behavioralTraits: d.behavioralTraits,
@@ -574,6 +599,20 @@ onStreetEnter(ev: Event) {
   const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
   if (s) this.pickAddress(s);
 }
+
+  getAgeString(birthYear: number, birthMonth: number): string {
+    if (!birthYear || !birthMonth) return '';
+    const now = new Date();
+    const y = now.getFullYear() - birthYear;
+    let m = (now.getMonth() + 1) - birthMonth;
+    let adjY = y;
+    if (m < 0) { adjY -= 1; m += 12; }
+    if (adjY < 0) return '0 months';
+    const yPart = adjY > 0 ? `${adjY} year${adjY > 1 ? 's' : ''}` : '';
+    const mPart = m > 0 ? `${m} month${m > 1 ? 's' : ''}` : (adjY === 0 ? '0 months' : '');
+    return [yPart, mPart].filter(Boolean).join(', ');
+  }
+
 
 }
 

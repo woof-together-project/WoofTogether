@@ -515,3 +515,8 @@ select.select--sm { padding: 6px 32px 6px 10px; border-radius: 8px; font-size: .
 .autocomplete-list li.active {
   font-weight: 700;
 }
+
+.row.simple .age-hint {
+  flex: 0 0 auto;    /* don’t stretch or shrink */
+  white-space: nowrap; /* keep on one line */
+}

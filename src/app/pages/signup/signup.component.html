@@ -418,19 +418,48 @@
                   </div>
                 </div>
 
-                <div class="mb-2">
+                <!--<div class="mb-2">
                 <label class="form-label">Dog's Age</label>
                 <input type="number" class="form-control" [(ngModel)]="dog.age" name="dogAge-{{i}}" required #dogAgeModel="ngModel">
                 <div *ngIf="signupForm.submitted && dogAgeModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
                   Dog age is required
                 </div>
-                </div>
-
-                <!--<div class="mb-2">
-                  <label class="form-label">Temperament</label>
-                  <input type="text" class="form-control" [(ngModel)]="dog.temperament" name="dogTemperament-{{i}}" required>
                 </div>-->
+                  <!-- Dog's Birth (Month + Year) -->
+                <div class="mb-2">
+                  <label class="form-label">Dog's Birth</label>
+                  <div class="d-flex gap-2">
+                    <!-- Month -->
+                    <select class="form-select"
+                            [(ngModel)]="dog.birthMonth"
+                            name="dogBirthMonth-{{i}}"
+                            required
+                            #dogBirthMonth="ngModel">
+                      <option value="" disabled selected>Month</option>
+                      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                    </select>
 
+                    <!-- Year -->
+                    <select class="form-select"
+                            [(ngModel)]="dog.birthYear"
+                            name="dogBirthYear-{{i}}"
+                            required
+                            #dogBirthYear="ngModel">
+                      <option value="" disabled selected>Year</option>
+                      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+                    </select>
+                  </div>
+
+                  <!-- Optional live preview -->
+                  <small *ngIf="dog.birthMonth && dog.birthYear" class="text-muted">
+                    ~ {{ getAgeString(dog.birthYear, dog.birthMonth) }}
+                  </small>
+
+                  <div *ngIf="signupForm.submitted && (dogBirthMonth.invalid || dogBirthYear.invalid)"
+                       class="text-danger small mb-1 text-end fade-in-error">
+                    Birth month & year are required
+                  </div>
+                </div>
 
                 </div>
 
