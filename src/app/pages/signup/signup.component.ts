@@ -84,6 +84,9 @@ export class SignupComponent {
   birthMonth: null, rabiesVaccinated: '', behavioralTraits: [], favoriteActivities: [], health: '', moreDetails: '' }
   ];
 
+  sitterAttempted: boolean[] = [false, false, false];      // per sitter page
+  dogAttempted: boolean[][] = [[false, false, false, false]]; // per dog, per page
+
   showGeneralInfo: boolean = true;
   showSitterSection: boolean = false;
   showDogSections: boolean[] = [true];
@@ -176,6 +179,7 @@ export class SignupComponent {
     this.currentDogPage.push(0);
     this.showDogSections.push(true);
     this.showDogCard.push(true);
+    this.dogAttempted.push([false, false, false, false]);
   }
 
   ngOnInit() {
@@ -627,6 +631,102 @@ onStreetEnter(ev: Event) {
     const yPart = adjY > 0 ? `${adjY} year${adjY > 1 ? 's' : ''}` : '';
     const mPart = m > 0 ? `${m} month${m > 1 ? 's' : ''}` : (adjY === 0 ? '0 months' : '');
     return [yPart, mPart].filter(Boolean).join(', ');
+  }
+
+  private dogValid(d: any): boolean {
+    // fields the form already marks as required:
+    const basicOk =
+      !!d.name &&
+      !!d.gender &&
+      (d.fixed === 'yes' || d.fixed === 'no') &&
+      !!d.size &&
+      d.weight != null &&
+      !!d.birthMonth &&
+      !!d.birthYear &&
+      (d.rabiesVaccinated === 'yes' || d.rabiesVaccinated === 'no');
+
+    // things *not* tracked by ngForm (file/photo)
+    const photoOk = !!d.imageUrl;
+
+    // (optional) prevent future birth date
+    const birthOk = !this.isFutureBirth(d.birthYear, d.birthMonth);
+
+    return basicOk && photoOk && birthOk;
+  }
+
+  private sitterValid(): boolean {
+    if (!this.isSitter) return true;
+    // form already requires gender/rate/experience; we only need to enforce the photo:
+    const photoOk = !!this.sitterImageUrl;
+    return photoOk;
+  }
+
+  extraValidations(): boolean {
+    const dogsOk = !this.addDog || this.dogs.every(d => this.dogValid(d));
+    const sitterOk = this.sitterValid();
+    return dogsOk && sitterOk;
+  }
+
+  private isFutureBirth(y?: number|null, m?: number|null): boolean {
+    if (!y || !m) return false;
+    const now = new Date();
+    return y > now.getFullYear() || (y === now.getFullYear() && m > (now.getMonth() + 1));
+  }
+
+  private isSitterPageValid(page: number): boolean {
+    if (!this.isSitter) return true;
+    if (page === 0) return !!this.gender && !!this.sitterImageUrl; // photo + gender
+    if (page === 1) return this.rate != null && this.rate !== undefined && this.experience !== '' && this.experience != null;
+    return true; // page 2 has no required fields
+  }
+
+  private isDogPageValid(i: number, page: number): boolean {
+    const d = this.dogs[i] || {};
+    if (page === 0) {
+      return !!d.imageUrl && !!d.name && !!d.gender && (d.fixed === 'yes' || d.fixed === 'no');
+    }
+    if (page === 1) {
+      return !!d.size && d.weight != null && !!d.birthMonth && !!d.birthYear && !this.isFutureBirth(d.birthYear, d.birthMonth);
+    }
+    if (page === 2) {
+      return (d.rabiesVaccinated === 'yes' || d.rabiesVaccinated === 'no');
+    }
+    return true; // page 3 has no required fields
+  }
+
+  // ---- “Next” that blocks and shows messages ----
+  tryNextSitterPage() {
+    const p = this.currentSitterPage;
+    this.sitterAttempted[p] = true;
+    if (this.isSitterPageValid(p)) {
+      this.sitterAttempted[p] = false; // optional
+      this.currentSitterPage++;
+    }
+  }
+
+  tryNextDogPage(i: number) {
+    const p = this.currentDogPage[i];
+    this.dogAttempted[i][p] = true;
+    if (this.isDogPageValid(i, p)) {
+      this.dogAttempted[i][p] = false; // optional
+      this.currentDogPage[i]++;
+    }
+  }
+
+  // ---- final form gate for the submit button ----
+  isAllValid(): boolean {
+    const generalOk = !!this.phone && !!this.city && !!this.street;
+    const sitterOk =
+      !this.isSitter ||
+      (this.isSitterPageValid(0) && this.isSitterPageValid(1)); // page 2 optional
+    const dogsOk =
+      !this.addDog ||
+      this.dogs.every((_, i) =>
+        this.isDogPageValid(i, 0) &&
+        this.isDogPageValid(i, 1) &&
+        this.isDogPageValid(i, 2)
+      );
+    return (this.isSitter || this.addDog) && generalOk && sitterOk && dogsOk;
   }
 
 
