@@ -456,13 +456,19 @@
                 <!-- Use ngValue so the model holds numbers, not strings -->
                 <select [(ngModel)]="newDog.birthMonth">
                   <option [ngValue]="null" disabled>Month</option>
-                  <option *ngFor="let m of months" [ngValue]="m.value">{{ m.label }}</option>
+                  <option *ngFor="let m of months" [ngValue]="m.value"
+                  [disabled]="isMonthDisabledForNewDog(m.value)">{{ m.label }}</option>
                 </select>
 
-                <select [(ngModel)]="newDog.birthYear">
+                <select class="form-select"
+                        [(ngModel)]="newDog.birthYear"
+                        (ngModelChange)="onNewDogYearChange($event)"
+                        name="newDogBirthYear"
+                        required>
                   <option [ngValue]="null" disabled>Year</option>
                   <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
                 </select>
+
 
                 <small *ngIf="newDog.birthMonth && newDog.birthYear" class="age-hint text-muted">
                     ~ {{ getAgeString(newDog.birthYear, newDog.birthMonth) }}
