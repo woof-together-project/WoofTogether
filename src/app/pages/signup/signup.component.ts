@@ -31,10 +31,8 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 })
 
 export class SignupComponent {
- // static readonly signupURL =  'https://eu2okj2maowkb7rrlnqmtnmfru0nvaif.lambda-url.us-east-1.on.aws/'; //signup lambda function URL
-  //static readonly uploadProfilePicURL = 'https://gmnmxjlmg5nwmqhs6nz7riribu0sukcb.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
-   static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; //signup lambda function URL in final user
-   static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
+  static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; //signup lambda function URL in final user
+  static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
   constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService, private places: PlacesService
 ) {}
@@ -66,8 +64,8 @@ export class SignupComponent {
   phone: string = '';
   city: string = '';
   street: string = '';
-  profilePic: string = ''; // Note: for real upload you'll need FileReader or FormData
-  profilePicFile: File | null = null; // Store the file object for upload
+  profilePic: string = '';
+  profilePicFile: File | null = null;
 
   // sitter data
   rate: number | null = null;
@@ -95,10 +93,11 @@ export class SignupComponent {
   isSitter: boolean = false;
   addDog: boolean = false;
 
-  currentSitterPage: number = 0; // 0 = About Me, 1 = Experience, etc.
-  currentDogPage: number[] = [0]; // One page index per dog
+  currentSitterPage: number = 0; //
+  currentDogPage: number[] = [0]; //
   sitterImageUrl: string = '';
   sitterImageFile: File | null = null;
+
   experienceWithOptions = [
   'Elder Dogs', 'Young Dogs', 'Cubs', 'Reactive Dogs',
   'Aggressive to Other Animals', 'Aggressive to People',
@@ -204,24 +203,23 @@ export class SignupComponent {
       error: err => { console.error('[CITY AUTOCOMPLETE] HTTP error', err); }
     });
 
-  this.addressQuery$
-  .pipe(
-    debounceTime(200),
-    distinctUntilChanged(),
-    switchMap(q => this.places.autocomplete(
-      q,
-      this.placesToken,
-      'address',
-      {
-        cityCenter: this.cityCenter ?? undefined,
-        cityRect: this.cityRect ?? undefined,
-        cityName: this.cityName ?? undefined
-      }
-    ))
-  )
-  .subscribe(res => this.addressSuggestions = res.predictions);
-
-}
+    this.addressQuery$
+    .pipe(
+      debounceTime(200),
+      distinctUntilChanged(),
+      switchMap(q => this.places.autocomplete(
+        q,
+        this.placesToken,
+        'address',
+        {
+          cityCenter: this.cityCenter ?? undefined,
+          cityRect: this.cityRect ?? undefined,
+          cityName: this.cityName ?? undefined
+        }
+      ))
+    )
+    .subscribe(res => this.addressSuggestions = res.predictions);
+  }
 
   removeDog(index: number) {
     this.dogs.splice(index, 1);
@@ -273,7 +271,6 @@ export class SignupComponent {
     }
   }
 
-  // Example for dogs:
   nextDogPage(index: number) {
     this.currentDogPage[index]++;
   }
@@ -304,59 +301,33 @@ export class SignupComponent {
     return Array.from(s);
   }
 
- submitForm() {
-  const signupData = this.prepareSignupData();
-  const payload = {
-    email: this.email,
-    signupData: signupData
-  };
+  submitForm() {
+    const signupData = this.prepareSignupData();
+    const payload = {
+      email: this.email,
+      signupData: signupData
+    };
 
   this.http.post<{ isComplete: boolean, success: boolean, message?: string }>(
     SignupComponent.signupURL, payload
-  ).subscribe({
-    next: res => {
-      if (res.success && res.isComplete) {
-        this.userContext.setUserCompleteStatus(true);
-        this.snackBar.open('Signup successful!', 'Close', { duration: 1500 });
-        setTimeout(() => this.navigationService.requestHomeRedirect(), 1500);
-      } else {
-        this.snackBar.open(res?.message || 'You must complete the signup before submitting.', 'Close', {
-          duration: 2500
-        });
+    ).subscribe({
+      next: res => {
+        if (res.success && res.isComplete) {
+          this.userContext.setUserCompleteStatus(true);
+          this.snackBar.open('Signup successful!', 'Close', { duration: 1500 });
+          setTimeout(() => this.navigationService.requestHomeRedirect(), 1500);
+        } else {
+          this.snackBar.open(res?.message || 'You must complete the signup before submitting.', 'Close', {
+            duration: 2500
+          });
+        }
+      },
+      error: err => {
+        console.error('Signup failed:', err);
+        this.snackBar.open('Signup failed. Please try again.', 'Close', { duration: 2000 });
       }
-    },
-    error: err => {
-      console.error('Signup failed:', err);
-      this.snackBar.open('Signup failed. Please try again.', 'Close', { duration: 2000 });
-    }
-  });
-}
-
-
-  // this.http.post<{ isComplete: boolean }>(SignupComponent.signupURL, payload)
-  //   .subscribe({
-  //     next: res => {
-  //       console.log('Submitted successfully:', res);
-  //       this.userContext.setUserCompleteStatus(res?.isComplete === true);
-  //       //this.userContext.setUserCompleteStatus(true);
-  //       this.snackBar.open('Signup successful!', 'Close', {
-  //         duration: 1500
-  //       });
-
-  //       setTimeout(() => {
-  //       this.navigationService.requestHomeRedirect();
-  //       }, 1500);
-
-  //     },
-  //     error: err => {
-  //       console.error('Submission failed:', err);
-  //       this.snackBar.open('Signup failed. Please try again.', 'Close', {
-  //         duration: 1500
-  //       });
-  //     }
-  //   });
-
-
+    });
+  }
 
   prepareSignupData() {
     return {
@@ -396,171 +367,172 @@ export class SignupComponent {
     };
   }
 
-onSitterPicSelected(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
+  onSitterPicSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
 
-  this.sitterImageFile = file;
-  this.uploadImageToS3(file, (url) => {
-    this.sitterImageUrl = url;
-  });
-}
+    this.sitterImageFile = file;
+    this.uploadImageToS3(file, (url) => {
+      this.sitterImageUrl = url;
+    });
+  }
 
-onDogPicSelected(event: Event, index: number): void {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (!file) return;
+  onDogPicSelected(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
 
-  this.uploadImageToS3(file, (url) => {
-    this.dogs[index].imageUrl = url;
-  });
-}
+    this.uploadImageToS3(file, (url) => {
+      this.dogs[index].imageUrl = url;
+    });
+  }
+
   private uploadImageToS3(file: File, done: (publicUrl: string) => void, fail?: (e:any)=>void) {
-  const lambdaUrl = SignupComponent.uploadProfilePicURL;
+    const lambdaUrl = SignupComponent.uploadProfilePicURL;
 
-  this.http.post<any>(lambdaUrl, {
-    fileName: file.name,
-    fileType: file.type
-  }).subscribe({
-    next: (res) => {
-      const presignedUrl = res.url;
-      const publicUrl = res.publicUrl;
+    this.http.post<any>(lambdaUrl, {
+      fileName: file.name,
+      fileType: file.type
+    }).subscribe({
+      next: (res) => {
+        const presignedUrl = res.url;
+        const publicUrl = res.publicUrl;
 
-      this.http.put(presignedUrl, file, { headers: { 'Content-Type': file.type } })
-        .subscribe({
-          next: () => done(publicUrl),
-          error: (err) => { console.error('[S3 Upload] failed', err); fail?.(err); }
-        });
-    },
-    error: (err) => { console.error('[Lambda Error] presigned URL failed', err); fail?.(err); }
-  });
-}
-
-onCityInput(v: string) {
-  this.city = v;
-  this.cityQuery$.next(v);
-  this.addressSuggestions = [];
-  this.cityActiveIndex = 0;
-}
-
-onStreetInput(v: string) {
-  this.street = v;
-  this.addressQuery$.next(v);
-  this.citySuggestions = [];
-  this.addressActiveIndex = 0;
-}
-
-pickAddress(s: { description: string; place_id: string }) {
-  this.street = s.description;
-  this.addressSuggestions = [];
-}
-
-pickCity(s: { description: string; place_id: string }) {
-  this.city = s.description;
-  this.citySuggestions = [];
-
-  this.street = '';
-  this.addressSuggestions = [];
-
-  this.places.details(s.place_id, this.placesToken).subscribe((d: any) => {
-  this.cityCenter = { lat: d.lat, lng: d.lng };
-  this.cityName = extractCityName(d.address_components) || this.city; // e.g., "Tel Aviv-Yafo"
-  const vp = d.geometry?.viewport;
-  if (vp?.south !== undefined) {
-    this.cityRect = { sw: { lat: vp.south, lng: vp.west }, ne: { lat: vp.north, lng: vp.east } };
-  } else if (vp?.southwest) {
-    this.cityRect = { sw: { lat: vp.southwest.lat, lng: vp.southwest.lng },
-                      ne: { lat: vp.northeast.lat, lng: vp.northeast.lng } };
-  } else {
-    this.cityRect = null;
+        this.http.put(presignedUrl, file, { headers: { 'Content-Type': file.type } })
+          .subscribe({
+            next: () => done(publicUrl),
+            error: (err) => { console.error('[S3 Upload] failed', err); fail?.(err); }
+          });
+      },
+      error: (err) => { console.error('[Lambda Error] presigned URL failed', err); fail?.(err); }
+    });
   }
-});
 
-}
+  onCityInput(v: string) {
+    this.city = v;
+    this.cityQuery$.next(v);
+    this.addressSuggestions = [];
+    this.cityActiveIndex = 0;
+  }
 
-private extractCityName(components?: AddressComponent[] | null): string | null {
-  if (!components) return null;
-  const get = (t: string) => components.find(c => c.types?.includes(t))?.long_name || null;
-  return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
-}
-
-private scrollCityIntoView() {
-  setTimeout(() => document.querySelector<HTMLElement>(`#city-opt-${this.cityActiveIndex}`)?.scrollIntoView({block:'nearest'}));
-}
-private scrollAddressIntoView() {
-  setTimeout(() => document.querySelector<HTMLElement>(`#addr-opt-${this.addressActiveIndex}`)?.scrollIntoView({block:'nearest'}));
-}
-
-onCityKeydown(ev: KeyboardEvent) {
-  const n = this.citySuggestions?.length ?? 0;
-  if (!n) return;                           
-
-  if (ev.key === 'ArrowDown') {
-    ev.preventDefault();
-    this.cityActiveIndex = (this.cityActiveIndex + 1) % n;
-    this.scrollCityIntoView();
-  } else if (ev.key === 'ArrowUp') {
-    ev.preventDefault();
-    this.cityActiveIndex = (this.cityActiveIndex - 1 + n) % n;
-    this.scrollCityIntoView();
-  } else if (ev.key === 'Enter') {
-    ev.preventDefault();                    
-    const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
-    if (s) this.pickCity(s);
-  } else if (ev.key === 'Escape') {
+  onStreetInput(v: string) {
+    this.street = v;
+    this.addressQuery$.next(v);
     this.citySuggestions = [];
+    this.addressActiveIndex = 0;
   }
-}
 
-onStreetKeydown(ev: KeyboardEvent) {
-  const n = this.addressSuggestions?.length ?? 0;
-  if (!n) return;
-
-  if (ev.key === 'ArrowDown') {
-    ev.preventDefault();
-    this.addressActiveIndex = (this.addressActiveIndex + 1) % n;
-    this.scrollAddressIntoView();
-  } else if (ev.key === 'ArrowUp') {
-    ev.preventDefault();
-    this.addressActiveIndex = (this.addressActiveIndex - 1 + n) % n;
-    this.scrollAddressIntoView();
-  } else if (ev.key === 'Enter') {
-    ev.preventDefault();
-    const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
-    if (s) this.pickAddress(s);
-  } else if (ev.key === 'Escape') {
+  pickAddress(s: { description: string; place_id: string }) {
+    this.street = s.description;
     this.addressSuggestions = [];
   }
-}
 
-onCityArrow(dir: 1|-1, ev: Event) {
-  ev.preventDefault(); ev.stopPropagation();
-  const n = this.citySuggestions?.length ?? 0;
-  if (!n) return;
-  this.cityActiveIndex = (this.cityActiveIndex + dir + n) % n;
-  this.scrollCityIntoView();
-}
+  pickCity(s: { description: string; place_id: string }) {
+    this.city = s.description;
+    this.citySuggestions = [];
 
-onStreetArrow(dir: 1|-1, ev: Event) {
-  ev.preventDefault(); ev.stopPropagation();
-  const n = this.addressSuggestions?.length ?? 0;
-  if (!n) return;
-  this.addressActiveIndex = (this.addressActiveIndex + dir + n) % n;
-  this.scrollAddressIntoView();
-}
+    this.street = '';
+    this.addressSuggestions = [];
 
-onCityEnter(ev: Event) {
-  ev.preventDefault(); ev.stopPropagation();
-  const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
-  if (s) this.pickCity(s);
-}
+    this.places.details(s.place_id, this.placesToken).subscribe((d: any) => {
+    this.cityCenter = { lat: d.lat, lng: d.lng };
+    this.cityName = extractCityName(d.address_components) || this.city; // e.g., "Tel Aviv-Yafo"
+    const vp = d.geometry?.viewport;
+    if (vp?.south !== undefined) {
+      this.cityRect = { sw: { lat: vp.south, lng: vp.west }, ne: { lat: vp.north, lng: vp.east } };
+    } else if (vp?.southwest) {
+      this.cityRect = { sw: { lat: vp.southwest.lat, lng: vp.southwest.lng },
+                        ne: { lat: vp.northeast.lat, lng: vp.northeast.lng } };
+    } else {
+      this.cityRect = null;
+    }
+  });
 
-onStreetEnter(ev: Event) {
-  ev.preventDefault(); ev.stopPropagation();
-  const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
-  if (s) this.pickAddress(s);
-}
+  }
+
+  private extractCityName(components?: AddressComponent[] | null): string | null {
+    if (!components) return null;
+    const get = (t: string) => components.find(c => c.types?.includes(t))?.long_name || null;
+    return get('locality') || get('administrative_area_level_2') || get('administrative_area_level_1');
+  }
+
+  private scrollCityIntoView() {
+    setTimeout(() => document.querySelector<HTMLElement>(`#city-opt-${this.cityActiveIndex}`)?.scrollIntoView({block:'nearest'}));
+  }
+  private scrollAddressIntoView() {
+    setTimeout(() => document.querySelector<HTMLElement>(`#addr-opt-${this.addressActiveIndex}`)?.scrollIntoView({block:'nearest'}));
+  }
+
+  onCityKeydown(ev: KeyboardEvent) {
+    const n = this.citySuggestions?.length ?? 0;
+    if (!n) return;
+
+    if (ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      this.cityActiveIndex = (this.cityActiveIndex + 1) % n;
+      this.scrollCityIntoView();
+    } else if (ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      this.cityActiveIndex = (this.cityActiveIndex - 1 + n) % n;
+      this.scrollCityIntoView();
+    } else if (ev.key === 'Enter') {
+      ev.preventDefault();
+      const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
+      if (s) this.pickCity(s);
+    } else if (ev.key === 'Escape') {
+      this.citySuggestions = [];
+    }
+  }
+
+  onStreetKeydown(ev: KeyboardEvent) {
+    const n = this.addressSuggestions?.length ?? 0;
+    if (!n) return;
+
+    if (ev.key === 'ArrowDown') {
+      ev.preventDefault();
+      this.addressActiveIndex = (this.addressActiveIndex + 1) % n;
+      this.scrollAddressIntoView();
+    } else if (ev.key === 'ArrowUp') {
+      ev.preventDefault();
+      this.addressActiveIndex = (this.addressActiveIndex - 1 + n) % n;
+      this.scrollAddressIntoView();
+    } else if (ev.key === 'Enter') {
+      ev.preventDefault();
+      const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
+      if (s) this.pickAddress(s);
+    } else if (ev.key === 'Escape') {
+      this.addressSuggestions = [];
+    }
+  }
+
+  onCityArrow(dir: 1|-1, ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const n = this.citySuggestions?.length ?? 0;
+    if (!n) return;
+    this.cityActiveIndex = (this.cityActiveIndex + dir + n) % n;
+    this.scrollCityIntoView();
+  }
+
+  onStreetArrow(dir: 1|-1, ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const n = this.addressSuggestions?.length ?? 0;
+    if (!n) return;
+    this.addressActiveIndex = (this.addressActiveIndex + dir + n) % n;
+    this.scrollAddressIntoView();
+  }
+
+  onCityEnter(ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const s = this.citySuggestions[this.cityActiveIndex] ?? this.citySuggestions[0];
+    if (s) this.pickCity(s);
+  }
+
+  onStreetEnter(ev: Event) {
+    ev.preventDefault(); ev.stopPropagation();
+    const s = this.addressSuggestions[this.addressActiveIndex] ?? this.addressSuggestions[0];
+    if (s) this.pickAddress(s);
+  }
 
   getAgeString(birthYear: number, birthMonth: number): string {
     if (!birthYear || !birthMonth) return '';
@@ -576,7 +548,6 @@ onStreetEnter(ev: Event) {
   }
 
   private dogValid(d: any): boolean {
-    // fields the form already marks as required:
     const basicOk =
       !!d.name &&
       !!d.gender &&
@@ -587,18 +558,13 @@ onStreetEnter(ev: Event) {
       !!d.birthYear &&
       (d.rabiesVaccinated === 'yes' || d.rabiesVaccinated === 'no');
 
-    // things *not* tracked by ngForm (file/photo)
     const photoOk = !!d.imageUrl;
-
-    // (optional) prevent future birth date
     const birthOk = !this.isFutureBirth(d.birthYear, d.birthMonth);
-
     return basicOk && photoOk && birthOk;
   }
 
   private sitterValid(): boolean {
     if (!this.isSitter) return true;
-    // form already requires gender/rate/experience; we only need to enforce the photo:
     const photoOk = !!this.sitterImageUrl;
     return photoOk;
   }
@@ -619,7 +585,7 @@ onStreetEnter(ev: Event) {
     if (!this.isSitter) return true;
     if (page === 0) return !!this.gender && !!this.sitterImageUrl; // photo + gender
     if (page === 1) return this.rate != null && this.rate !== undefined && this.experience !== '' && this.experience != null;
-    return true; // page 2 has no required fields
+    return true;
   }
 
   private isDogPageValid(i: number, page: number): boolean {
@@ -633,10 +599,9 @@ onStreetEnter(ev: Event) {
     if (page === 2) {
       return (d.rabiesVaccinated === 'yes' || d.rabiesVaccinated === 'no');
     }
-    return true; // page 3 has no required fields
+    return true;
   }
 
-  // ---- “Next” that blocks and shows messages ----
   tryNextSitterPage() {
     const p = this.currentSitterPage;
     this.sitterAttempted[p] = true;
@@ -655,7 +620,6 @@ onStreetEnter(ev: Event) {
     }
   }
 
-  // ---- final form gate for the submit button ----
   isAllValid(): boolean {
     const generalOk = !!this.phone && !!this.city && !!this.street;
     const sitterOk =
@@ -671,7 +635,21 @@ onStreetEnter(ev: Event) {
     return (this.isSitter || this.addDog) && generalOk && sitterOk && dogsOk;
   }
 
+  isMonthDisabledForDog(i: number, month: number): boolean {
+    const y = this.dogs[i]?.birthYear;
+    if (!y) return false;
+    const now = new Date();
+    const yNow = now.getFullYear();
+    const mNow = now.getMonth() + 1;
+    return (y > yNow) || (y === yNow && month > mNow);
+  }
 
+  onDogYearChange(i: number) {
+    const m = this.dogs[i]?.birthMonth;
+    if (m && this.isMonthDisabledForDog(i, m)) {
+      this.dogs[i].birthMonth = null;
+    }
+  }
 }
 
 function extractCityName(components?: any[]): string | null {

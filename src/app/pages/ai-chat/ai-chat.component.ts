@@ -33,7 +33,7 @@ export class AiChatComponent implements OnInit{
 
     this.userInput = '';
 
-    this.http.post<any>('https://7mdjw4qnum54opy55mfksdbiwu0hiydf.lambda-url.us-east-1.on.aws/', body).subscribe({
+    this.http.post<any>('https://3nqz6vpnmyozrnqr7o3zqgwu540sewcy.lambda-url.us-east-1.on.aws/', body).subscribe({
       next: (res) => {
         this.messages.push({ role: 'assistant', content: res.response });
       },

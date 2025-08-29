@@ -418,14 +418,6 @@
                   </div>
                 </div>
 
-                <!--<div class="mb-2">
-                <label class="form-label">Dog's Age</label>
-                <input type="number" class="form-control" [(ngModel)]="dog.age" name="dogAge-{{i}}" required #dogAgeModel="ngModel">
-                <div *ngIf="signupForm.submitted && dogAgeModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                  Dog age is required
-                </div>
-                </div>-->
-                  <!-- Dog's Birth (Month + Year) -->
                 <div class="mb-2">
                   <label class="form-label">Dog's Birth</label>
                   <div class="d-flex gap-2">
@@ -435,8 +427,10 @@
                             name="dogBirthMonth-{{i}}"
                             required
                             #dogBirthMonth="ngModel">
-                      <option value="" disabled selected>Month</option>
-                      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+                      <option [ngValue]="null" disabled>Month</option>
+                      <option *ngFor="let m of months"
+                              [ngValue]="m.value"
+                              [disabled]="isMonthDisabledForDog(i, m.value)">{{ m.label }}</option>
                     </select>
 
                     <!-- Year -->
@@ -444,7 +438,8 @@
                             [(ngModel)]="dog.birthYear"
                             name="dogBirthYear-{{i}}"
                             required
-                            #dogBirthYear="ngModel">
+                            #dogBirthYear="ngModel"
+                            (ngModelChange)="onDogYearChange(i)">
                       <option value="" disabled selected>Year</option>
                       <option *ngFor="let y of years" [value]="y">{{ y }}</option>
                     </select>
