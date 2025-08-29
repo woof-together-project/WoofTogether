@@ -11,13 +11,10 @@ import { AuthGuard } from './shared/auth/guard/guard';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
-
   { path: 'login', component: LoginComponent },
-
   { path: 'sitters',         component: SittersComponent,        canActivate: [AuthGuard] },
   { path: 'dog-match',       component: DogMatchComponent,       canActivate: [AuthGuard] },
   { path: 'ask-us',          component: AiChatComponent,         canActivate: [AuthGuard] },
   { path: 'user-management', component: UserManagementComponent, canActivate: [AuthGuard] },
-
   { path: 'signup', component: SignupComponent, canActivate: [AuthGuard] },
 ];

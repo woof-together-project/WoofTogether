@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PlacesService {
-  private base = 'https://si2ancz2kzrnbpv2luhwwodgci0gyuay.lambda-url.us-east-1.on.aws/';
+//   private base = 'https://si2ancz2kzrnbpv2luhwwodgci0gyuay.lambda-url.us-east-1.on.aws/';
+  private base = 'https://n66mcpvf5jjubyxt2srvj4s2lq0kovfu.lambda-url.us-east-1.on.aws/';
 
   constructor(private http: HttpClient) {}
 
