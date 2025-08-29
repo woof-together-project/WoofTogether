@@ -9,8 +9,6 @@ import { TokenService } from '../../shared/auth/tokenService';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-type Intent = 'login' | 'signup';
-type UserStatus = { userExists: boolean; isComplete: boolean };
 
 @Component({
   selector: 'app-navbar',
@@ -65,9 +63,8 @@ export class NavbarComponent {
       if (tokens?.id_token) {
         // Persist tokens, then set user from ID token
         this.tokenSvc.setTokens(tokens);
-        this.hydrateFromIdToken(tokens.id_token);   // <-- does NOTHING if id_token is falsy
+        this.hydrateFromIdToken(tokens.id_token);   
 
-        // ✅ Get truth from backend and store it (NO defaulting to false)
         try {
           const status = await this.getUserStatus(); // { userExists, isComplete }
           this.userContext.setUserCompleteStatus(status.isComplete);
@@ -77,7 +74,6 @@ export class NavbarComponent {
           await this.router.navigate([shouldGoToSignup ? '/signup' : (returnTo || '/')]);
         } catch (e) {
           console.warn('[Auth] getUserStatus failed on callback; keeping local flag.', e);
-          // Do nothing—keep whatever local isComplete currently is
         }
 
         // Clean URL once
