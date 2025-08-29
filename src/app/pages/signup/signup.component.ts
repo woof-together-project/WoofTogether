@@ -301,41 +301,57 @@ export class SignupComponent {
   }
 
  submitForm() {
-  console.log('Form submitted with the following data:');
-  console.log('Email:', this.email);
-  console.log('Nickname:', this.nickname);
-
   const signupData = this.prepareSignupData();
   const payload = {
     email: this.email,
     signupData: signupData
   };
 
-  console.log('Submitting form with payload:', payload);
-
-  this.http.post(SignupComponent.signupURL , payload)
-    .subscribe({
-      next: res => {
-        console.log('Submitted successfully:', res);
-        // Update user context isComplete flag
+  this.http.post<{ isComplete: boolean, success: boolean, message?: string }>(
+    SignupComponent.signupURL, payload
+  ).subscribe({
+    next: res => {
+      if (res.success && res.isComplete) {
         this.userContext.setUserCompleteStatus(true);
-        this.snackBar.open('Signup successful!', 'Close', {
-          duration: 1500
-        });
-
-        setTimeout(() => {
-        this.navigationService.requestHomeRedirect();
-        }, 1500);
-
-      },
-      error: err => {
-        console.error('Submission failed:', err);
-        this.snackBar.open('Signup failed. Please try again.', 'Close', {
-          duration: 1500
+        this.snackBar.open('Signup successful!', 'Close', { duration: 1500 });
+        setTimeout(() => this.navigationService.requestHomeRedirect(), 1500);
+      } else {
+        this.snackBar.open(res?.message || 'You must complete the signup before submitting.', 'Close', {
+          duration: 2500
         });
       }
-    });
+    },
+    error: err => {
+      console.error('Signup failed:', err);
+      this.snackBar.open('Signup failed. Please try again.', 'Close', { duration: 2000 });
+    }
+  });
 }
+
+
+  // this.http.post<{ isComplete: boolean }>(SignupComponent.signupURL, payload)
+  //   .subscribe({
+  //     next: res => {
+  //       console.log('Submitted successfully:', res);
+  //       this.userContext.setUserCompleteStatus(res?.isComplete === true);
+  //       //this.userContext.setUserCompleteStatus(true);
+  //       this.snackBar.open('Signup successful!', 'Close', {
+  //         duration: 1500
+  //       });
+
+  //       setTimeout(() => {
+  //       this.navigationService.requestHomeRedirect();
+  //       }, 1500);
+
+  //     },
+  //     error: err => {
+  //       console.error('Submission failed:', err);
+  //       this.snackBar.open('Signup failed. Please try again.', 'Close', {
+  //         duration: 1500
+  //       });
+  //     }
+  //   });
+
 
 
   prepareSignupData() {

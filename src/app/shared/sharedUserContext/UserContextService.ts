@@ -43,7 +43,6 @@ export class UserContextService {
     console.log('[UserContextService] setUser called. Emitted:', user);
   }
 
-  /** Update only the completion flag (e.g., from backend status on boot or after signup). */
   setUserCompleteStatus(isComplete: boolean) {
     const cur = this.currentUser.value;
     const next: UserDetails = cur
