@@ -22,8 +22,9 @@ export class DogMatchComponent implements OnInit {
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
   selectedTab: 'map' | 'criteria' | null = 'map';
+  defaultZoom = 13;
   center: google.maps.LatLngLiteral = { lat: 32.0853, lng: 34.7818 }; // default to Tel Aviv for example
-  zoomLevel = 13;
+  zoomLevel = this.defaultZoom;
   dogs: Dog[] = [];
   loading = false;
   uiMessage: { text: string; type: 'info' | 'warning' | 'error' } | null = null;
@@ -167,18 +168,6 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
 }
 
 
-  // getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
-  //   return new Promise((resolve, reject) => {
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => resolve({
-  //         latitude: position.coords.latitude,
-  //         longitude: position.coords.longitude
-  //       }),
-  //       (error) => reject(error),
-  //     );
-  //   });
-  // }
-
  loadDogsByLocation(): void {
   const url = DogMatchComponent.getDogURL;
   const payload = this.buildFilterPayload();
@@ -187,6 +176,9 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     next: (data) => {
       this.dogs = mapDogs(data).filter(d => (d.userEmail ?? '') !== this.useremail);
       this.updateMarkers();
+
+      this.center = { lat: this.location.latitude, lng: this.location.longitude };
+      this.zoomLevel = this.defaultZoom;
     },
     error: (err) => console.error('Failed to fetch dogs:', err)
   });
@@ -216,30 +208,49 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
       RabiesVaccinated: this.filters.vaccinated ?? null,
       Fixed: this.filters.neutered ?? null,
       City: (this.searchCity || '').trim(),
-      excludeEmail: this.currentUserEmail || '',
+      excludeEmail: this.useremail  || '',
       BehavioralTraits: this.filters.behavioralTraits ?? [],
       FavoriteActivities: this.filters.favoriteActivities ?? [] 
     };
   }
 
-  updateMarkers() {
-    this.markers = this.dogs
-      .filter(d => !!d.latitude && !!d.longitude)
-      .map(d => ({
-        id: d.id,
-        lat: d.latitude!,
-        lng: d.longitude!,
-        label: d.name
-      }));
+  // updateMarkers() {
+  //   this.markers = this.dogs
+  //     .filter(d => !!d.latitude && !!d.longitude)
+  //     .map(d => ({
+  //       id: d.id,
+  //       lat: d.latitude!,
+  //       lng: d.longitude!,
+  //       label: d.name
+  //     }));
+    
+  //   // current user location marker
+  //   this.markers.push({
+  //     id: -1,
+  //     lat: this.location.latitude,
+  //     lng: this.location.longitude,
+  //     label: 'You'
+  //   });
+  // }
 
-    // current user location marker
-    this.markers.push({
-      id: -1,
-      lat: this.location.latitude,
-      lng: this.location.longitude,
-      label: 'You'
-    });
-  }
+  updateMarkers(): void {
+  const baseMarkers = this.dogs
+    .filter(d => d.latitude != null && d.longitude != null)
+    .map(d => ({
+      id: d.id,
+      lat: d.latitude as number,
+      lng: d.longitude as number,
+      label: d.name
+    }));
+
+  const spread = this.distributeOverlappingMarkers(baseMarkers, 20);
+
+  this.markers = [
+    ...spread,
+    { id: -1, lat: this.location.latitude, lng: this.location.longitude, label: 'You' }
+  ];
+}
+
 
   clearFilters(): void {
     this.filters = {
@@ -265,6 +276,8 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     next: (data) => {
       this.dogs = mapDogs(data).filter(d => (d.userEmail ?? '') !== this.useremail);
       this.updateMarkers();
+      this.center = { lat: this.location.latitude, lng: this.location.longitude };
+      this.zoomLevel = this.defaultZoom;
       this.selectedTab = 'map';
     },
     error: (err) => console.error('Dog filter request failed', err)
@@ -399,6 +412,8 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
       this.uiMessage = null;
       this.dogs = mapDogs(dogsRes).filter(d => (d.userEmail ?? '') !== this.useremail);
       this.updateMarkers();
+       this.center = { lat: this.location.latitude, lng: this.location.longitude };
+      this.zoomLevel = this.defaultZoom;
       this.selectedTab = 'map';
       this.showSuggestions = false;
     },
@@ -466,7 +481,7 @@ focusOnDog(dog: Dog) {
 
 resetMapView() {
   this.center =  { lat: 32.0853, lng: 34.7818 }; // default to Tel Aviv 
-  this.zoomLevel = 13;
+  this.zoomLevel = this.defaultZoom;
 }
 
 onTraitToggle(trait: string) {
@@ -481,6 +496,45 @@ onActivityToggle(activity: string): void {
   const i = arr.indexOf(activity);
   if (i > -1) arr.splice(i, 1);
   else arr.push(activity);
+}
+
+private metersToDegLat(m: number) { return m / 111_320; }
+private metersToDegLng(m: number, atLat: number) {
+  return m / (111_320 * Math.cos(atLat * Math.PI / 180));
+}
+
+private distributeOverlappingMarkers(
+  markers: { id: number; lat: number; lng: number; label?: string }[],
+  radiusMeters = 15
+) {
+  const key = (lat: number, lng: number) => `${lat.toFixed(6)}|${lng.toFixed(6)}`;
+  const groups = new Map<string, { id: number; lat: number; lng: number; label?: string }[]>();
+
+  for (const m of markers) {
+    const k = key(m.lat, m.lng);
+    if (!groups.has(k)) groups.set(k, []);
+    groups.get(k)!.push(m);
+  }
+
+  const spread: typeof markers = [];
+  for (const group of groups.values()) {
+    if (group.length === 1) { spread.push(group[0]); continue; }
+
+    const centerLat = group[0].lat;
+    const centerLng = group[0].lng;
+    const dLat = this.metersToDegLat(radiusMeters);
+    const dLng = this.metersToDegLng(radiusMeters, centerLat);
+
+    group.forEach((m, i) => {
+      const angle = (2 * Math.PI * i) / group.length;
+      spread.push({
+        ...m,
+        lat: centerLat + dLat * Math.sin(angle),
+        lng: centerLng + dLng * Math.cos(angle),
+      });
+    });
+  }
+  return spread;
 }
 
 }

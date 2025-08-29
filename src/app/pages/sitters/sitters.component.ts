@@ -236,12 +236,16 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     
     this.http.post<Sitter[]>(url, payload).subscribe({
       next: (data) => {
-       this.sitters = data.map(sitter => ({
-        ...sitter,
+      this.sitters = data
+        .filter(s => s.email !== this.useremail)
+        .map(sitter => ({
+          ...sitter,
         imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
       }));
    
         this.updateMarkers();
+        this.center = { lat: this.location.latitude, lng: this.location.longitude };
+        this.zoom   = this.defaultZoom;
         this.selectedTab = 'map';        
       },
       error: (err) => console.error('Filter request failed', err)
