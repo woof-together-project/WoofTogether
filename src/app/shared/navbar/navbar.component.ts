@@ -20,8 +20,10 @@ type UserStatus = { userExists: boolean; isComplete: boolean };
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  static readonly insertUserToDBURL =
-    'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; // insert user to DB lambda
+  // static readonly insertUserToDBURL =
+  //   'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; 
+    static readonly insertUserToDBURL =
+    'https://og3trfcczul4fjn5hsachnn7ma0lijfq.lambda-url.us-east-1.on.aws/'; // insert user to DB lambda
 
   constructor(
     private router: Router,

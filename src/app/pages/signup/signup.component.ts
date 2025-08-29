@@ -31,10 +31,10 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 })
 
 export class SignupComponent {
-  static readonly signupURL =  'https://eu2okj2maowkb7rrlnqmtnmfru0nvaif.lambda-url.us-east-1.on.aws/'; //signup lambda function URL
-  static readonly uploadProfilePicURL = 'https://gmnmxjlmg5nwmqhs6nz7riribu0sukcb.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
-  // static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; //signup lambda function URL in final user
-  // static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
+ // static readonly signupURL =  'https://eu2okj2maowkb7rrlnqmtnmfru0nvaif.lambda-url.us-east-1.on.aws/'; //signup lambda function URL
+  //static readonly uploadProfilePicURL = 'https://gmnmxjlmg5nwmqhs6nz7riribu0sukcb.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
+   static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; //signup lambda function URL in final user
+   static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
   constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService, private places: PlacesService
 ) {}

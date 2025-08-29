@@ -15,9 +15,9 @@ import { Dog, DogDto, mapDogs } from './dog-match.model';
   styleUrls: ['./dog-match.component.css']
 })
 export class DogMatchComponent implements OnInit {
-  static readonly getDogURL =
-    'https://zdvfdowds6ocbzwuilwrx57due0kxoyl.lambda-url.us-east-1.on.aws/';
-  // static readonly getDogURL = ''; // final user env
+  // static readonly getDogURL =
+  //   'https://zdvfdowds6ocbzwuilwrx57due0kxoyl.lambda-url.us-east-1.on.aws/';
+   static readonly getDogURL = 'https://nid3kplozsnfhfslq4sq4upqxy0oihwp.lambda-url.us-east-1.on.aws/'; // final user env
 
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
