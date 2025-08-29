@@ -171,7 +171,7 @@
 
        <div class="row">
         <label>Gender</label>
-        <span *ngIf="!isEditing('sitter','rate')">{{ gender ?? '—' }}</span>
+        <span *ngIf="!isEditing('sitter','rate')">{{ gender }}</span>
         <input *ngIf="isEditing('sitter','gender')" [(ngModel)]="gender" />
       </div>
 
