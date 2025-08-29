@@ -75,11 +75,11 @@ interface ModalVM {
 })
 export class UserManagementComponent {
   static readonly profileURL =
-    'https://5org75ldcmqj6zhgsat7gi6mia0qwnav.lambda-url.us-east-1.on.aws/'; // GET ?sub=...
+    'https://oriosyqlioqnmqo7xyr4ojoara0ycilg.lambda-url.us-east-1.on.aws/'; // GET ?sub=...
   static readonly updateURL =
-    'https://tlvxanhnbet3pvmwmepkwwukre0ncsli.lambda-url.us-east-1.on.aws/'; // POST updates
+    'https://r4776sz54z52iqfj4zbea55nti0ssbgi.lambda-url.us-east-1.on.aws/'; // POST updates
   static readonly uploadProfilePicURL =
-    'https://gmnmxjlmg5nwmqhs6nz7riribu0sukcb.lambda-url.us-east-1.on.aws/';
+    'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/';
 
   constructor(
     private http: HttpClient,
