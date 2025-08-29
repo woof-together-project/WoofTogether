@@ -6,18 +6,13 @@ export const DogHappyArticle: Article = {
   imageUrl: '/assets/images/dogHappy.png', 
   content: {
     textList: [
-      '🐾 Relaxed Eyes and Soft Gaze: Happy dogs often have soft, relaxed eyes and may blink frequently, indicating comfort and affection.',
-      '🐾 Relaxed Mouth and Facial Expression: A slightly open mouth with a relaxed tongue suggests your dog is at ease.',
-      '🐾 Gentle Tail Wagging: A slow, wide wag often signals contentment.',
-      '🐾 Playful Behavior: Dogs that initiate games or bow to play are feeling joyful.',
-      '🐾 Healthy Appetite: An excited reaction to food is a great sign.',
-      '🐾 Normal Sleep Patterns: Regular sleep habits show relaxation.',
-      '🐾 Sociable Behavior: Enjoying people and dogs is a positive signal.',
-      '🐾 Healthy Coat and Skin: A glossy coat often reflects wellness.',
-      '🐾 Relaxed Body Posture: Wiggly, loose movements mean your dog is comfortable.',
-      '🐾 Regular "Check-Ins": Looking back at you while walking shows connection.',
-      '🐾 Contented Sighs: A gentle sigh while resting indicates peace.',
-      '🐾 Curiosity and Engagement: Exploring surroundings means your dog is happy and secure.'
+      "🐾 Every dog owner wants to know one thing—is my dog truly happy? While our furry friends can’t put their feelings into words, they show us in countless ways. Understanding their body language, habits, and little quirks can reveal a lot about their emotional well-being.",
+      "🐾 A soft gaze and relaxed eyes are often the first clues. Happy dogs tend to blink gently, with no tension in their face, showing that they feel safe and affectionate. Similarly, their mouth and expression tell a story—an open mouth with a relaxed tongue often signals comfort and calm.",
+      "🐾 Another big indicator is the tail wag. A slow, wide wag from side to side usually reflects genuine contentment, especially when paired with a loose, wiggly body posture. Dogs that feel at ease also display playful behavior—initiating games, bouncing around, or giving the classic “play bow” are sure signs of joy.",
+      "🐾 Happiness is also tied to everyday routines. A healthy appetite and an excited reaction to food show that your pup is enjoying life. Normal sleep patterns are equally important, as regular rest reflects relaxation and emotional balance.",
+      "🐾 Social behavior can reveal a lot, too. Dogs that are sociable—enjoying both people and other dogs—are usually confident and happy. On the outside, their health reflects their mood: a shiny coat and healthy skin often go hand in hand with overall wellness.",
+      "🐾 Look for smaller, tender gestures as well. A dog who checks in with you on walks—glancing back to make sure you’re there—is showing trust and connection. Likewise, contented sighs while resting are like little exclamations of peace. And don’t forget curiosity and engagement—a happy dog is eager to sniff, explore, and interact with the world around them.",
+      "🐾 When you put it all together, happiness in dogs looks like a blend of comfort, curiosity, playfulness, and trust. By tuning in to these signs, you’ll not only understand your dog better but also strengthen the bond you share. After all, a happy dog makes for a happy home."
     ]
   }
 };
