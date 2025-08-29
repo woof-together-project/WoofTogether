@@ -899,4 +899,21 @@ app-map, #mapElement {
 .btn-chip { background: #fff; border: 1px solid #e2e8da; color: #1f4d34; font-weight: 600; padding: .25rem .6rem; border-radius: 999px; line-height: 1.1; }
 .btn-chip:hover { background: #f4fbf7; border-color: #cfe2d6; }
 
+.range-labels{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
+.range-badge{
+  padding: .25rem .6rem;
+  border-radius: 9999px;
+  background: #e7f0e7;
+  white-space: nowrap;
+}
+
+.range-helper{
+  display:block;       /* ensures it's on its own line */
+  margin-top: 50px;    /* nudge it down; tweak to taste (e.g., 12–14px) */
+  line-height: 1.2;
+}

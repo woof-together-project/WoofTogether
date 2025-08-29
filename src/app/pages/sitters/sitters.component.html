@@ -210,9 +210,12 @@
     />
     <div class="range-labels">
       <span class="min">₪0</span>
-      <span class="range-badge">Up to ₪{{ filters.rateMax }}</span>
+      <span class="range-badge">Max ₪{{ filters.rateMax }}</span>
       <span class="max">₪150</span>
     </div>
+     <small class="range-helper text-muted small d-block">
+  Includes sitters charging ≤ ₪{{ filters.rateMax }}.
+</small>
   </div>
 </section>
 
