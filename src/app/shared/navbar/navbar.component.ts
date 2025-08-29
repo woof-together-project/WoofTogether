@@ -41,10 +41,8 @@ export class NavbarComponent {
     this.username   = u?.nickname ?? null;
     this.isComplete = !!u?.isComplete;
   });
-  // 1) Load tokens from storage (whatever your TokenService does)
   this.tokenSvc.loadFromStorage();
 
-  // 2) OAuth callback handling (has ?code=...)
   const url = new URL(window.location.href);
   const code = url.searchParams.get('code');
   const rawState = url.searchParams.get('state');
@@ -61,12 +59,11 @@ export class NavbarComponent {
     try {
       const tokens = await this.exchangeCodeForTokens(code);
       if (tokens?.id_token) {
-        // Persist tokens, then set user from ID token
         this.tokenSvc.setTokens(tokens);
         this.hydrateFromIdToken(tokens.id_token);   
 
         try {
-          const status = await this.getUserStatus(); // { userExists, isComplete }
+          const status = await this.getUserStatus(); 
           this.userContext.setUserCompleteStatus(status.isComplete);
           this.isComplete = status.isComplete;
 
@@ -103,103 +100,15 @@ export class NavbarComponent {
         console.warn('[Auth] getUserStatus failed on boot; keeping local flag.', e);
       }
     } else {
-      // No ID token in storage — do NOT call setUser; just show signed out
       this.username = null;
       console.warn('[Auth] VALID status but missing idToken; not setting user.');
     }
   } else {
-    // EXPIRED/NONE
     this.username = null;
-    // Do NOT call setUser() here. Wait for explicit login.
   }
 
   this.loading = false;
 }
-
-
-//   async ngOnInit() {
-//   this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
-
-//   this.tokenSvc.loadFromStorage();
-
-//   const status = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
-//   console.log('Token status on boot:', status);
-
-//   // if (status === 'VALID') {
-//   //   this.hydrateFromIdToken(this.tokenSvc.getIdToken());
-//   // } else {
-//   //   this.username = null;
-//   // }
-
-//   if (status === 'VALID') {
-//   this.hydrateFromIdToken(this.tokenSvc.getIdToken());
-
-//   try {
-//     const backend = await this.getUserStatus();
-//     this.userContext.setUserCompleteStatus(backend.isComplete);
-//   } catch (e) {
-//     console.warn('[Auth] Failed to get user status on boot:', e);
-//   }
-// } else {
-//   this.username = null;
-// }
-
-
-//   const url = new URL(window.location.href);
-//   const code = url.searchParams.get('code');
-//   const rawState = url.searchParams.get('state');
-
-//   let intent: Intent = 'login';
-//   let returnTo = '/';
-
-//   if (rawState) {
-//     try {
-//       const obj = JSON.parse(atob(rawState));
-//       intent = (obj.intent === 'signup' ? 'signup' : 'login') as Intent;
-//       returnTo = obj.returnTo || '/';
-//     } catch {}
-//   }
-
-//   if (code) {
-//     try {
-//       const tokens = await this.exchangeCodeForTokens(code);
-//       if (tokens?.id_token) {
-//         // this.tokenSvc.setTokens(tokens);
-//         // this.hydrateFromIdToken(tokens.id_token);
-
-//         // await this.sendDataToBackendOnce();
-
-//         // if (intent === 'signup') {
-//         //   await this.router.navigate(['/signup']);
-//         // } else {
-//         //   await this.router.navigate([returnTo || '/']);
-//         // }
-
-//        this.tokenSvc.setTokens(tokens);
-//         this.hydrateFromIdToken(tokens.id_token);
-
-//         const status = await this.getUserStatus();
-//         const shouldGoToSignup = !status.userExists || !status.isComplete;
-//         console.log('[Auth] Routing – shouldGoToSignup:', shouldGoToSignup, status);
-
-//         if (shouldGoToSignup) {
-//           await this.router.navigate(['/signup']);
-//         } else {
-//           await this.router.navigate([returnTo || '/']);
-// }
-
-//         url.searchParams.delete('code');
-//         url.searchParams.delete('state');
-//         window.history.replaceState({}, '', url.toString());
-//       }
-//     } catch (error) {
-//       console.error('Error exchanging code for tokens:', error);
-//     }
-//   }
-
-//   this.loading = false;
-// }
-
 
   async exchangeCodeForTokens(code: string) {
     const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
@@ -215,7 +124,6 @@ export class NavbarComponent {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          // you chose to keep the client secret in the browser
           'Authorization': 'Basic ' + btoa(`${environment.clientId}:${environment.clientSecret}`)
         },
         body
@@ -226,7 +134,6 @@ export class NavbarComponent {
         throw new Error(`Failed to exchange code. Status: ${response.status} ${text}`);
       }
 
-      // shape: { access_token, id_token, refresh_token, expires_in, token_type }
       const data = await response.json();
       return data;
     } catch (error) {
@@ -236,8 +143,6 @@ export class NavbarComponent {
   }
 
   redirectToLogin(): void {
-    //window.location.href = environment.loginUrl;
-
       window.location.href = this.buildHostedUiUrl(this.router.url || '/');
 
   }
@@ -276,8 +181,6 @@ export class NavbarComponent {
     );
     return JSON.parse(jsonPayload);
   }
-
-  // ---- BACKEND SYNC (ONCE) ----
 
   private async sendDataToBackendOnce() {
     const current = this.userContext.getCurrentUserValue();
