@@ -41,13 +41,11 @@ export class DogMatchComponent implements OnInit {
   currentUserEmail: string = '';
   disableRadius = true;
 
-  // Search by name (kept for future)
   searchDogName: string = '';
   allDogNames: string[] = [];
   filteredDogNames: string[] = [];
   showNameSuggestions: boolean = false;
 
-  // Criteria
   selectedSize: string = 'Any';
   selectedBreed: string = 'Any';
   minAge: number = 0;
@@ -55,7 +53,6 @@ export class DogMatchComponent implements OnInit {
   minWeight: number = 0;
   maxWeight: number = 100;
 
-  // UI selection
   selectedDog: Dog | null = null;
   selectedDogId: number | null = null;
 
@@ -81,7 +78,7 @@ export class DogMatchComponent implements OnInit {
     ageMax: 20,
     weightMin: 0,
     weightMax: 100,
-    vaccinated: null as boolean | null, // RabiesVaccinated
+    vaccinated: null as boolean | null, 
     neutered: null as boolean | null,
     behavioralTraits: [] as string[],
     favoriteActivities: [] as string[]    
@@ -133,17 +130,50 @@ favoriteActivitiesOptions: string[] = [
     });
   }
 
-  getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        }),
-        (error) => reject(error),
-      );
+
+getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+  return new Promise((resolve, reject) => {
+    const email = this.userContext.getUserEmail(); 
+
+    if (!email) {
+      reject(new Error('No email found for current user'));
+      return;
+    }
+
+    const url = DogMatchComponent.getDogURL;
+    this.http.post<{ lat: number; lng: number }>(
+      url,   
+      {
+        action: 'getMyLocation',
+        email: email
+      }
+    ).subscribe({
+      next: (res) => {
+        resolve({
+          latitude: res.lat,
+          longitude: res.lng
+        });
+      },
+      error: (err) => {
+        console.error('Error loading location from Lambda:', err);
+        reject(err);
+      }
     });
-  }
+  });
+}
+
+
+  // getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+  //   return new Promise((resolve, reject) => {
+  //     navigator.geolocation.getCurrentPosition(
+  //       (position) => resolve({
+  //         latitude: position.coords.latitude,
+  //         longitude: position.coords.longitude
+  //       }),
+  //       (error) => reject(error),
+  //     );
+  //   });
+  // }
 
  loadDogsByLocation(): void {
   const url = DogMatchComponent.getDogURL;
@@ -151,7 +181,6 @@ favoriteActivitiesOptions: string[] = [
 
   this.http.post<DogDto[]>(url, payload).subscribe({
     next: (data) => {
-      // map → filter out my own listings → update markers
       this.dogs = mapDogs(data).filter(d => (d.userEmail ?? '') !== this.useremail);
       this.updateMarkers();
     },
@@ -384,49 +413,6 @@ private showUiMessage(type: 'info'|'warning'|'error', text: string) {
 clearMessageOnTyping() {
   if (this.uiMessage) this.uiMessage = null;
 }
-
-//   onCitySearch(): void {
-//   const city = (this.searchCity || '').trim();
-//   if (!city) return;
-
-//   this.http.post<DogDto[]>(DogMatchComponent.getDogURL, {
-//     action: 'searchByCity',
-//     city,
-//     latitude: this.location.latitude,
-//     longitude: this.location.longitude
-//   }).subscribe({
-//     next: (dogsRes) => {
-//       if (!dogsRes || dogsRes.length === 0) {
-//         this.cityError = `No dogs found in "${city}". Showing all nearby dogs.`;
-//         setTimeout(() => {
-//           this.searchCity = '';
-//           this.filteredCities = [...this.allCities];
-//           this.showSuggestions = false;
-//           this.loadDogsByLocation();
-//           this.cityError = null;
-//         }, 2000);
-//         return;
-//       }
-
-//       this.cityError = null;
-//       this.dogs = mapDogs(dogsRes).filter(d => (d.userEmail ?? '') !== this.useremail);
-//       this.updateMarkers();
-//       this.selectedTab = 'map';
-//       this.showSuggestions = false;
-//     },
-//     error: (err) => {
-//       console.error('Failed to search dogs by city', err);
-//       this.cityError = 'Something went wrong searching that city. Showing all nearby dogs.';
-//       setTimeout(() => {
-//         this.searchCity = '';
-//         this.filteredCities = [...this.allCities];
-//         this.showSuggestions = false;
-//         this.loadDogsByLocation();
-//         this.cityError = null;
-//       }, 2000);
-//     }
-//   });
-// }
 
 
   selectCity(city: string): void {

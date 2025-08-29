@@ -127,23 +127,40 @@ newReview = { rating: 5, comment: '' };
   });
 }
 
-
-   getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
   return new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        });
-      },
-      (error) => {
-        console.error('Error getting location:', error);
-        reject(error);
-      },
-    );
+    const email = this.userContext.getUserEmail();
+    if (!email) {
+      reject(new Error('No email for current user'));
+      return;
+    }
+    const url = SittersComponent.getSittersUrl;
+    this.http.post<{ lat: number; lng: number }>(
+      url,   
+      { action: 'getMyLocation', email }
+    ).subscribe({
+      next: (res) => resolve({ latitude: res.lat, longitude: res.lng }),
+      error: (err) => reject(err),
+    });
   });
 }
+
+//    getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+//   return new Promise((resolve, reject) => {
+//     navigator.geolocation.getCurrentPosition(
+//       (position) => {
+//         resolve({
+//           latitude: position.coords.latitude,
+//           longitude: position.coords.longitude
+//         });
+//       },
+//       (error) => {
+//         console.error('Error getting location:', error);
+//         reject(error);
+//       },
+//     );
+//   });
+// }
 
   onSelectSitter(sitter: Sitter) {
     if (this.selectedSitter?.sitterId === sitter.sitterId) {
@@ -211,7 +228,7 @@ newReview = { rating: 5, comment: '' };
   applyFilters(): void {
     const url = SittersComponent.getSittersUrl; 
     const payload = this.buildFilterPayload(); 
-    console.log("✅ Filter payload:", payload);
+    console.log("Filter payload:", payload);
     
     this.http.post<Sitter[]>(url, payload).subscribe({
       next: (data) => {
@@ -378,30 +395,6 @@ filterCities(): void {
   this.showSuggestions = true;
 }
 
-
-// onCitySearch() {
-//   const city = this.searchCity.trim();
-//   if (!city) return;
-
-//   this.http.post<any[]>(SittersComponent.getSittersUrl , {
-//     action: 'searchByCity',
-//     city: city,
-//     latitude: this.location.latitude,
-//     longitude: this.location.longitude
-//   }).subscribe({
-//     next: (sittersRes) => {
-//       if (sittersRes.length === 0) {
-//         alert(`No sitters found in "${city}"`);
-//       }
-//       this.clearFilters(false); // Clear filters but don't reload sitters
-//       this.sitters = sittersRes;
-//       this.updateMarkers();
-//       this.selectedTab = 'map';
-//     },
-//     error: (err) => console.error('Failed to search sitters by city', err)
-//   });
-// }
-
 onCitySearch(): void {
   const city = (this.searchCity || '').trim();
   if (!city) return;
@@ -471,7 +464,6 @@ clearCitySearch(): void {
 }
 
 
-// --- Functions ---
 openReviews(sitter: any) {
   this.modalSitter = sitter;
   this.showReviewModal = true;
@@ -578,5 +570,4 @@ submitReview() {
       ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, 0);
 }
-
 }
