@@ -1,3 +1,4 @@
+* { font-family: 'Comfortaa', 'Segoe UI', sans-serif; }
 /* Page & container */
 :host {
   display: block;
@@ -285,7 +286,7 @@
 .btn-chip,
 .btn-chip.active,
 .btn-chip.selected {
-  font-weight: 200 !important;  
+  font-weight: 200 !important;
 }
 
 .chip,
@@ -446,13 +447,13 @@ button.apply-filters:hover {
 }
 
 button.apply-filters {
-  background-color: #006400 !important; 
+  background-color: #006400 !important;
   color: white !important;
   border: none;
 }
 
 button.apply-filters:hover {
-  background-color: #004d00 !important; 
+  background-color: #004d00 !important;
 }
 
 

@@ -1,4 +1,4 @@
-<div class="profile-shell">
+<div class="profile-shell" xmlns="http://www.w3.org/1999/html">
   <h2 class="page-title"></h2>
 
   <div class="cards-grid">
@@ -21,17 +21,6 @@
         <button *ngIf="isEditing('general','phone')" class="pill save" (click)="saveField('general','phone')">Save</button>
         <button *ngIf="isEditing('general','phone')" class="pill cancel" (click)="cancelField('general','phone')">Cancel</button>
       </div>
-
-      <!--<div class="row">
-        <label>City</label>
-        <span *ngIf="!isEditing('general','city')">{{ city || '—' }}</span>
-        <input *ngIf="isEditing('general','city')" [(ngModel)]="city" />
-        <button class="icon-btn" (click)="toggleEdit('general','city')">
-          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        </button>
-        <button *ngIf="isEditing('general','city')" class="pill save" (click)="saveField('general','city')">Save</button>
-        <button *ngIf="isEditing('general','city')" class="pill cancel" (click)="cancelField('general','city')">Cancel</button>
-      </div>-->
 
       <div class="row">
         <label>City</label>
@@ -73,18 +62,6 @@
         <button *ngIf="isEditing('general','city')" class="pill save" (click)="saveField('general','city')">Save</button>
         <button *ngIf="isEditing('general','city')" class="pill cancel" (click)="cancelField('general','city')">Cancel</button>
       </div>
-
-
-      <!--<div class="row">
-        <label>Street</label>
-        <span *ngIf="!isEditing('general','street')">{{ street || '—' }}</span>
-        <input *ngIf="isEditing('general','street')" [(ngModel)]="street" />
-        <button class="icon-btn" (click)="toggleEdit('general','street')">
-          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        </button>
-        <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
-        <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
-      </div>-->
 
       <div class="row">
         <label>Street</label>
@@ -137,9 +114,13 @@
         <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
         <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
       </div>
+    </section>
 
-
-
+    <!-- Become-a-sitter CTA (shown only when no sitter record exists) -->
+    <section class="card" *ngIf="!isSitter">
+      <h3>Are you a dog sitter?</h3>
+      <p class="muted">Create a sitter profile to appear in sitter searches and get bookings.</p>
+      <button class="pill save" (click)="openBecomeSitterModal()">Become a sitter</button>
     </section>
 
     <!-- Sitter Card -->
@@ -171,7 +152,7 @@
 
        <div class="row">
         <label>Gender</label>
-        <span *ngIf="!isEditing('sitter','rate')">{{ gender }}</span>
+        <span *ngIf="!isEditing('sitter','gender')">{{ gender }}</span>
         <input *ngIf="isEditing('sitter','gender')" [(ngModel)]="gender" />
       </div>
 
@@ -591,6 +572,108 @@
       </div>
     </div>
   </div>
+
+  <!-- Become Sitter Modal -->
+  <div class="mm-backdrop" *ngIf="becomeSitterOpen">
+    <div class="mm-modal add-dog-modal">
+      <h4>Create your sitter profile</h4>
+
+      <ng-container [ngSwitch]="sitterPage">
+
+        <!-- Page 0: basics -->
+        <div *ngSwitchCase="0" class="wizard-page">
+
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.profilePictureUrl">
+            <label>Photo</label>
+            <div class="avatar-row">
+              <img *ngIf="sitterWizard.profilePictureUrl" [src]="sitterWizard.profilePictureUrl" class="avatar" alt="sitter" />
+              <input #wizSitterPic type="file" accept="image/*" hidden (change)="onSitterWizardPicSelected($event)" />
+              <button class="pill btn-change" (click)="wizSitterPic.click()">Upload</button>
+            </div>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.profilePictureUrl">
+              Photo is required
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.gender">
+            <label>Gender</label>
+            <select [(ngModel)]="sitterWizard.gender">
+              <option value="" disabled>Select Gender</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.gender">Gender is required</small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && (sitterWizard.experienceYears == null || sitterWizard.experienceYears < 0)">
+            <label>Experience Years</label>
+            <input type="number" min="0" [(ngModel)]="sitterWizard.experienceYears" />
+            <small class="field-error" *ngIf="sitterAttempted && (sitterWizard.experienceYears == null || sitterWizard.experienceYears < 0)">
+              Enter a non-negative whole number
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && (sitterWizard.rate == null || sitterWizard.rate < 0)">
+            <label>Rate</label>
+            <input type="number" min="0" [(ngModel)]="sitterWizard.rate" />
+            <small class="field-error" *ngIf="sitterAttempted && (sitterWizard.rate == null || sitterWizard.rate < 0)">
+              Rate is required
+            </small>
+          </div>
+        </div>
+
+        <!-- Page 1: copy -->
+        <div *ngSwitchCase="1" class="wizard-page">
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.availability.trim()">
+            <label>Availability</label>
+            <textarea class="input-ta ta-medium" rows="5" [(ngModel)]="sitterWizard.availability"></textarea>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.availability.trim()">Availability is required</small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.sitterBio.trim()">
+            <label>Bio</label>
+            <textarea class="input-ta ta-large" rows="8" [(ngModel)]="sitterWizard.sitterBio"></textarea>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.sitterBio.trim()">Bio is required</small>
+          </div>
+        </div>
+
+        <!-- Page 2: lists -->
+        <div *ngSwitchCase="2" class="wizard-page">
+        <div class="options-list">
+          <h5 class="options-title"><strong>Experience With</strong></h5>
+            <label class="check-row" *ngFor="let opt of experienceWithOptions">
+              <input
+                type="checkbox"
+                [checked]="sitterWizard.experienceDetails.includes(opt)"
+                (change)="onSitterWizardListToggle('experienceDetails', opt, $any($event.target).checked)" />
+              <span>{{ opt }}</span>
+            </label>
+          </div>
+
+        <div class="options-list" [class.invalid]="sitterAttempted && !sitterWizard.serviceOptions.length">
+          <h5 class="options-title"><strong>Services</strong></h5>
+            <label class="check-row" *ngFor="let opt of serviceOptionsMaster">
+              <input
+                type="checkbox"
+                [checked]="sitterWizard.serviceOptions.includes(opt)"
+                (change)="onSitterWizardListToggle('serviceOptions', opt, $any($event.target).checked)" />
+              <span>{{ opt }}</span>
+            </label>
+          <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.serviceOptions.length">Pick at least one service</small>
+        </div>
+      </div>
+
+      </ng-container>
+
+      <div class="modal-actions">
+        <button class="pill cancel" (click)="closeBecomeSitterModal()">Cancel</button>
+        <button class="pill" *ngIf="sitterPage > 0" (click)="prevSitterPage()">Back</button>
+        <button class="pill save" *ngIf="sitterPage < 2" (click)="nextSitterPage()">Next</button>
+        <button class="pill save" *ngIf="sitterPage === 2" (click)="saveNewSitter()">Save</button>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Deactivate sitter confirmation -->
   <div class="mm-backdrop" *ngIf="confirmDeactivateOpen">

@@ -51,7 +51,7 @@ export class AiChatComponent implements OnInit{
 
       // Only fetch chat history ONCE when sub is ready
       if (this.sub && this.messages.length === 0) {
-        this.http.get<any>(`https://7mdjw4qnum54opy55mfksdbiwu0hiydf.lambda-url.us-east-1.on.aws/?sub=${this.sub}`).subscribe({
+        this.http.get<any>(`https://3nqz6vpnmyozrnqr7o3zqgwu540sewcy.lambda-url.us-east-1.on.aws/?sub=${this.sub}`).subscribe({
           next: (res) => {
             this.messages = Array.isArray(res.messages) ? res.messages : [];
           },

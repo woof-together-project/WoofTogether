@@ -426,7 +426,8 @@
                             [(ngModel)]="dog.birthMonth"
                             name="dogBirthMonth-{{i}}"
                             required
-                            #dogBirthMonth="ngModel">
+                            #dogBirthMonth="ngModel"
+                            (ngModelChange)="onDogMonthChange(i)">
                       <option [ngValue]="null" disabled>Month</option>
                       <option *ngFor="let m of months"
                               [ngValue]="m.value"
@@ -440,14 +441,15 @@
                             required
                             #dogBirthYear="ngModel"
                             (ngModelChange)="onDogYearChange(i)">
-                      <option value="" disabled selected>Year</option>
-                      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+                      <option [ngValue]="null" disabled>Year</option>
+                      <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
                     </select>
+
                   </div>
 
                   <!-- Optional live preview -->
                   <small *ngIf="dog.birthMonth && dog.birthYear" class="text-muted">
-                    ~ {{ getAgeString(dog.birthYear, dog.birthMonth) }}
+                    ~ {{ formatAgeDecimal(ageDecimal(dog.birthYear, dog.birthMonth)) }} years
                   </small>
 
                   <div *ngIf="dogAttempted[i]?.[1] && (dogBirthMonth.invalid || dogBirthYear.invalid)"

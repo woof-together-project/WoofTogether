@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { NavigationService } from '../../shared/navigation/navigation.service';
 import { PlacesService } from '../../shared/map/places/PlacesService';
 import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
@@ -25,7 +25,7 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatSnackBarModule],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css'
 })
@@ -388,6 +388,38 @@ export class SignupComponent {
     });
   }
 
+  onDogYearChange(i: number) {
+    const y = this.dogs[i]?.birthYear;
+    const m = this.dogs[i]?.birthMonth;
+
+    // future year → clear + warn
+    const nowY = new Date().getFullYear();
+    if (y && y > nowY) {
+      this.dogs[i].birthYear = null;
+      this.dogs[i].birthMonth = null;
+      this.warn("Birth date can't be in the future.");
+      return;
+    }
+
+    // month that hasn't happened yet for that year → clear + warn
+    if (m && this.isMonthDisabledForDog(i, m)) {
+      this.dogs[i].birthMonth = null;
+      this.warn("That month hasn't happened yet for the selected year.");
+    }
+  }
+
+  onDogMonthChange(i: number) {
+    const y = this.dogs[i]?.birthYear;
+    const m = this.dogs[i]?.birthMonth;
+    if (!m) return;
+
+    if (this.isMonthDisabledForDog(i, m) || this.isFutureBirth(y, m)) {
+      this.dogs[i].birthMonth = null;
+      this.warn("Birth date can't be in the future.");
+    }
+  }
+
+
   private uploadImageToS3(file: File, done: (publicUrl: string) => void, fail?: (e:any)=>void) {
     const lambdaUrl = SignupComponent.uploadProfilePicURL;
 
@@ -614,8 +646,17 @@ export class SignupComponent {
   tryNextDogPage(i: number) {
     const p = this.currentDogPage[i];
     this.dogAttempted[i][p] = true;
+
+    if (p === 1) {
+      const d = this.dogs[i];
+      if (this.isFutureBirth(d.birthYear, d.birthMonth)) {
+        this.warn("Birth date can't be in the future.");
+        return;
+      }
+    }
+
     if (this.isDogPageValid(i, p)) {
-      this.dogAttempted[i][p] = false; // optional
+      this.dogAttempted[i][p] = false;
       this.currentDogPage[i]++;
     }
   }
@@ -644,12 +685,21 @@ export class SignupComponent {
     return (y > yNow) || (y === yNow && month > mNow);
   }
 
-  onDogYearChange(i: number) {
-    const m = this.dogs[i]?.birthMonth;
-    if (m && this.isMonthDisabledForDog(i, m)) {
-      this.dogs[i].birthMonth = null;
-    }
+  ageDecimal(year: number, month: number): number {
+    const now = new Date();
+    const totalMonths = (now.getFullYear() - year) * 12 + (now.getMonth() + 1) - month;
+    const years = Math.max(0, totalMonths) / 12;
+    return Math.round(years * 100) / 100;
   }
+
+  formatAgeDecimal(age: number): string {
+    return age.toFixed(2).replace(/\.?0+$/, '');
+  }
+
+  private warn(msg: string, ms = 2200) {
+    this.snackBar.open(msg, 'OK', { duration: ms });
+  }
+
 }
 
 function extractCityName(components?: any[]): string | null {

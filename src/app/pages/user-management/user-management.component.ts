@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { UserContextService } from '../../shared/sharedUserContext/UserContextService';
 import { MatSnackBar, MatSnackBarModule, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
-import { Subject, of } from 'rxjs';
+import { Subject, of, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, switchMap, tap, catchError } from 'rxjs/operators';
 import { NavigationService } from '../../shared/navigation/navigation.service';
 import { PlacesService } from '../../shared/map/places/PlacesService';
@@ -12,6 +12,19 @@ import { PlacesService } from '../../shared/map/places/PlacesService';
 type AddressComponent = { long_name: string; short_name: string; types: string[] };
 
 /* ---------------- Types (top-level) ---------------- */
+interface SitterWizardVM {
+  profilePictureUrl?: string;
+  gender: '' | 'male' | 'female';
+  rate: number | null;
+  availability: string;
+  sitterBio: string;
+  experienceYears: number | null;
+  experienceDetails: string[];
+  serviceOptions: string[];
+}
+
+type SitterListField = 'experienceDetails' | 'serviceOptions';
+
 interface DogVM {
   id?: number;
   name: string;
@@ -208,7 +221,7 @@ export class UserManagementComponent {
   rate: number | null = null;
   availability = '';
   sitterBio = '';
-  experienceYears = '';
+  experienceYears: number | null = null;
   experienceDetails: string[] = [];
   serviceOptions: string[] = [];
   confirmDeactivateOpen = false;
@@ -247,6 +260,21 @@ export class UserManagementComponent {
   addDogModalOpen = false;
   addDogPage = 0; // 0..3
   newDog!: DogVM;
+
+  becomeSitterOpen = false;
+  sitterPage = 0;
+  sitterAttempted = false;
+
+  sitterWizard: SitterWizardVM = {
+    profilePictureUrl: '',
+    gender: '',
+    rate: null,
+    availability: '',
+    sitterBio: '',
+    experienceYears: null,
+    experienceDetails: [],
+    serviceOptions: []
+  };
 
   private blankDog(): DogVM {
     return {
@@ -371,6 +399,126 @@ export class UserManagementComponent {
       }
     });
   }
+
+  openBecomeSitterModal() {
+    this.becomeSitterOpen = true;
+    this.sitterPage = 0;
+    this.sitterAttempted = false;
+    this.sitterWizard = {
+      profilePictureUrl: '',
+      gender: '',
+      rate: null,
+      availability: '',
+      sitterBio: '',
+      experienceYears: null,
+      experienceDetails: [],
+      serviceOptions: []
+    };
+  }
+  closeBecomeSitterModal() {
+    this.becomeSitterOpen = false;
+  }
+
+  prevSitterPage() {
+    if (this.sitterPage > 0) this.sitterPage--;
+  }
+
+  onSitterWizardPicSelected(ev: Event) {
+    const file = (ev.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const key = 'sitter:create:pic';
+    if (!this.lock(key)) return;
+
+    this.http.post<any>(UserManagementComponent.uploadProfilePicURL, {
+      fileName: file.name,
+      fileType: file.type
+    }).subscribe({
+      next: (res) => {
+        this.http.put(res.url, file, { headers: { 'Content-Type': file.type } })
+          .subscribe({
+            next: () => { this.sitterWizard.profilePictureUrl = res.publicUrl; this.ok('Photo uploaded'); this.unlock(key); },
+            error: () => { this.warn('Upload failed'); this.unlock(key); }
+          });
+      },
+      error: () => { this.warn('Upload failed'); this.unlock(key); }
+    });
+  }
+
+  private validateSitterPage(page: number): string[] {
+    const e: string[] = [];
+    const s = this.sitterWizard;
+
+    if (page === 0) {
+      if (!s.profilePictureUrl) e.push('profilePictureUrl');
+      if (!s.gender) e.push('gender');
+      if (s.experienceYears == null || !Number.isInteger(+s.experienceYears) || +s.experienceYears < 0) e.push('experienceYears');
+      if (s.rate == null || +s.rate < 0) e.push('rate');
+    } else if (page === 1) {
+      if (!s.availability.trim()) e.push('availability');
+      if (!s.sitterBio.trim()) e.push('sitterBio');
+    } else if (page === 2) {
+      if (!s.serviceOptions.length) e.push('serviceOptions');
+      // experienceDetails can be empty if you want
+    }
+    return e;
+  }
+
+  nextSitterPage() {
+    this.sitterAttempted = true;
+    if (this.validateSitterPage(this.sitterPage).length) return;
+    this.sitterAttempted = false;
+    if (this.sitterPage < 2) this.sitterPage++;
+  }
+
+  /** Create sitter once by posting the normal update endpoint for each field.
+   *  _ensure_sitter on the server will create the row on the first call. */
+  async saveNewSitter() {
+    this.sitterAttempted = true;
+    // Validate last page too
+    if (this.validateSitterPage(this.sitterPage).length || this.validateSitterPage(0).length || this.validateSitterPage(1).length) return;
+
+    const key = 'sitter:create';
+    if (!this.lock(key)) return;
+
+    try {
+      const s = this.sitterWizard;
+      const posts: Array<[string, any]> = [
+        ['gender', s.gender],
+        ['experienceYears', Number(s.experienceYears)],
+        ['rate', Number(s.rate)],
+        ['availability', s.availability],
+        ['sitterBio', s.sitterBio],
+        ['experienceDetails', s.experienceDetails],
+        ['serviceOptions', s.serviceOptions],
+      ];
+      if (s.profilePictureUrl) {
+        posts.unshift(['profilePictureUrl', s.profilePictureUrl]); // optional first
+      }
+
+      // First call creates sitter record; the rest fill fields
+      for (const [field, value] of posts) {
+        await firstValueFrom(
+          this.http.post(UserManagementComponent.updateURL, {
+            email: this.email, section: 'sitter', field, value
+          })
+        );
+      }
+
+      this.ok('Sitter profile created!');
+      this.becomeSitterOpen = false;
+
+      // Refresh the UI → will flip isSitter=true and show the normal sitter card
+      this.isSitter = true;
+      this.sitterActive = true;
+      this.loadProfile();
+    } catch (err: any) {
+      this.warn(this.msgFrom(err));
+    } finally {
+      this.unlock(key);
+    }
+  }
+
 
   isEditing(section: 'general' | 'sitter', field: string) {
     if (section === 'sitter' && !this.sitterActive) return false;
@@ -976,7 +1124,7 @@ export class UserManagementComponent {
         const created: DogVM = {
         ...this.newDog,
         id: assignedId,
-        age: this.computeAgeFromBirth(this.newDog.birthYear!, this.newDog.birthMonth!)};
+        age: this.ageDecimal(this.newDog.birthYear!, this.newDog.birthMonth!)};
         this.dogs = [...this.dogs, created];
         this.dogOpen = [...this.dogOpen, true];
         this.addDogAttempted = false;
@@ -1003,13 +1151,6 @@ export class UserManagementComponent {
     if (this.newDog.birthMonth && this.isMonthDisabledForNewDog(this.newDog.birthMonth)) {
       this.newDog.birthMonth = null;
     }
-  }
-
-  private computeAgeFromBirth(year: number, month: number): number {
-    const now = new Date();
-    let age = now.getFullYear() - year;
-    if ((now.getMonth() + 1) < month) age -= 1;
-    return Math.max(0, age);
   }
 
   private isMissing(v: unknown) {
@@ -1164,6 +1305,23 @@ export class UserManagementComponent {
     // force a render tick, THEN focus
     this.cdRef.detectChanges();
     setTimeout(() => this.streetInput?.nativeElement?.focus(), 50);
+  }
+
+  private ageDecimal(year: number, month: number): number {
+    const now = new Date();
+    const totalMonths = (now.getFullYear() - year) * 12 + (now.getMonth() + 1) - month;
+    const years = Math.max(0, totalMonths) / 12;
+    return Math.round(years * 100) / 100;
+  }
+
+  formatAgeDecimal(age: number): string {
+    return age.toFixed(2).replace(/\.?0+$/, '');
+  }
+
+  onSitterWizardListToggle(field: SitterListField, opt: string, checked: boolean) {
+    const curr = new Set(this.sitterWizard[field]);
+    if (checked) curr.add(opt); else curr.delete(opt);
+    this.sitterWizard[field] = Array.from(curr);
   }
 
 }

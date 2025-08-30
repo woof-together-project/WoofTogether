@@ -155,6 +155,16 @@ input, textarea {
   border: none; cursor: pointer;
   background: #365020; color: white; box-shadow: 0 6px 16px rgba(0,0,0,.15);
 }
+
+.add-dog-fab .bi,
+.add-dog-fab i,
+.add-dog-fab span,
+.add-dog-fab svg {
+  color: #fff !important;
+  fill: #fff !important;
+  stroke: #fff !important;
+}
+
 .add-dog-fab:hover { filter: brightness(1.05); }
 
 .dog-accordion { border-top: 1px solid #eee; }
@@ -520,3 +530,6 @@ select.select--sm { padding: 6px 32px 6px 10px; border-radius: 8px; font-size: .
   flex: 0 0 auto;    /* don’t stretch or shrink */
   white-space: nowrap; /* keep on one line */
 }
+
+:host ::ng-deep .mm-modal .options-list + .options-list { margin-top: 12px; }
+:host ::ng-deep .mm-modal .options-title { margin-bottom: 6px; font-weight: 700; }
