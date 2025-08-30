@@ -71,7 +71,7 @@ export class HomeComponent{
     },
     {
       question: 'How do I become a sitter?',
-      answer: 'Sign up, complete your profile, and get verified. You’ll be matched with nearby dog owners.',
+      answer: 'Sign up, complete your profile, and fill in the sitter details. Another way to join is through the Management page, there’s also an option there to join as a sitter.',
       isOpen: false,
     },
     {

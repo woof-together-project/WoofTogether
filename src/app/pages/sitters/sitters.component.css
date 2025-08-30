@@ -795,7 +795,6 @@ app-map, #mapElement {
   pointer-events: none;
 }
 
-/* Your existing stylish slider (kept) */
 .stylish-range {
   --track-height: 8px;
   width: 100%;
@@ -834,7 +833,6 @@ app-map, #mapElement {
   box-shadow: 0 2px 8px rgba(44,110,73,.25);
 }
 
-/* Ensure Apply buttons read well (white text) */
 .criteria-card .btn-success {
   background: #2c6e49;
   border-color: #2c6e49;
@@ -846,31 +844,21 @@ app-map, #mapElement {
   color: #fff !important;
 }
 
-/* Taller cards overall */
 .criteria-card { padding: 1.25rem 1.25rem 1rem; }
 
-/* Default: give every box some height */
 .crit-section { min-height: 210px; }
 
-/* Desktop+ : 4 columns with roomier boxes, no scroll in "Experienced With" */
 @media (min-width: 1200px) {
   .criteria-grid {
-    /* 4 columns (service / gender / experienced / rate) with a wider middle column */
     grid-template-columns: 1.15fr 1fr 1.7fr 1.15fr;
     gap: 1.25rem 1.5rem;
   }
 
-  /* make all boxes a bit taller */
   .crit-section { min-height: 260px; }
-
-  /* the 3rd section is "Experienced With" in your layout — give it extra height */
   .criteria-grid > .crit-section:nth-child(3) { min-height: 300px; }
-
-  /* remove the inner scroller so chips wrap naturally */
   .criteria-card .scrollable { max-height: none; overflow: visible; }
 }
 
-/* Tablet: still taller than before */
 @media (min-width: 768px) and (max-width: 1199.98px) {
   .crit-section { min-height: 240px; }
   .criteria-card .scrollable { max-height: none; overflow: visible; }
@@ -911,4 +899,21 @@ app-map, #mapElement {
 .btn-chip { background: #fff; border: 1px solid #e2e8da; color: #1f4d34; font-weight: 600; padding: .25rem .6rem; border-radius: 999px; line-height: 1.1; }
 .btn-chip:hover { background: #f4fbf7; border-color: #cfe2d6; }
 
+.range-labels{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
 
+.range-badge{
+  padding: .25rem .6rem;
+  border-radius: 9999px;
+  background: #e7f0e7;
+  white-space: nowrap;
+}
+
+.range-helper{
+  display:block;       /* ensures it's on its own line */
+  margin-top: 50px;    /* nudge it down; tweak to taste (e.g., 12–14px) */
+  line-height: 1.2;
+}

@@ -570,8 +570,9 @@ submitReview() {
     longitude: lng
   };
 
+  this.center = { lat, lng };
   this.selectedTab = 'map';
-  this.zoom = 16;
+  this.zoom = 13;
 
   setTimeout(() => {
     document.getElementById('mapElement')
