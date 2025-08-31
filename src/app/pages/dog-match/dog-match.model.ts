@@ -1,4 +1,3 @@
-// --- Raw object as it comes from the API / DB (names mirror dbo.Dogs) ---
 export interface DogDto {
   latitude: number;
   longitude: number;
@@ -13,8 +12,9 @@ export interface DogDto {
   healthConditions?: string | null;   // HealthConditions
   fixed: boolean;                     // Fixed (neutered)
   favoriteActivities?: string[] | string | null; 
+  behavioralTraits?: string[] | string | null;
   rabiesVaccinated: boolean;          // RabiesVaccinated
-  createdAt: string;                  // CreatedAt (ISO)
+  createdAt: string;                  // CreatedAt
   gender?: string | null;             // Gender
   
 
@@ -24,7 +24,6 @@ export interface DogDto {
   distanceKm?: number | null;
 }
 
-// --- UI shape the component wants to render easily ---
 export interface Dog {
   id: number;
   ownerId: number;
@@ -36,7 +35,8 @@ export interface Dog {
   moreDetails: string | null;
   healthConditions: string | null;
   isNeutered: boolean;               // from Fixed
- favoriteActivities?: string[];      
+  favoriteActivities?: string[]; 
+  behavioralTraits?: string[];     
   vaccinationStatus: boolean;        // from RabiesVaccinated
   createdAt: string;
   gender: string | null;
@@ -89,6 +89,10 @@ export function mapDogDtoToDog(d: DogDto): Dog {
     (d as any).favoriteActivities ?? (d as any).FavoriteActivities
   );
 
+  const behavioralTraits = toStringArray(
+    (d as any).behavioralTraits ?? (d as any).BehavioralTraits
+  );
+
   const lat =
     (d as any).latitude ?? (d as any).lat ?? 0;
 
@@ -110,6 +114,7 @@ export function mapDogDtoToDog(d: DogDto): Dog {
     healthConditions: (d as any).healthConditions?.trim?.() ? (d as any).healthConditions : null,
     isNeutered: !!(d as any).fixed,
     favoriteActivities,
+    behavioralTraits,
     vaccinationStatus: !!(d as any).rabiesVaccinated,
     createdAt: (d as any).createdAt ?? '',
     gender: (d as any).gender ?? null,
