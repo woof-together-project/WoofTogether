@@ -74,8 +74,15 @@
 
               <div class="mt-3 d-flex justify-content-between align-items-center">
                 <span class="text-muted">📍 {{ dog.distanceKm }} km away</span>
-                <a
-                  [href]="getSmartEmailLink(currentUserEmail, dog.userEmail!, dog.userName!)"
+               <a
+                  [href]="getSmartEmailLink(
+                            currentUserEmail,
+                            dog.userEmail || '',
+                            dog.userName || '',
+                            dog.name
+                          )"
+                  target="_blank"
+                  rel="noopener"
                   class="btn btn-success btn-sm contact-btn"
                   (click)="$event.stopPropagation()"
                 >

@@ -917,3 +917,58 @@ app-map, #mapElement {
   margin-top: 50px;    /* nudge it down; tweak to taste (e.g., 12–14px) */
   line-height: 1.2;
 }
+
+/* --- Reviews modal look --- */
+.average-line .star { color: #f6c102; }              /* yellow star */
+
+.review-item {
+  padding: 12px 14px;
+  margin: 10px 0;
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04);
+}
+.review-item:nth-child(odd) { background: #fafbff; } /* subtle zebra */
+
+.review-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  background: #eef2ff;
+  color: #374151;
+}
+
+.rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid #f6c102;
+  background: rgba(246, 193, 2, 0.12);
+  color: #5c4600;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.star { color: #f6c102; line-height: 1; }            /* yellow star */
+.review-date { color: #6b7280; white-space: nowrap; }
+.review-text { margin-top: 6px; color: #374151; white-space: pre-wrap; }

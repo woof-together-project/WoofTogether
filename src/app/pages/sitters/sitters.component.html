@@ -294,14 +294,15 @@
       </div>
 
       <!-- Reviews List -->
-      <div *ngIf="reviews.length; else none">
-        <div class="border rounded p-2 mb-2" *ngFor="let r of reviews">
-          <div class="d-flex justify-content-between">
-            <div>⭐ {{ r.rating }}</div>
-            <small class="text-muted">{{ r.reviewDate | date:'medium':'Asia/Jerusalem' }}</small>
-          </div>
-          <div class="mt-1">{{ r.comment }}</div>
+      <div *ngFor="let r of reviews" class="review-item">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <strong>{{ r.userName }}</strong>
+          <span class="ms-2">★ {{ r.rating }}</span>
         </div>
+        <small>{{ r.reviewDate | date:'MMM d, y, h:mm a' }}</small>
+      </div>
+        <div class="text-muted">{{ r.comment }}</div>
       </div>
       <ng-template #none>
         <div class="text-muted">No reviews yet.</div>

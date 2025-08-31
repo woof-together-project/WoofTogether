@@ -252,7 +252,7 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
 }
 
 
-  clearFilters(): void {
+  async clearFilters(): Promise<void> {
     this.filters = {
       size: 'Any',
       breed: 'Any',
@@ -265,9 +265,25 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
       behavioralTraits: [],
       favoriteActivities: []
     };
+    this.searchCity = '';
+    this.filteredCities = [...this.allCities];
+    this.showSuggestions = false;
+    this.uiMessage = null;
+    this.selectedDog = null;
+    this.selectedDogId = null;
+
+    try {
+      const coords = await this.getCurrentLocation();
+      this.location.latitude = coords.latitude;
+      this.location.longitude = coords.longitude;
+    } catch {}
+
+    this.center = { lat: this.location.latitude, lng: this.location.longitude };
+    this.zoomLevel = this.defaultZoom;
+    this.selectedTab = 'map';
+
     this.loadDogsByLocation();
   }
-
   applyFilters(): void {
   const url = DogMatchComponent.getDogURL;
   const payload = this.buildFilterPayload();
@@ -322,25 +338,38 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     this.selectedTab = tab;
   }
 
-  // ===== Smart email link =====
-  getSmartEmailLink(userEmail: string, ownerEmail: string, ownerName: string): string {
-    const subject = encodeURIComponent('Looking for a partner to play with my dog');
-    const body = encodeURIComponent(`Hi ${ownerName}, I saw your profile and would love to connect!`);
-    const domain = (userEmail || '').split('@')[1]?.toLowerCase() || '';
+ // ===== Smart email link =====
+  getSmartEmailLink(
+  userEmail: string,
+  ownerEmail: string,
+  ownerName?: string,
+  dogName?: string
+): string {
+  const safeOwner = (ownerName && ownerName.trim()) ? ownerName.trim() : 'there';
+  const dn = (dogName && dogName.trim()) ? dogName.trim() : 'your dog';
 
-    if (domain.includes('gmail.com')) {
-      return `https://mail.google.com/mail/?view=cm&fs=1&to=${ownerEmail}&su=${subject}&body=${body}`;
-    }
-    if (domain.includes('outlook.com') || domain.includes('hotmail.com') || domain.includes('live.com')) {
-      return `https://outlook.live.com/mail/deeplink/compose?to=${ownerEmail}&subject=${subject}&body=${body}`;
-    }
-    if (domain.includes('yahoo.com')) {
-      return `https://compose.mail.yahoo.com/?to=${ownerEmail}&subject=${subject}&body=${body}`;
-    }
+  const subject = encodeURIComponent(`Dog playdate with ${dn}?`);
+  const body = encodeURIComponent(
+    `Hi ${safeOwner},\n\nI saw ${dn}'s profile and would love to connect between our dogs!\n\nThanks!`
+  );
+
+  const domain = (userEmail || '').split('@')[1]?.toLowerCase() || '';
+
+  if (domain.includes('gmail.com')) {
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${ownerEmail}&su=${subject}&body=${body}`;
   }
+  if (domain.includes('outlook.com') || domain.includes('hotmail.com') || domain.includes('live.com')) {
+    return `https://outlook.live.com/mail/deeplink/compose?to=${ownerEmail}&subject=${subject}&body=${body}`;
+  }
+  if (domain.includes('yahoo.com')) {
+    return `https://compose.mail.yahoo.com/?to=${ownerEmail}&subject=${subject}&body=${body}`;
+  }
 
-  // ===== geo helpers =====
+  return `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+  }
+
+
+
   withinRadius(s: Dog): boolean {
     const R = 6371;
     const dLat = this.deg2rad((s.latitude ?? 0) - this.location.latitude);

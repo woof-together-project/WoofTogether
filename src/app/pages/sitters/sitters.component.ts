@@ -24,12 +24,13 @@ export class SittersComponent implements OnInit {
   selectedTab: 'map' | 'criteria' | null = 'map';
   sitters: Sitter[] = [];
   loading = false;
+  
   location = {
     latitude: 0,    
     longitude: 0,
     radius: 15           
   };
-
+  userLocation = { latitude: 0, longitude: 0 };
   
    //cognito data
   useremail: string = '';
@@ -69,6 +70,8 @@ reviews: Array<{
   id: number;
   sitterId: number;
   userId: number;
+  userName: string; 
+  userEmail: string;
   rating: number;
   comment: string;
   reviewDate: string;
@@ -101,6 +104,8 @@ newReview = { rating: 5, comment: '' };
     this.zoom = this.defaultZoom;
     
     const coords = await this.getCurrentLocation();
+    this.userLocation.latitude = coords.latitude;
+    this.userLocation.longitude = coords.longitude;
     this.location.latitude = coords.latitude;
     this.location.longitude = coords.longitude;
     console.log('Location resolved:', coords);
@@ -210,7 +215,7 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     }
   }
 
-  clearFilters(shouldReload: boolean = true): void {
+  async clearFilters(shouldReload: boolean = true): Promise<void> {
   this.filters = {
     servicesSelected: [],
     gender: 'Any',
@@ -225,6 +230,11 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
   this.maxRate = 150;
 
   if (shouldReload) {
+    const coords = await this.getCurrentLocation();
+    this.userLocation.latitude = coords.latitude;
+    this.userLocation.longitude = coords.longitude;
+    this.center = { lat: this.userLocation.latitude, lng: this.userLocation.longitude };
+    this.zoom = this.defaultZoom;
     this.loadSittersByLocation();
   }
 }
@@ -235,19 +245,25 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     console.log("Filter payload:", payload);
     
     this.http.post<Sitter[]>(url, payload).subscribe({
-      next: (data) => {
-      this.sitters = data
-        .filter(s => s.email !== this.useremail)
-        .map(sitter => ({
-          ...sitter,
-        imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
-      }));
-   
-        this.updateMarkers();
-        this.center = { lat: this.location.latitude, lng: this.location.longitude };
-        this.zoom   = this.defaultZoom;
-        this.selectedTab = 'map';        
-      },
+  next: (data) => {
+  this.sitters = data
+    .filter(s => s.email !== this.useremail)
+    .map(sitter => ({
+      ...sitter,
+    imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
+  }));
+
+    this.updateMarkers();
+    this.getCurrentLocation().then(coords => {
+      this.userLocation.latitude = coords.latitude;
+      this.userLocation.longitude = coords.longitude;
+      this.center = { lat: this.userLocation.latitude, lng: this.userLocation.longitude };
+      this.zoom   = this.defaultZoom;
+      this.selectedTab = 'map';
+    }).catch(err => {
+      console.error('Failed to update location after filtering:', err);
+    });
+  },
       error: (err) => console.error('Filter request failed', err)
     });
   }
@@ -316,8 +332,10 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     
     this.markers.push({
       id: -1, // Unique ID
-      lat: this.location.latitude,
-      lng: this.location.longitude,
+      lat: this.userLocation.latitude,
+      lng: this.userLocation.longitude,
+      // lat: this.location.latitude,
+      // lng: this.location.longitude,
       label: 'You' 
   });
 
@@ -366,8 +384,10 @@ private setMapView(lat: number, lng: number, zoom: number) {
   buildFilterPayload() {
     return {
       action: 'filterByCriteria',
-      latitude: this.location.latitude,
-      longitude: this.location.longitude,
+      latitude: this.userLocation.latitude,
+      longitude: this.userLocation.longitude,
+      // latitude: this.location.latitude,
+      // longitude: this.location.longitude,
       radius: this.location.radius,
       noRadiusFilter: this.disableRadius,
       maxRate: this.filters.rateMax,
@@ -403,33 +423,93 @@ filterCities(): void {
   this.showSuggestions = true;
 }
 
+// onCitySearch(): void {
+//   const city = (this.searchCity || '').trim();
+//   if (!city) return;
+
+//   this.http.post<any[]>(SittersComponent.getSittersUrl, {
+//     action: 'searchByCity',
+//     city,
+//     // latitude: this.location.latitude,
+//     // longitude: this.location.longitude
+//     latitude: this.userLocation.latitude,
+//     longitude: this.userLocation.longitude
+//   }).subscribe({
+//     next: (sittersRes) => {
+//       if (!sittersRes || sittersRes.length === 0) {
+//         this.cityError = `No sitters found in "${city}". Showing all nearby sitters.`;
+//         console.log('[CitySearch] no results -> show error');
+
+//         setTimeout(() => {
+//           this.searchCity = '';
+//           this.filteredCities = [...this.allCities];
+//           this.showSuggestions = false;
+//           this.loadSittersByLocation(); 
+//           this.cityError = null;
+//         }, 2000);
+//         return;
+//       }
+
+//       this.cityError = null;
+//       this.clearFilters(false); 
+//       this.sitters = sittersRes.map(sitter => ({
+//         ...sitter,
+//         imageUrl: sitter.profilePictureUrl
+//           ? encodeURI(sitter.profilePictureUrl)
+//           : 'assets/images/default-profile.png'
+//       }));
+//       this.updateMarkers();
+//       this.selectedTab = 'map';
+//       this.showSuggestions = false;
+//     },
+//     error: (err) => {
+//       console.error('Failed to search sitters by city', err);
+//       this.cityError = 'Something went wrong searching that city. Showing all nearby sitters.';
+//       setTimeout(() => {
+//         this.searchCity = '';
+//         this.filteredCities = [...this.allCities];
+//         this.showSuggestions = false;
+//         this.loadSittersByLocation();
+//         this.cityError = null;
+//       }, 2000);
+//     }
+//   });
+// }
+
 onCitySearch(): void {
-  const city = (this.searchCity || '').trim();
-  if (!city) return;
+  const normalize = (s: string) =>
+    (s || '').toLowerCase().replace(/[,\s]+/g, ' ').trim();
+
+  const typed = normalize(this.searchCity);
+  if (!typed) return;
+
+  let cityToSend = this.searchCity.trim();
+  const match = this.allCities.find(c => normalize(c).includes(typed));
+  if (match) cityToSend = match; 
 
   this.http.post<any[]>(SittersComponent.getSittersUrl, {
     action: 'searchByCity',
-    city,
-    latitude: this.location.latitude,
-    longitude: this.location.longitude
+    city: cityToSend,
+    latitude: this.userLocation.latitude,
+    longitude: this.userLocation.longitude,
+    excludeEmail: this.useremail || this.currentUserEmail 
   }).subscribe({
     next: (sittersRes) => {
       if (!sittersRes || sittersRes.length === 0) {
-        this.cityError = `No sitters found in "${city}". Showing all nearby sitters.`;
+        this.cityError = `No sitters found in "${cityToSend}". Showing all nearby sitters.`;
         console.log('[CitySearch] no results -> show error');
-
+        this.loadSittersByLocation();
         setTimeout(() => {
           this.searchCity = '';
           this.filteredCities = [...this.allCities];
           this.showSuggestions = false;
-          this.loadSittersByLocation(); 
           this.cityError = null;
         }, 2000);
         return;
       }
-
+      console.log("Current user email:", this.currentUserEmail);
       this.cityError = null;
-      this.clearFilters(false); 
+      this.clearFilters(false);
       this.sitters = sittersRes.map(sitter => ({
         ...sitter,
         imageUrl: sitter.profilePictureUrl
@@ -442,17 +522,18 @@ onCitySearch(): void {
     },
     error: (err) => {
       console.error('Failed to search sitters by city', err);
-      this.cityError = 'Something went wrong searching that city. Showing all nearby sitters.';
+      this.cityError = `Something went wrong searching "${cityToSend}". Showing all nearby sitters.`;
+      this.loadSittersByLocation();
       setTimeout(() => {
         this.searchCity = '';
         this.filteredCities = [...this.allCities];
         this.showSuggestions = false;
-        this.loadSittersByLocation();
         this.cityError = null;
       }, 2000);
     }
   });
 }
+
 selectCity(city: string): void {
   this.searchCity = city;
   this.showSuggestions = false;
@@ -549,7 +630,8 @@ submitReview() {
 }
 
  resetMapView(): void {
-    this.center = { lat: this.location.latitude, lng: this.location.longitude };
+    this.center = { lat: this.userLocation.latitude, lng: this.userLocation.longitude };
+    // this.center = { lat: this.location.latitude, lng: this.location.longitude };
     this.zoom = this.defaultZoom;
   }
 
@@ -572,7 +654,7 @@ submitReview() {
 
   this.center = { lat, lng };
   this.selectedTab = 'map';
-  this.zoom = 13;
+  this.zoom = 16;
 
   setTimeout(() => {
     document.getElementById('mapElement')

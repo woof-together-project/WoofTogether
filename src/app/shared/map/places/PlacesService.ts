@@ -1,10 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+export interface Prediction {
+  description: string;
+  place_id: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class PlacesService {
-//   private base = 'https://si2ancz2kzrnbpv2luhwwodgci0gyuay.lambda-url.us-east-1.on.aws/';
   private base = 'https://n66mcpvf5jjubyxt2srvj4s2lq0kovfu.lambda-url.us-east-1.on.aws/';
 
   constructor(private http: HttpClient) {}
@@ -16,9 +21,9 @@ export class PlacesService {
     opts?: {
       cityCenter?: { lat: number; lng: number };
       cityRect?: { sw: { lat: number; lng: number }, ne: { lat: number; lng: number } };
-      cityName?: string;
+      cityName?: string; 
     }
-  ): Observable<{ predictions: { description: string; place_id: string }[] }> {
+  ): Observable<{ predictions: Prediction[] }> {
     let params = new HttpParams()
       .set('mode', 'autocomplete')
       .set('q', q)
@@ -32,9 +37,38 @@ export class PlacesService {
     } else if (opts?.cityCenter) {
       params = params.set('cityCenter', `${opts.cityCenter.lat},${opts.cityCenter.lng}`);
     }
-    if (opts?.cityName) params = params.set('cityName', opts.cityName);
+    if (opts?.cityName) {
+      params = params.set('cityName', opts.cityName);
+    }
 
-    return this.http.get<{ predictions: { description: string; place_id: string }[] }>(this.base, { params });
+    return this.http
+      .get<{ predictions: Prediction[] }>(this.base, { params })
+      .pipe(
+        map(res => {
+          if (kind !== 'address') return res;
+
+          const predictions = res.predictions ?? [];
+          const city = (opts?.cityName || '').trim();
+          const normalizedCity = this.norm(city);
+
+          let list = predictions;
+          if (normalizedCity) {
+            list = predictions.filter(p => this.norm(p.description).includes(normalizedCity));
+          }
+
+          const seen = new Set<string>();
+          const cleaned: Prediction[] = [];
+          for (const p of list) {
+            const streetOnly = (p.description.split(',')[0] || '').trim();
+            if (streetOnly && !seen.has(streetOnly.toLowerCase())) {
+              seen.add(streetOnly.toLowerCase());
+              cleaned.push({ place_id: p.place_id, description: streetOnly });
+            }
+          }
+
+          return { predictions: cleaned };
+        })
+      );
   }
 
   details(placeId: string, token: string) {
@@ -42,6 +76,11 @@ export class PlacesService {
       .set('mode', 'details')
       .set('place_id', placeId)
       .set('token', token);
-    return this.http.get<any>(this.base, { params }); // `any` is fine here
+
+    return this.http.get<any>(this.base, { params });
+  }
+
+  private norm(s: string): string {
+    return s.toLowerCase().replace(/[\s,\-]+/g, ' ').trim();
   }
 }
