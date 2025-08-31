@@ -265,6 +265,8 @@ export class UserManagementComponent {
   sitterPage = 0;
   sitterAttempted = false;
 
+  loaded = false;
+
   sitterWizard: SitterWizardVM = {
     profilePictureUrl: '',
     gender: '',
@@ -396,6 +398,9 @@ export class UserManagementComponent {
       error: (err) => {
         console.error('Load profile failed:', err);
         this.warn('Failed to load profile');
+      },
+      complete: () => {
+        this.loaded = true;
       }
     });
   }
