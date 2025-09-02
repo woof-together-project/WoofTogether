@@ -1,12 +1,8 @@
 <div class="home-container">
 <div class="home-scrollable">
-  <!-- MAIN CONTENT -->
-  <!-- <section class="carousel-container"> -->
     <section class="carousel-container page-wrapper">
-    <!-- LEFT: WOOF TOGETHER TEXT with vertical line -->
     <div class="side-text">
       <div class="title-with-line">
-        <!-- Decorative vertical line -->
         <div class="vertical-line"></div>
 
         <!-- Title and description -->
@@ -24,7 +20,6 @@
       </div>
     </div>
 
-    <!-- RIGHT: CAROUSEL -->
     <div class="carousel-wrapper">
       <button class="arrow-btn left" (click)="prevCard()">&#10094;</button>
 
@@ -37,7 +32,6 @@
           <img [src]="card.image" [alt]="card.title" />
           <h3>{{ card.title }}</h3>
           <p>{{ card.description }}</p>
-          <!-- <button>{{ card.button }}</button> -->
           <button (click)="scrollToArticle(card.articleId)">{{ card.button }}</button>
         </div>
       </div>
@@ -46,27 +40,11 @@
     </div>
   </section>
 
-  <!-- DOTTED DECORATION -->
   <div class="corner-dots"></div>
 
-  <!-- FAQ SECTION -->
+  <!-- FAQ -->
 <section class="faq-section page-wrapper">
   <h2 class="faq-title"> Common Questions ❓</h2>
-
-  <!-- <div *ngFor="let faq of faqList; let i = index"
-  class="faq-item"
-  [class.open]="faq.isOpen"
->
-  <div class="faq-question">
-  {{ faq.question }}
-  <span class="faq-toggle" (click)="toggleFAQ(i)">{{ faq.isOpen ? '−' : '+' }}</span>
-</div>
-
-  <div class="faq-answer">
-    {{ faq.answer }}
-  </div>
-</div> -->
-
 <div *ngFor="let faq of faqList; let i = index" class="faq-item" (click)="toggleFAQ(i)">
   <div class="faq-question">
     <span class="faq-text">{{ faq.question }}</span>
@@ -77,20 +55,15 @@
     {{ faq.answer }}
   </div>
 </div>
-
-
-
-
 </section>
 
-  <!-- ARTICLE SECTIONS -->
+  <!-- ARTICLES -->
   <section
 >  <ul class="article-list">
     <section
     *ngFor="let article of articles"
     [id]="article.id"
-    class="article-section page-wrapper"
-  >
+    class="article-section page-wrapper">
     <div class="article-box">
       <img *ngIf="article.imageUrl" [src]="article.imageUrl" alt="Article Image" class="article-image" />
       <h2 class="article-title">{{ article.title.text }}</h2>
@@ -99,7 +72,6 @@
       </ul>
     </div>
   </section>
-
    </ul>
 </section>
 </div>

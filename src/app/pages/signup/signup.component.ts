@@ -31,8 +31,11 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 })
 
 export class SignupComponent {
-  static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; //signup lambda function URL in final user
-  static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; //s3 upload lambda function URL
+  static readonly signupURL =  'https://tjjimnumqzhnfp4nbs25nnx5ye0fpvux.lambda-url.us-east-1.on.aws/'; //final user
+  static readonly uploadProfilePicURL = 'https://7gzjldl32p36nbk3ck4bii25p40jsaoi.lambda-url.us-east-1.on.aws/'; //S3 - final user
+
+  // static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; 
+  // static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; 
   constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService, private places: PlacesService
 ) {}

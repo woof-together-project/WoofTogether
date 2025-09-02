@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { Article } from './services/article.model';
 import { ArticleService } from './services/article.service';
 import { FormsModule } from '@angular/forms';
-import { environment } from './../../../environments/environment';
 
 @Component({
   selector: 'app-home',
@@ -80,15 +79,6 @@ export class HomeComponent{
       isOpen: false,
     },
   ];
-
-  // toggleFAQ(index: number) {
-  //   this.faqList[index].isOpen = !this.faqList[index].isOpen;
-  // }
-
-//   toggleFAQ(index: number, event: MouseEvent): void {
-//   event.stopPropagation(); // optional, to prevent parent click if needed
-//   this.faqList[index].isOpen = !this.faqList[index].isOpen;
-// }
 
 toggleFAQ(index: number): void {
   this.faqList[index].isOpen = !this.faqList[index].isOpen;

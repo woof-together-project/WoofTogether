@@ -6,7 +6,7 @@ export const authConfig: PassedInitialConfig = {
             authWellknownEndpointUrl: 'https://login.microsoftonline.com/common/v2.0',
             redirectUrl: window.location.origin,
             clientId: 'please-enter-clientId',
-            scope: 'please-enter-scopes', // 'openid profile offline_access ' + your scopes
+            scope: 'please-enter-scopes', 
             responseType: 'code',
             silentRenew: true,
             useRefreshToken: true,
@@ -14,7 +14,7 @@ export const authConfig: PassedInitialConfig = {
             issValidationOff: false,
             autoUserInfo: false,
             customParamsAuthRequest: {
-              prompt: 'select_account', // login, consent
+              prompt: 'select_account',
             },
     }
 }

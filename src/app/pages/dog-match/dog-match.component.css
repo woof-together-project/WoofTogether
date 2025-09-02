@@ -1,5 +1,4 @@
 * { font-family: 'Comfortaa', 'Segoe UI', sans-serif; }
-/* Page & container */
 :host {
   display: block;
   height: 100vh;
@@ -64,20 +63,18 @@
 .contact-btn:hover { background-color: #68aa76 !important; }
 .contact-btn:active { transform: translateY(1px); background-color: #60926c !important; }
 
-/* Right column layout */
 .col-lg-8 { display: flex; flex-direction: column; height: 100%; }
 .flex-grow-1 { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-/* Header row above the map: toolbar (left) + tabs (right) */
 .map-header-row {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 8px; /* space before map */
+  margin-bottom: 8px; 
 }
 .toolbar-inner { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .toolbar-search { width: 520px; max-width: 100%; }
-.map-header-row .nav-tabs { margin-left: auto; } /* push tabs to right */
+.map-header-row .nav-tabs { margin-left: auto; } 
 
 /* Map area */
 .map-area {
@@ -96,7 +93,7 @@
 
 
 .search-row {
-  flex-wrap: wrap; /* allow wrapping if screen too small */
+  flex-wrap: wrap; 
 }
 
 .city-msg {
@@ -151,7 +148,6 @@
 .dm-crit-field{display:flex;flex-direction:column}
 .dm-crit-label{font-weight:800;color:#284d3a;margin-bottom:4px}
 
-/* --- pretty inline checkboxes --- */
 .dm-crit-check{
   display:inline-flex;align-items:center;gap:10px;
   background:#f6fbf7;border:1px solid #e2eee6;border-radius:10px;
@@ -167,7 +163,6 @@
   border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)
 }
 
-/* --- radius rectangle --- */
 .dm-crit-radius{border:1px dashed #dfeae3;border-radius:12px;background:#fbfdfc;padding:1rem 1.25rem;margin-top:6px}
 .dm-crit-radius__title{margin:0 0 .5rem;color:#2c4f3b;font-weight:800}
 .dm-crit-radius__inner{display:grid;grid-template-columns:230px 260px 1fr;align-items:center;gap:1rem}
@@ -180,14 +175,12 @@
 .dm-crit-radius__input{border:none;background:transparent;outline:none;width:100%;font-weight:700;color:#1f4d34}
 .dm-crit-input-suffix__unit{margin-left:.4rem;font-weight:700;color:#66725e}
 
-/* quick radius chips */
 .dm-chip{
   background:#fff !important;border:1px solid #e2e8da;color:#1f4d34 !important;
   font-weight:700;padding:.25rem .6rem;border-radius:999px;cursor:pointer
 }
 .dm-chip:hover{background:#f4fbf7 !important;border-color:#cfe2d6}
 
-/* --- distinct action buttons, override your global .btn --- */
 .dm-crit-actions{display:flex;gap:.5rem;justify-content:flex-end;margin-top:.25rem}
 .btn-apply{
   background:#2c6e49 !important;border:1px solid #2c6e49 !important;color:#fff !important;
@@ -200,12 +193,10 @@
 }
 .btn-clear:hover{background:#f7faf8 !important;border-color:#b9c6bb !important}
 
-/* number input spinners off */
 .dm-crit-radius__input::-webkit-outer-spin-button,
 .dm-crit-radius__input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .dm-crit-radius__input[type="number"]{-moz-appearance:textfield}
 
-/* responsive */
 @media (max-width: 991.98px){
   .dm-crit-row{grid-template-columns:1fr 1fr}
   .dm-crit-row--checks{grid-template-columns:1fr}
@@ -215,7 +206,6 @@
   .dm-crit-row{grid-template-columns:1fr}
 }
 
-/* block wrapper (same vibe as radius card) */
 .dm-crit-block {
   border: 1px dashed #dfeae3;
   border-radius: 12px;
@@ -229,14 +219,12 @@
   font-weight: 800;
 }
 
-/* chips grid */
 .dm-chip-grid {
   display: flex;
   flex-wrap: wrap;
   gap: .5rem .5rem;
 }
 
-/* accessible chip toggle */
 .dm-chip-toggle {
   position: relative;
   display: inline-flex;
@@ -317,11 +305,11 @@
 .btn-chip {
   border: 1px solid #c9d7c2;
   background: #fff;
-  color: #2b3a2a;          /* not bold */
+  color: #2b3a2a;          
   padding: 6px 10px;
   border-radius: 999px;
   line-height: 1;
-  font-weight: 500;        /* keep medium, not bold */
+  font-weight: 500;      
 }
 
 .btn-chip.active {
@@ -335,7 +323,6 @@
   color: #6e7b68;
 }
 
-/* Panel */
 .criteria-form .criteria-panel {
   background: #ffffff;
   border: 1px solid #e6efe2;
@@ -344,7 +331,6 @@
   box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
 
-/* Grid */
 .criteria-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -352,13 +338,12 @@
   margin-bottom: 12px;
 }
 .criteria-grid.two-col {
-  grid-template-columns: 1.2fr 2.8fr; /* radius + traits proportion */
+  grid-template-columns: 1.2fr 2.8fr;
 }
 @media (max-width: 992px) {
   .criteria-grid, .criteria-grid.two-col { grid-template-columns: 1fr; }
 }
 
-/* Cards & labels */
 .criteria-card {
   background: #f7fbf5;
   border: 1px dashed #d6e4d1;
@@ -368,7 +353,6 @@
 .criteria-label { display: block; margin-bottom: 6px; color: #3a4a36; font-weight: 600; }
 .criteria-title { font-weight: 600; color: #3a4a36; margin-bottom: 8px; }
 
-/* Radius */
 .radius-card { display: flex; flex-direction: column; }
 .radius-row { display: flex; align-items: center; gap: 8px; }
 .radius-input { max-width: 140px; }
@@ -382,14 +366,12 @@
   color: #2b3a2a;
 }
 
-/* Checkbox line */
 .checkbox {
   display: inline-flex; align-items: center; gap: 8px;
   user-select: none; cursor: pointer;
 }
 .checkbox > input { position: relative; top: 1px; }
 
-/* Chips */
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .btn-chip {
   border: 1px solid #c9d7c2;
@@ -405,19 +387,17 @@
   border-color: #86b486;
 }
 
-/* Hints */
 .criteria-hint {
   margin-top: 6px;
   font-size: .85rem;
   color: #6e7b68;
 }
 
-/* Actions – pushed down a bit and separated */
 .criteria-actions {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 18px;       /* <- moves buttons a little down */
+  margin-top: 18px;       
   padding-top: 8px;
   border-top: 1px solid #edf3ea;
 }
@@ -454,6 +434,32 @@ button.apply-filters {
 
 button.apply-filters:hover {
   background-color: #004d00 !important;
+}
+
+.dogmatch-scrollable {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+
+.dogmatch-scrollable::-webkit-scrollbar {
+  width: 12px;
+}
+
+.dogmatch-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dogmatch-scrollable::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.dogmatch-scrollable::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
 }
 
 

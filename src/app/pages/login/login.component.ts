@@ -12,38 +12,6 @@ type Intent = 'login' | 'signup';
 })
 
 export class LoginComponent {
-  // login() {
-  //   const cognito = amplifyCognitoConfig.Auth?.Cognito;
-
-  //   if (!cognito || !cognito.loginWith?.oauth) {
-  //     console.error('❌ Missing Cognito OAuth configuration');
-  //     return;
-  //   }
-  
-  //   const {
-  //     userPoolClientId,
-  //     loginWith: {
-  //       oauth: {
-  //         domain,
-  //         redirectSignIn,
-  //         scopes,
-  //         responseType
-  //       }
-  //     }
-  //   } = cognito;
-  
-  //   const oauthUrl = `https://${domain}/oauth2/authorize` +
-  //     `?response_type=${responseType}` +
-  //     `&client_id=${userPoolClientId}` +
-  //     `&redirect_uri=${encodeURIComponent(redirectSignIn[0])}` +
-  //     `&scope=${encodeURIComponent(scopes.join(' '))}` +
-  //     `&prompt=login`;
-  
-  //   console.log('Redirecting to Cognito UI:', oauthUrl);
-  //   window.location.href = oauthUrl;
-
-  // }
-
   login() {
     try {
       const state = this.buildState('login', window.location.pathname || '/');
@@ -67,7 +35,6 @@ export class LoginComponent {
   }
 
    private buildState(intent: Intent, returnTo: string = '/'): string {
-    // encode a tiny JSON object so we can route after redirect
     return btoa(JSON.stringify({ intent, returnTo }));
   }
 
@@ -85,7 +52,6 @@ export class LoginComponent {
       }
     } = cognito;
 
-    // NOTE: no &prompt=login → lets Cognito reuse its session
     return `https://${domain}/${oauthPath}`
       + `?response_type=${encodeURIComponent(responseType)}`
       + `&client_id=${encodeURIComponent(userPoolClientId)}`

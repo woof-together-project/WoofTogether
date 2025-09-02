@@ -2,7 +2,7 @@ export interface DogDto {
   latitude: number;
   longitude: number;
   id: number;                         // Id
-  userId: number;                     // UserId  (FK owner)
+  userId: number;                     // UserId  
   name: string;                       // Name
   breed?: string | null;              // Breed
   size: string;                       // Size
@@ -34,10 +34,10 @@ export interface Dog {
   age: number;
   moreDetails: string | null;
   healthConditions: string | null;
-  isNeutered: boolean;               // from Fixed
+  isNeutered: boolean;               //Fixed
   favoriteActivities?: string[]; 
   behavioralTraits?: string[];     
-  vaccinationStatus: boolean;        // from RabiesVaccinated
+  vaccinationStatus: boolean;        //RabiesVaccinated
   createdAt: string;
   gender: string | null;
   latitude: number;    
@@ -46,8 +46,8 @@ export interface Dog {
   
   userName: string | null;
   userEmail: string | null;
-  imageUrl: string;                  // always safe for <img>
-  distanceKm: number;                // safe number
+  imageUrl: string;                  
+  distanceKm: number;              
 }
 
 function toStringArray(v: unknown): string[] {
@@ -57,7 +57,6 @@ function toStringArray(v: unknown): string[] {
 }
 
 export function mapDogDtoToDog(d: DogDto): Dog {
-  // --- alias resolution (covers old/new backend shapes) ---
   const name =
     (d as any).name ??
     (d as any).dogName ??
@@ -122,7 +121,6 @@ export function mapDogDtoToDog(d: DogDto): Dog {
     latitude: Number(lat) || 0,
     longitude: Number(lon) || 0,
 
-    // card extras
     userName,
     userEmail,
     imageUrl,

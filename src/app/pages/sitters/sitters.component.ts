@@ -16,8 +16,8 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 })
 
 export class SittersComponent implements OnInit {
-  // static readonly getSittersUrl = 'https://5zhpsv4mgumqdxkzbwqfisqnba0xkzkm.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL
-  static readonly getSittersUrl = 'https://vj7lapeqfmnbf4fn75tc5m6zn40fpqyl.lambda-url.us-east-1.on.aws/'; //get sitters lambda function URL in final user
+  static readonly getSittersUrl = 'https://vt3c6nlcnhrflreiofdoal5yse0qxgun.lambda-url.us-east-1.on.aws/'; //final user
+  // static readonly getSittersUrl = 'https://vj7lapeqfmnbf4fn75tc5m6zn40fpqyl.lambda-url.us-east-1.on.aws/'; 
 
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 

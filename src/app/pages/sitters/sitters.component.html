@@ -1,6 +1,5 @@
-<!-- SITTERS LIST + MAP (unchanged from your layout) -->
+<!-- SITTERS LIST + MAP -->
 <div class="container-fluid px-4 py-3 dogsitter-container">
-  <!-- Header -->
   <div class="text-center mb-3">
     <h1 class="fw-bold text">FIND ME A DOGSITTER</h1>
   </div>
@@ -123,22 +122,17 @@
           </div>
         </ng-container>
 
-<ng-container *ngIf="selectedTab === 'criteria'">
-  <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
 
-    <!-- Header -->
+<ng-container *ngIf="selectedTab === 'criteria'">
+  <div class="sitter-scrollable">
+    <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
+
     <div class="criteria-header">
       <div class="d-flex align-items-center gap-2">
         <i class="bi bi-funnel-fill"></i>
         <span class="criteria-title">Refine your search</span>
       </div>
       <div class="d-flex align-items-center gap-2">
-        <!-- <button type="button" class="btn btn-link btn-sm text-decoration-none" (click)="clearFilters()">
-          Clear all
-        </button>
-        <button type="submit" class="btn btn-success btn-sm">
-          Apply
-        </button> -->
       </div>
     </div>
 
@@ -196,23 +190,23 @@
       </section>
 
       <section class="crit-section rate-section">
-  <h6 class="crit-label"><i class="bi bi-cash-stack me-1"></i>Max Rate</h6>
-  <div class="range-wrap">
-    <input
-      type="range"
-      class="form-range stylish-range"
-      min="0"
-      max="150"
-      step="5"
-      [(ngModel)]="filters.rateMax"
-      name="rateMax"
-      aria-label="Maximum hourly rate"
-    />
-    <div class="range-labels">
-      <span class="min">₪0</span>
-      <span class="range-badge">Max ₪{{ filters.rateMax }}</span>
-      <span class="max">₪150</span>
-    </div>
+      <h6 class="crit-label"><i class="bi bi-cash-stack me-1"></i>Max Rate</h6>
+      <div class="range-wrap">
+        <input
+          type="range"
+          class="form-range stylish-range"
+          min="0"
+          max="150"
+          step="5"
+          [(ngModel)]="filters.rateMax"
+          name="rateMax"
+          aria-label="Maximum hourly rate"
+        />
+      <div class="range-labels">
+        <span class="min">₪0</span>
+        <span class="range-badge">Max ₪{{ filters.rateMax }}</span>
+        <span class="max">₪150</span>
+      </div>
      <small class="range-helper text-muted small d-block">
   Includes sitters charging ≤ ₪{{ filters.rateMax }}.
 </small>
@@ -272,13 +266,12 @@
         <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
         <button type="submit" class="btn btn-success">Apply Filters</button>
       </div>
-    </div>
-  </form>
+      </div>
+    </form>
+  </div>
 </ng-container>
 
-
-
-<!-- ========== REVIEWS MODAL ========== -->
+<!-- REVIEWS MODAL -->
 <div class="modal-backdrop-custom" *ngIf="showReviewModal" (click)="closeReviews()"></div>
 <div class="modal-custom" *ngIf="showReviewModal">
   <div class="modal-header">
@@ -316,7 +309,7 @@
   </div>
 </div>
 
-<!-- ========== ADD REVIEW MODAL ========== -->
+<!-- ADD REVIEW -->
 <div class="modal-backdrop-custom" *ngIf="showAddReviewModal" (click)="closeAddReview()"></div>
 <div class="modal-custom" *ngIf="showAddReviewModal">
   <div class="modal-header">

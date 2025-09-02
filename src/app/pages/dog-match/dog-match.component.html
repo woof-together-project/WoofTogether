@@ -1,5 +1,4 @@
 <div class="container-fluid px-4 py-3 dogmatch-container">
-  <!-- PAGE TITLE -->
   <div class="text-center mb-3">
     <h1 class="fw-bold">FIND ME A DOG MATCH</h1>
     <hr />
@@ -14,7 +13,6 @@
           *ngFor="let dog of dogs"
           (click)="toggleDogDetails(dog.id); focusOnDog(dog)"
         >
-          <!-- Collapsed -->
           <ng-container *ngIf="selectedDogId !== dog.id; else expandedDog">
             <div class="d-flex gap-3">
               <img [src]="dog.imageUrl" class="dog-img" />
@@ -34,7 +32,6 @@
             </div>
           </ng-container>
 
-          <!-- Expanded -->
           <ng-template #expandedDog>
             <div>
               <div class="d-flex align-items-center gap-3 mb-2">
@@ -98,30 +95,15 @@
 
     <!-- RIGHT: Map & Filters -->
     <div class="col-lg-8 d-flex flex-column">
-      <!-- HEADER ROW (Toolbar left, Tabs right) -->
       <div class="map-header-row">
-        <!-- Toolbar LEFT -->
         <div class="toolbar-inner">
           <button class="btn btn-success btn-sm" (click)="resetMapView()">
             Return to Default View
           </button>
-           <!-- <div class="ms-auto small text-muted">
-          Zoom: {{ zoomLevel }} | Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
-        </div> -->
 
           <div class="position-relative toolbar-search">
             <div class="input-group">
               <span class="input-group-text">📍</span>
-              <!-- <input
-                type="text"
-                class="form-control"
-                placeholder="Search by city..."
-                [(ngModel)]="searchCity"
-                (focus)="loadCities()"
-                (input)="filterCities()"
-                (blur)="hideSuggestionsWithDelay()"
-              /> -->
-
             <div class="search-row d-flex align-items-center gap-2">
                 <input
                   type="text"
@@ -132,11 +114,6 @@
                   (input)="filterCities(); clearMessageOnTyping()"
                   (blur)="hideSuggestionsWithDelay()"
                 />
-
-                <!-- <button class="btn btn-primary" (click)="onCitySearch()">Search</button>
-                <button class="btn btn-secondary" (click)="clearCitySearch()">Clear</button> -->
-
-                <!-- Message appears inline after Clear -->
               </div>
 
               <button class="btn btn-success" (click)="onCitySearch()">Search</button>
@@ -150,7 +127,6 @@
                 </div>
             </div>
 
-            <!-- Suggestions -->
             <ul
               *ngIf="filteredCities.length && showSuggestions"
               class="list-group position-absolute bg-white shadow-sm"
@@ -167,7 +143,7 @@
           </div>
         </div>
 
-        <!-- Tabs RIGHT -->
+        <!-- Tabs -->
         <ul class="nav nav-tabs ms-auto">
           <li class="nav-item">
             <a class="nav-link" [class.active]="selectedTab === 'map'" (click)="selectTab('map')"
@@ -185,7 +161,6 @@
         </ul>
       </div>
 
-      <!-- CONTENT -->
       <div class="flex-grow-1">
         <!-- MAP TAB -->
         <ng-container *ngIf="selectedTab === 'map'">
@@ -201,13 +176,13 @@
           </div>
         </ng-container>
 
-     <!-- CRITERIA TAB -->
-        <ng-container *ngIf="selectedTab === 'criteria'">
-          <form (ngSubmit)="applyFilters()" class="criteria-form">
-
+     <!-- CRITERIA -->
+    <ng-container *ngIf="selectedTab === 'criteria'">
+      <div class="container dogmatch-scrollable">
+        <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
             <div class="criteria-panel">
 
-              <!-- Row 1: Size & Breed -->
+              <!-- Size & Breed -->
               <div class="criteria-grid">
                 <div class="criteria-card">
                   <label class="criteria-label">Size</label>
@@ -224,7 +199,7 @@
                 </div>
               </div>
 
-              <!-- Row 2: Ages & Weights -->
+              <!-- Ages & Weights -->
               <div class="criteria-grid">
                 <div class="criteria-card">
                   <label class="criteria-label">Age Min</label>
@@ -248,7 +223,7 @@
                 </div>
               </div>
 
-              <!-- Row 3: Checkboxes -->
+              <!-- Checkboxes -->
               <div class="criteria-grid">
                 <div class="criteria-card checkbox-card">
                   <label class="checkbox">
@@ -319,7 +294,7 @@
                 </div>
               </div>
 
-              <!-- Row 5: Favorite Activities (full width) -->
+              <!-- Favorite Activities -->
               <div class="criteria-card mt-3">
                 <div class="criteria-title">🎾 Favorite Activities</div>
                 <div class="chips">
@@ -347,11 +322,11 @@
                   Apply Filters
                 </button>
               </div>
-
             </div>
-          </form>
-        </ng-container>
 
+        </form>
+        </div>
+      </ng-container>
 
       </div>
     </div>

@@ -15,15 +15,14 @@ import { Dog, DogDto, mapDogs } from './dog-match.model';
   styleUrls: ['./dog-match.component.css']
 })
 export class DogMatchComponent implements OnInit {
-  // static readonly getDogURL =
-  //   'https://zdvfdowds6ocbzwuilwrx57due0kxoyl.lambda-url.us-east-1.on.aws/';
-   static readonly getDogURL = 'https://nid3kplozsnfhfslq4sq4upqxy0oihwp.lambda-url.us-east-1.on.aws/'; // final user env
+  static readonly getDogURL = 'https://qdxyy6qi3abpggenqlija532ni0inoya.lambda-url.us-east-1.on.aws/'; // final user env
+  //  static readonly getDogURL = 'https://nid3kplozsnfhfslq4sq4upqxy0oihwp.lambda-url.us-east-1.on.aws/'; 
 
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
   selectedTab: 'map' | 'criteria' | null = 'map';
   defaultZoom = 13;
-  center: google.maps.LatLngLiteral = { lat: 32.0853, lng: 34.7818 }; // default to Tel Aviv for example
+  center: google.maps.LatLngLiteral = { lat: 32.0853, lng: 34.7818 }; // default to Tel Aviv
   zoomLevel = this.defaultZoom;
   dogs: Dog[] = [];
   loading = false;
@@ -59,7 +58,7 @@ export class DogMatchComponent implements OnInit {
 
   // Options
   sizeOptions: string[] = ['Any', 'Small', 'Medium', 'Large', 'Giant'];
-  breedOptions: string[] = []; // if you populate from backend later
+  breedOptions: string[] = []; 
 
   // City search
   searchCity: string = '';
@@ -131,7 +130,7 @@ favoriteActivitiesOptions: string[] = [
       this.username = currentUser?.username ?? '';
       this.nickname = currentUser?.nickname ?? '';
       this.sub = currentUser?.sub ?? '';
-      this.currentUserEmail = this.useremail || 'daniella@gmail.com';
+      this.currentUserEmail = this.useremail;
     });
   }
 
@@ -214,25 +213,6 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     };
   }
 
-  // updateMarkers() {
-  //   this.markers = this.dogs
-  //     .filter(d => !!d.latitude && !!d.longitude)
-  //     .map(d => ({
-  //       id: d.id,
-  //       lat: d.latitude!,
-  //       lng: d.longitude!,
-  //       label: d.name
-  //     }));
-    
-  //   // current user location marker
-  //   this.markers.push({
-  //     id: -1,
-  //     lat: this.location.latitude,
-  //     lng: this.location.longitude,
-  //     label: 'You'
-  //   });
-  // }
-
   updateMarkers(): void {
   const baseMarkers = this.dogs
     .filter(d => d.latitude != null && d.longitude != null)
@@ -310,25 +290,19 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     this.selectedDog = (this.selectedDog?.id === dog.id) ? null : dog;
   }
 
-  // toggleDogDetails(dogId: number) {
-  //   this.selectedDogId = this.selectedDogId === dogId ? null : dogId;
-  // }
 
   toggleDogDetails(dogId: number) {
-  if (this.selectedDogId === dogId) {
-    // Close card
-    this.selectedDogId = null;
-  } else {
-    // Open card
-    this.selectedDogId = dogId;
-    const dog = this.dogs.find(d => d.id === dogId);
-    if (dog?.latitude && dog?.longitude) {
-      this.center = { lat: dog.latitude, lng: dog.longitude };
-      this.zoomLevel = 16; // zoom in when card clicked
+    if (this.selectedDogId === dogId) {
+      this.selectedDogId = null;
+    } else {
+      this.selectedDogId = dogId;
+      const dog = this.dogs.find(d => d.id === dogId);
+      if (dog?.latitude && dog?.longitude) {
+        this.center = { lat: dog.latitude, lng: dog.longitude };
+        this.zoomLevel = 16; 
+      }
     }
   }
-}
-
 
   closeDogDetails() {
     this.selectedDog = null;
@@ -338,13 +312,12 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     this.selectedTab = tab;
   }
 
- // ===== Smart email link =====
   getSmartEmailLink(
   userEmail: string,
   ownerEmail: string,
   ownerName?: string,
   dogName?: string
-): string {
+  ): string {
   const safeOwner = (ownerName && ownerName.trim()) ? ownerName.trim() : 'there';
   const dn = (dogName && dogName.trim()) ? dogName.trim() : 'your dog';
 
@@ -365,7 +338,7 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     return `https://compose.mail.yahoo.com/?to=${ownerEmail}&subject=${subject}&body=${body}`;
   }
 
-  return `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
+    return `mailto:${ownerEmail}?subject=${subject}&body=${body}`;
   }
 
 
@@ -389,7 +362,6 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
     return deg * (Math.PI / 180);
   }
 
-  // ===== city search =====
   loadCities() {
     if (this.allCities.length === 0) {
       this.http.post<string[]>(DogMatchComponent.getDogURL, {
@@ -563,7 +535,6 @@ private distributeOverlappingMarkers(
       });
     });
   }
-  return spread;
-}
-
+    return spread;
+  }
 }

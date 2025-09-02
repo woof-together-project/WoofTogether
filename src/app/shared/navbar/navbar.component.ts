@@ -18,10 +18,11 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  // static readonly insertUserToDBURL =
-  //   'https://65uloxgkusbas32clh3zf4o2zm0dmxdv.lambda-url.us-east-1.on.aws/'; 
-    static readonly insertUserToDBURL =
-    'https://og3trfcczul4fjn5hsachnn7ma0lijfq.lambda-url.us-east-1.on.aws/'; // insert user to DB lambda
+  static readonly insertUserToDBURL =
+    'https://n2wr2kxcun27zuws7zpkk5ujfy0btspl.lambda-url.us-east-1.on.aws/'; //final user
+    
+    // static readonly insertUserToDBURL =
+    // 'https://og3trfcczul4fjn5hsachnn7ma0lijfq.lambda-url.us-east-1.on.aws/'; 
 
   constructor(
     private router: Router,
