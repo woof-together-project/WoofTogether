@@ -1,5 +1,3 @@
-// amplify.config.ts
-//import { Amplify } from 'aws-amplify';
 
 //not in use!
 export const amplifyCognitoConfig = {
@@ -13,13 +11,9 @@ export const amplifyCognitoConfig = {
           scopes: ['openid', 'email', 'profile'],
           redirectSignIn: ['http://localhost:4200/'],
           redirectSignOut: ['http://localhost:4200/'],
-          // redirectSignIn: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
-          // redirectSignOut: ['https://ui.dhz62hiqax4cs.amplifyapp.com/'],
           responseType: 'code' as const
         }
       }
     }
   }
 };
-
-// Amplify.configure(amplifyCognitoConfig);

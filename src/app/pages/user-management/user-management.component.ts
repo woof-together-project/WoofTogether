@@ -11,7 +11,7 @@ import { PlacesService } from '../../shared/map/places/PlacesService';
 
 type AddressComponent = { long_name: string; short_name: string; types: string[] };
 
-/* ---------------- Types (top-level) ---------------- */
+/* ---------------- Types ---------------- */
 interface SitterWizardVM {
   profilePictureUrl?: string;
   gender: '' | 'male' | 'female';
@@ -89,11 +89,11 @@ interface ModalVM {
 
 export class UserManagementComponent {
   static readonly profileURL =
-    'https://oriosyqlioqnmqo7xyr4ojoara0ycilg.lambda-url.us-east-1.on.aws/';
+    'https://spa3u2hjtnu4ywu3gkohwbrgiy0ywpuh.lambda-url.us-east-1.on.aws/';
   static readonly updateURL =
-    'https://r4776sz54z52iqfj4zbea55nti0ssbgi.lambda-url.us-east-1.on.aws/';
+    'https://ohwi76hmttz5j6rlbajk23zcpy0uugmv.lambda-url.us-east-1.on.aws/';
   static readonly uploadProfilePicURL =
-    'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/';
+    'https://7gzjldl32p36nbk3ck4bii25p40jsaoi.lambda-url.us-east-1.on.aws/';
 
   constructor(
     private http: HttpClient,
@@ -132,26 +132,25 @@ export class UserManagementComponent {
   private unlock(key: string) {
     this.ops.delete(key);
   }
-  //private lastClientErrorAt = 0;
-  //private readonly CLIENT_ERR_WINDOW_MS = 3500;
+
   private snackRef?: MatSnackBarRef<SimpleSnackBar>;
 
   addDogAttempted = false;
 
   months = [
-  { value: 1,  label: 'Jan' },
-  { value: 2,  label: 'Feb' },
-  { value: 3,  label: 'Mar' },
-  { value: 4,  label: 'Apr' },
-  { value: 5,  label: 'May' },
-  { value: 6,  label: 'Jun' },
-  { value: 7,  label: 'Jul' },
-  { value: 8,  label: 'Aug' },
-  { value: 9,  label: 'Sep' },
-  { value: 10, label: 'Oct' },
-  { value: 11, label: 'Nov' },
-  { value: 12, label: 'Dec' },
-];
+    { value: 1,  label: 'Jan' },
+    { value: 2,  label: 'Feb' },
+    { value: 3,  label: 'Mar' },
+    { value: 4,  label: 'Apr' },
+    { value: 5,  label: 'May' },
+    { value: 6,  label: 'Jun' },
+    { value: 7,  label: 'Jul' },
+    { value: 8,  label: 'Aug' },
+    { value: 9,  label: 'Sep' },
+    { value: 10, label: 'Oct' },
+    { value: 11, label: 'Nov' },
+    { value: 12, label: 'Dec' },
+  ];
 
   years: number[] = [];
 
@@ -258,7 +257,7 @@ export class UserManagementComponent {
   };
 
   addDogModalOpen = false;
-  addDogPage = 0; // 0..3
+  addDogPage = 0;
   newDog!: DogVM;
 
   becomeSitterOpen = false;
@@ -305,7 +304,7 @@ export class UserManagementComponent {
       this.username = u?.username ?? '';
       this.sub = u?.sub ?? '';
       const thisYear = new Date().getFullYear();
-      const span = 25;                 // show 25 years back (adjust if you want)
+      const span = 25;
       this.years = Array.from({length: span + 1}, (_, i) => thisYear - i);
       if (this.email) this.loadProfile();
     });
@@ -464,7 +463,6 @@ export class UserManagementComponent {
       if (!s.sitterBio.trim()) e.push('sitterBio');
     } else if (page === 2) {
       if (!s.serviceOptions.length) e.push('serviceOptions');
-      // experienceDetails can be empty if you want
     }
     return e;
   }
@@ -476,11 +474,8 @@ export class UserManagementComponent {
     if (this.sitterPage < 2) this.sitterPage++;
   }
 
-  /** Create sitter once by posting the normal update endpoint for each field.
-   *  _ensure_sitter on the server will create the row on the first call. */
   async saveNewSitter() {
     this.sitterAttempted = true;
-    // Validate last page too
     if (this.validateSitterPage(this.sitterPage).length || this.validateSitterPage(0).length || this.validateSitterPage(1).length) return;
 
     const key = 'sitter:create';
@@ -498,10 +493,9 @@ export class UserManagementComponent {
         ['serviceOptions', s.serviceOptions],
       ];
       if (s.profilePictureUrl) {
-        posts.unshift(['profilePictureUrl', s.profilePictureUrl]); // optional first
+        posts.unshift(['profilePictureUrl', s.profilePictureUrl]);
       }
 
-      // First call creates sitter record; the rest fill fields
       for (const [field, value] of posts) {
         await firstValueFrom(
           this.http.post(UserManagementComponent.updateURL, {
@@ -513,7 +507,6 @@ export class UserManagementComponent {
       this.ok('Sitter profile created!');
       this.becomeSitterOpen = false;
 
-      // Refresh the UI → will flip isSitter=true and show the normal sitter card
       this.isSitter = true;
       this.sitterActive = true;
       this.loadProfile();
@@ -523,7 +516,6 @@ export class UserManagementComponent {
       this.unlock(key);
     }
   }
-
 
   isEditing(section: 'general' | 'sitter', field: string) {
     if (section === 'sitter' && !this.sitterActive) return false;
@@ -659,7 +651,7 @@ export class UserManagementComponent {
     }
 
     const key = `dog:${i}:${field}`;
-    if (!this.lock(key)) return;            // <-- prevent double submit
+    if (!this.lock(key)) return;
 
     const dogId = this.dogs[i].id;
     const payload = dogId != null
@@ -775,9 +767,9 @@ export class UserManagementComponent {
             this.dogs[i].profilePictureUrl = res.publicUrl;
             this.http.post(UserManagementComponent.updateURL, {
               email: this.email,
-              entity: 'dog',                      // dog entity
-              dogId: this.dogs[i].id,             // (or index if new/unsaved)
-              field: 'profilePictureUrl',         // <-- field name on your backend
+              entity: 'dog',
+              dogId: this.dogs[i].id,
+              field: 'profilePictureUrl',
               value: res.publicUrl
             }).subscribe({
               next: () => { this.ok('Dog photo updated'); this.unlock(key); },
@@ -952,11 +944,11 @@ export class UserManagementComponent {
   }
 
   private requiredGeneralFields = new Set<string>([
-    'phone', 'city', 'street', 'email' // adjust as you like
+    'phone', 'city', 'street', 'email'
   ]);
 
   private requiredSitterFields = new Set<string>([
-    'rate', 'availability', 'sitterBio', 'experienceYears', 'experienceDetails', 'serviceOptions'// tweak as needed
+    'rate', 'availability', 'sitterBio', 'experienceYears', 'experienceDetails', 'serviceOptions'
   ]);
 
   private validateSingleField(
@@ -968,7 +960,6 @@ export class UserManagementComponent {
     if (section === 'general') {
       if (field === 'phone') {
         if (this.isBlank(value)) return 'Phone number is required';
-        // simple phone sanity check; relax/tighten as you prefer
         if (!/^\+?[0-9()\-\s]{7,}$/.test(String(value))) {
           return 'Please enter a valid phone number';
         }
@@ -1298,16 +1289,14 @@ export class UserManagementComponent {
   private openStreetForEdit(options?: { clear?: boolean }) {
     const clear = options?.clear ?? false;
 
-    if (clear) this.street = '';                 // wipe old street when city changed
-    this.editState.general['street'] = true;     // open inline editor
+    if (clear) this.street = '';
+    this.editState.general['street'] = true;
 
-    // reset biasing so suggestions match the new city
     this.cityCenter = null;
     this.cityRect   = null;
     this.cityName   = this.city || null;
     this.addressSuggestions = [];
 
-    // force a render tick, THEN focus
     this.cdRef.detectChanges();
     setTimeout(() => this.streetInput?.nativeElement?.focus(), 50);
   }
@@ -1328,5 +1317,4 @@ export class UserManagementComponent {
     if (checked) curr.add(opt); else curr.delete(opt);
     this.sitterWizard[field] = Array.from(curr);
   }
-
 }

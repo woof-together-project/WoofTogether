@@ -9,7 +9,6 @@
   background-color: #f1f7ee;
 }
 
-/* CONTAINER */
 .dogsitter-container {
   height: 85%;
   padding: 1.5rem;
@@ -17,7 +16,6 @@
   box-sizing: border-box;
 }
 
-/* HEADER */
 .text-center {
   text-align: center;
   margin-bottom: 1rem;
@@ -93,7 +91,6 @@
 .sitter-summary > div p {
   margin-bottom: 0.3rem;
 }
-
 
 .sitter-img {
   width: 100px;
@@ -188,7 +185,7 @@
 }
 
 .form-check-label {
-  font-size: 1.1rem; /* or try 1.2rem / 18px */
+  font-size: 1.1rem;
 }
 
 .form-check-input{
@@ -203,19 +200,18 @@
   font-size: 1.2rem;
 }
 
-/* Reset default styling */
 input[type="range"] {
   -webkit-appearance: none; /* Safari/Chrome */
   width: 100%;
   height: 8px;
-  background: transparent; /* Remove default background */
+  background: transparent;
   cursor: pointer;
 }
 
 /* Track - Chrome, Safari */
 input[type="range"]::-webkit-slider-runnable-track {
   height: 8px;
-  background: #b0bea9;  /* Line color */
+  background: #b0bea9;
   border-radius: 5px;
 }
 
@@ -224,9 +220,9 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 18px;
   width: 18px;
-  background: #b0bea9; /* Thumb color */
+  background: #b0bea9;
   border-radius: 50%;
-  margin-top: -5px; /* Centers the thumb on the track */
+  margin-top: -5px;
   border: 2px solid white;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.4);
 }
@@ -234,7 +230,7 @@ input[type="range"]::-webkit-slider-thumb {
 /* Track - Firefox */
 input[type="range"]::-moz-range-track {
   height: 8px;
-  background: white; /* Line color */
+  background: white;
   border-radius: 5px;
 }
 
@@ -242,12 +238,11 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-moz-range-thumb {
   height: 18px;
   width: 18px;
-  background: #b0bea9; /* Thumb color */
+  background: #b0bea9;
   border-radius: 50%;
   border: none;
 }
 
-/* Track - Edge */
 input[type="range"]::-ms-track {
   height: 8px;
   background: transparent;
@@ -275,7 +270,7 @@ input[type="range"]::-ms-thumb {
 
 .map-area-wrapper {
    height: 100vh;
-  min-height: 600px; /* or calc(100vh - headerHeight) */
+  min-height: 600px;
   width: 100%;
   display: flex;
 }
@@ -283,20 +278,20 @@ input[type="range"]::-ms-thumb {
 .col-lg-8 {
   display: flex;
   flex-direction: column;
-  height: 100%; /* ADDED/EMPHASIZED: Crucial for this column to occupy its parent's height */
+  height: 100%;
 }
 
 .flex-grow-1 {
   flex-grow: 1;
-  display: flex; /* ADDED: To make it a flex container for its children */
-  flex-direction: column; /* ADDED: To stack children vertically */
-  overflow: hidden; /* ADDED/RECOMMENDED: To prevent scrollbars if content overflows */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.flex-grow-1 > .h-100 { /* Targeting the h-100 div specifically within flex-grow-1 */
-  height: 100%; /* Ensure this div truly takes 100% of the flex-grow-1 space */
-  display: flex; /* ADDED: To make it a flex container for its child (app-map) */
-  flex-direction: column; /* ADDED: To stack children if needed */
+.flex-grow-1 > .h-100 {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 app-map, #mapElement {
@@ -311,23 +306,22 @@ app-map, #mapElement {
   object-fit: cover;
   border-radius: 50%;
 }
-/* lightweight modal */
+
 .modal-backdrop-custom {
   position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 1040;
 }
 
 .modal-custom .modal-header { padding: .75rem 1rem; border-bottom: 1px solid #eee; }
 .modal-custom .modal-body   { padding: 1rem; }
-/* Make the card a positioned container */
+
 .sitter-card {
   position: relative;
   display: block;
 }
 
-/* Footer row sits at the bottom; actions snap to bottom-right */
 .sitter-card-footer {
   position: relative;
-  padding-right: 160px; /* leave room so text doesn't sit under actions */
+  padding-right: 160px;
   margin-top: 0.5rem;
 }
 
@@ -368,7 +362,7 @@ app-map, #mapElement {
   background: white;
   padding: 1rem;
   border-radius: 8px;
-  width: 800px; /* wider */
+  width: 800px;
   max-height: 90vh;
   overflow-y: auto;
   z-index: 1001;
@@ -381,14 +375,12 @@ app-map, #mapElement {
   z-index: 1000;
 }
 
-
-
 .sitter-card-buttons .btn {
   display: inline-block;
   padding: 6px 12px;
   border: none;
   border-radius: 6px;
-  background-color: #2c6e49; /* your green */
+  background-color: #2c6e49;
   color: white;
   font-weight: 600;
   cursor: pointer;
@@ -400,14 +392,13 @@ app-map, #mapElement {
 }
 
 .sitter-card-buttons .btn-secondary {
-  background-color: #6c757d; /* gray for reviews */
+  background-color: #6c757d;
 }
 
 .sitter-card-buttons .btn-secondary:hover {
   background-color: #565e64;
 }
 
-/* Backdrop */
 .modal-backdrop-custom {
   position: fixed;
   top: 0;
@@ -426,28 +417,25 @@ app-map, #mapElement {
   transform: translate(-50%, -50%);
   background: white;
   border-radius: 8px;
-  width: 600px; 
+  width: 600px;
   max-width: 90vw;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 1001;
   overflow: hidden;
-  border: 1px solid #ccc; /* frame border */
+  border: 1px solid #ccc;
 }
 
-/* Header */
 .modal-header {
   background-color: #f1f1f1;
   border-bottom: 1px solid #ddd;
   padding: 0.75rem 1rem;
 }
 
-/* Body */
 .modal-body {
   padding: 1.5rem;
-  background-color: #f9f9f9; /* light bg inside */
+  background-color: #f9f9f9;
 }
 
-/* Buttons */
 .btn {
   min-width: 110px;
 }
@@ -458,7 +446,6 @@ app-map, #mapElement {
   gap: .5rem;
 }
 
-/* compact inline message pill (re-usable with your dog-match look & feel) */
 .city-msg {
   display: inline-flex;
   align-items: center;
@@ -484,7 +471,6 @@ app-map, #mapElement {
   line-height: 1;
 }
 
-
 /* ========== Card shell ========== */
 .criteria-card {
   background: #ffffff;
@@ -494,7 +480,6 @@ app-map, #mapElement {
   padding: 1rem 1rem 0.75rem;
 }
 
-/* Header */
 .criteria-header {
   display: flex;
   align-items: center;
@@ -506,7 +491,6 @@ app-map, #mapElement {
 .criteria-header .bi { color: #2c6e49; font-size: 1.1rem; }
 .criteria-title { font-weight: 700; letter-spacing: .3px; }
 
-/* Footer */
 .criteria-footer {
   display: flex;
   align-items: center;
@@ -688,7 +672,6 @@ app-map, #mapElement {
   padding: .2rem .6rem;
 }
 
-/* Buttons inside header/footer */
 .criteria-card .btn-success {
   background: #2c6e49;
   border-color: #2c6e49;
@@ -701,13 +684,11 @@ app-map, #mapElement {
   background: #f3f6f1;
 }
 
-/* Responsive niceties */
 @media (max-width: 576px) {
   .criteria-header, .criteria-footer { flex-direction: column; align-items: stretch; gap: .5rem; }
   .criteria-footer .ms-auto { margin-left: 0 !important; }
 }
 
-/* make the 0 / 150 hug the slider ends */
 .range-wrap { position: relative; padding-bottom: .25rem; }
 .range-labels {
   position: relative;
@@ -726,7 +707,6 @@ app-map, #mapElement {
 .range-labels .min { left: 0; }
 .range-labels .max { right: 0; }
 
-/* keep the middle badge centered */
 .range-badge {
   display: inline-block;
   background: #e9f4ee;
@@ -736,11 +716,10 @@ app-map, #mapElement {
   padding: .2rem .6rem;
 }
 
-/* ensure Apply buttons have white text (overrides your base .btn) */
 .criteria-card .btn-success {
   background: #2c6e49;
   border-color: #2c6e49;
-  color: #fff !important;             /* <- white text */
+  color: #fff !important;
 }
 .criteria-card .btn-success:hover {
   background: #1f4d34;
@@ -752,14 +731,13 @@ app-map, #mapElement {
 .range-wrap {
   position: relative;
   padding-top: .25rem;
-  padding-bottom: 1.4rem; /* space for badge */
-  --thumb-size: 18px;     /* keep in sync with your thumb size */
-  --min: 0;               /* default fallbacks; Angular overrides */
+  padding-bottom: 1.4rem;
+  --thumb-size: 18px;
+  --min: 0;
   --max: 150;
   --val: 75;
 }
 
-/* Edge labels (₪0 / ₪max) */
 .range-edges {
   position: absolute;
   top: -1.1rem;
@@ -773,7 +751,6 @@ app-map, #mapElement {
 .range-edges .min { position: absolute; left: 0; }
 .range-edges .max { position: absolute; right: 0; }
 
-/* Badge centered under the thumb, regardless of min/max/value */
 .range-badge {
   position: absolute;
   top: calc(100% - .2rem);
@@ -781,7 +758,7 @@ app-map, #mapElement {
     (
       (var(--val) - var(--min)) *
       (100% - var(--thumb-size)) /
-      max(1, (var(--max) - var(--min)))   /* avoid /0 */
+      max(1, (var(--max) - var(--min)))
     ) + (var(--thumb-size) / 2)
   );
   transform: translateX(-50%);
@@ -913,13 +890,13 @@ app-map, #mapElement {
 }
 
 .range-helper{
-  display:block;       /* ensures it's on its own line */
-  margin-top: 50px;    /* nudge it down; tweak to taste (e.g., 12–14px) */
+  display:block;
+  margin-top: 50px;
   line-height: 1.2;
 }
 
 /* --- Reviews modal look --- */
-.average-line .star { color: #f6c102; }              /* yellow star */
+.average-line .star { color: #f6c102; }
 
 .review-item {
   padding: 12px 14px;
@@ -929,7 +906,7 @@ app-map, #mapElement {
   background: #fff;
   box-shadow: 0 1px 2px rgba(0,0,0,.04);
 }
-.review-item:nth-child(odd) { background: #fafbff; } /* subtle zebra */
+.review-item:nth-child(odd) { background: #fafbff; }
 
 .review-head {
   display: flex;
@@ -969,7 +946,7 @@ app-map, #mapElement {
   font-size: 12px;
 }
 
-.star { color: #f6c102; line-height: 1; }            /* yellow star */
+.star { color: #f6c102; line-height: 1; }
 .review-date { color: #6b7280; white-space: nowrap; }
 .review-text { margin-top: 6px; color: #374151; white-space: pre-wrap; }
 

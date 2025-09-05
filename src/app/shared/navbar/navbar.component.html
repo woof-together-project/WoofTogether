@@ -1,48 +1,37 @@
 <nav class="navbar">
   <div class="logo">🐶</div>
-  <!-- <ul class="nav-links">
+   <ul class="nav-links">
     <li><a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
-    <li><a href="#" (click)="handleProtectedRoute($event, '/sitters')">Sitters</a>
-    </li>
-    <li>
-      <a href="#" (click)="handleProtectedRoute($event, '/dog-match')">Dog Match</a>
-    </li>
-    <li><a href="#" (click)="handleProtectedRoute($event, '/ask-us')">Ask Us</a></li>
-  </ul> -->
- <ul class="nav-links">
-  <li><a routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Home</a></li>
-  <li><a routerLink="/sitters"   routerLinkActive="active-link">Sitters</a></li>
-  <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li>
-  <li><a routerLink="/ask-us"    routerLinkActive="active-link">Ask Us</a></li>
-</ul>
+    <li><a routerLink="/sitters"   routerLinkActive="active-link">Sitters</a></li>
+    <li><a routerLink="/dog-match" routerLinkActive="active-link">Dog Match</a></li>
+    <li><a routerLink="/ask-us"    routerLinkActive="active-link">Ask Us</a></li>
+  </ul>
 
+  <div class="nav-actions">
+    <ng-container *ngIf="username as name; else showLogin">
+      <div class="hello-text bold-text">
+        Hello {{ name }} 👋
+      </div>
+      <button class="login-btn" (click)="logout()">Logout</button>
+    </ng-container>
 
-   <div class="nav-actions">
-  <ng-container *ngIf="username as name; else showLogin">
-    <div class="hello-text bold-text">
-      Hello {{ name }} 👋
-    </div>
-    <button class="login-btn" (click)="logout()">Logout</button>
-  </ng-container>
+    <!-- Show when logged out -->
+    <ng-template #showLogin>
+      <button class="login-btn" (click)="login()">Login</button>
+    </ng-template>
 
-  <!-- Show when logged out -->
-  <ng-template #showLogin>
-    <button class="login-btn" (click)="login()">Login</button>
-  </ng-template>
-
-   <ng-container *ngIf="isComplete">
-   <a
-    class="icon-btn ml-2"
-    href="#"
-    (click)="handleProtectedRoute($event, '/user-management')"
-    aria-label="Personal space"
-    title="Personal space"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
-      <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
-    </svg>
-  </a>
-   </ng-container>
-
-</div>
+     <ng-container *ngIf="isComplete">
+     <a
+        class="icon-btn ml-2"
+        href="#"
+        (click)="handleProtectedRoute($event, '/user-management')"
+        aria-label="Personal space"
+        title="Personal space"
+     >
+        <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5Z"/>
+        </svg>
+     </a>
+     </ng-container>
+  </div>
 </nav>

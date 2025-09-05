@@ -44,7 +44,7 @@ export class UserContextService {
     const cur = this.currentUser.value;
     const next: UserDetails = cur
       ? { ...cur, isComplete }
-      : { email: null, nickname: null, username: null, sub: null, isComplete }; 
+      : { email: null, nickname: null, username: null, sub: null, isComplete };
     this.currentUser.next(next);
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(next));
     console.log('[UserContextService] setUserCompleteStatus called. Updated user:', next);
@@ -74,7 +74,6 @@ export class UserContextService {
     const u = this.currentUser.value;
     return !!(u && u.sub && u.email);
   }
-
 
   markReady() { this._ready$.next(true); }
 

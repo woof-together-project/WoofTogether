@@ -34,11 +34,9 @@ export class SignupComponent {
   static readonly signupURL =  'https://tjjimnumqzhnfp4nbs25nnx5ye0fpvux.lambda-url.us-east-1.on.aws/'; //final user
   static readonly uploadProfilePicURL = 'https://7gzjldl32p36nbk3ck4bii25p40jsaoi.lambda-url.us-east-1.on.aws/'; //S3 - final user
 
-  // static readonly signupURL =  'https://2p6gr6ezoopfvhdhklwmiipxca0yvhpn.lambda-url.us-east-1.on.aws/'; 
-  // static readonly uploadProfilePicURL = 'https://mec7bs3xaigxfcycy4h3alpfmy0tagat.lambda-url.us-east-1.on.aws/'; 
   constructor(private http: HttpClient, private userContext: UserContextService,
         private snackBar: MatSnackBar,  private navigationService: NavigationService, private places: PlacesService
-) {}
+  ) {}
 
   months = [
     { value: 1,  label: 'Jan' },
@@ -63,7 +61,7 @@ export class SignupComponent {
   username: string = '';
   sub: string = '';
 
-  // genetal data
+  // general data
   phone: string = '';
   city: string = '';
   street: string = '';
@@ -91,7 +89,7 @@ export class SignupComponent {
   showGeneralInfo: boolean = true;
   showSitterSection: boolean = false;
   showDogSections: boolean[] = [true];
-  showDogCard: boolean[] = [true]; // One boolean per dog
+  showDogCard: boolean[] = [true];
   sitterCardOpen = true;
   isSitter: boolean = false;
   addDog: boolean = false;
@@ -155,7 +153,6 @@ export class SignupComponent {
   cityRect: { sw: { lat: number; lng: number }, ne: { lat: number; lng: number } } | null = null;
   cityActiveIndex = 0;
   addressActiveIndex = 0;
-
 
   toggleSitterCard() {
     this.sitterCardOpen = !this.sitterCardOpen;
@@ -355,7 +352,6 @@ export class SignupComponent {
         gender: d.gender,
         size: d.size,
         weight: d.weight,
-        //age: d.age,
         birthMonth: d.birthMonth,
         birthYear: d.birthYear,
         healthConditions: d.health,
@@ -395,7 +391,6 @@ export class SignupComponent {
     const y = this.dogs[i]?.birthYear;
     const m = this.dogs[i]?.birthMonth;
 
-    // future year → clear + warn
     const nowY = new Date().getFullYear();
     if (y && y > nowY) {
       this.dogs[i].birthYear = null;
@@ -404,7 +399,6 @@ export class SignupComponent {
       return;
     }
 
-    // month that hasn't happened yet for that year → clear + warn
     if (m && this.isMonthDisabledForDog(i, m)) {
       this.dogs[i].birthMonth = null;
       this.warn("That month hasn't happened yet for the selected year.");
@@ -421,7 +415,6 @@ export class SignupComponent {
       this.warn("Birth date can't be in the future.");
     }
   }
-
 
   private uploadImageToS3(file: File, done: (publicUrl: string) => void, fail?: (e:any)=>void) {
     const lambdaUrl = SignupComponent.uploadProfilePicURL;
@@ -466,7 +459,6 @@ export class SignupComponent {
   pickCity(s: { description: string; place_id: string }) {
     this.city = s.description;
     this.citySuggestions = [];
-
     this.street = '';
     this.addressSuggestions = [];
 
@@ -641,7 +633,7 @@ export class SignupComponent {
     const p = this.currentSitterPage;
     this.sitterAttempted[p] = true;
     if (this.isSitterPageValid(p)) {
-      this.sitterAttempted[p] = false; // optional
+      this.sitterAttempted[p] = false;
       this.currentSitterPage++;
     }
   }
@@ -668,7 +660,7 @@ export class SignupComponent {
     const generalOk = !!this.phone && !!this.city && !!this.street;
     const sitterOk =
       !this.isSitter ||
-      (this.isSitterPageValid(0) && this.isSitterPageValid(1)); // page 2 optional
+      (this.isSitterPageValid(0) && this.isSitterPageValid(1));
     const dogsOk =
       !this.addDog ||
       this.dogs.every((_, i) =>

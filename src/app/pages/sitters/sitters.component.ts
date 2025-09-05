@@ -17,22 +17,21 @@ import { UserContextService } from '../../shared/sharedUserContext/UserContextSe
 
 export class SittersComponent implements OnInit {
   static readonly getSittersUrl = 'https://vt3c6nlcnhrflreiofdoal5yse0qxgun.lambda-url.us-east-1.on.aws/'; //final user
-  // static readonly getSittersUrl = 'https://vj7lapeqfmnbf4fn75tc5m6zn40fpqyl.lambda-url.us-east-1.on.aws/'; 
 
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
   selectedTab: 'map' | 'criteria' | null = 'map';
   sitters: Sitter[] = [];
   loading = false;
-  
+
   location = {
-    latitude: 0,    
+    latitude: 0,
     longitude: 0,
-    radius: 15           
+    radius: 15
   };
   userLocation = { latitude: 0, longitude: 0 };
-  
-   //cognito data
+
+  //cognito data
   useremail: string = '';
   nickname: string = '';
   username: string = '';
@@ -49,7 +48,7 @@ export class SittersComponent implements OnInit {
   minRate: number = 0;
   maxRate: number = 150;
   radiusMin = 1;   // km
-  radiusMax = 50;  // km 
+  radiusMax = 50;  // km
 
   selectedSitter: Sitter | null = null;
   selectedSitterId: number | null = null;
@@ -60,28 +59,28 @@ export class SittersComponent implements OnInit {
   cityError: string | null = null;
 
   // ===== Reviews Part =====
-showReviewModal = false;           // For reviews list modal
-showAddReviewModal = false;        // For add review modal
-reviewsLoading = false;
-reviewSubmitting = false;
-modalSitter: any | null = null;
+  showReviewModal = false;
+  showAddReviewModal = false;
+  reviewsLoading = false;
+  reviewSubmitting = false;
+  modalSitter: any | null = null;
 
-reviews: Array<{
-  id: number;
-  sitterId: number;
-  userId: number;
-  userName: string; 
-  userEmail: string;
-  rating: number;
-  comment: string;
-  reviewDate: string;
-}> = [];
+  reviews: Array<{
+    id: number;
+    sitterId: number;
+    userId: number;
+    userName: string;
+    userEmail: string;
+    rating: number;
+    comment: string;
+    reviewDate: string;
+  }> = [];
 
-reviewsAverage = 0;
-reviewsCount = 0;
-newReview = { rating: 5, comment: '' };
-@ViewChild('addReviewForm') addReviewForm!: ElementRef;
-@ViewChild('reviewModalBody') reviewModalBody!: ElementRef;
+  reviewsAverage = 0;
+  reviewsCount = 0;
+  newReview = { rating: 5, comment: '' };
+  @ViewChild('addReviewForm') addReviewForm!: ElementRef;
+  @ViewChild('reviewModalBody') reviewModalBody!: ElementRef;
 
 
   filters = {
@@ -97,79 +96,62 @@ newReview = { rating: 5, comment: '' };
   center = { lat: this.location.latitude, lng: this.location.longitude };
 
   async ngOnInit(): Promise<void> {
-  try {
-    this.location.latitude = 32.0853;
-    this.location.longitude = 34.7818;
-    this.center = { lat: this.location.latitude, lng: this.location.longitude };
-    this.zoom = this.defaultZoom;
-    
-    const coords = await this.getCurrentLocation();
-    this.userLocation.latitude = coords.latitude;
-    this.userLocation.longitude = coords.longitude;
-    this.location.latitude = coords.latitude;
-    this.location.longitude = coords.longitude;
-    console.log('Location resolved:', coords);
-    this.center = { lat: this.location.latitude, lng: this.location.longitude };
-    this.zoom = this.defaultZoom;
-    this.loadSittersByLocation();
+    try {
+      this.location.latitude = 32.0853;
+      this.location.longitude = 34.7818;
+      this.center = { lat: this.location.latitude, lng: this.location.longitude };
+      this.zoom = this.defaultZoom;
 
-  } catch (err) {
-    console.error('Could not get user location, falling back to default');
-    this.loadSittersByLocation();
+      const coords = await this.getCurrentLocation();
+      this.userLocation.latitude = coords.latitude;
+      this.userLocation.longitude = coords.longitude;
+      this.location.latitude = coords.latitude;
+      this.location.longitude = coords.longitude;
+      console.log('Location resolved:', coords);
+      this.center = { lat: this.location.latitude, lng: this.location.longitude };
+      this.zoom = this.defaultZoom;
+      this.loadSittersByLocation();
+
+    } catch (err) {
+      console.error('Could not get user location, falling back to default');
+      this.loadSittersByLocation();
+    }
+
+    this.experienceWithOptions = [
+      'Elder Dogs', 'Young Dogs', 'Cubs',
+      'Reactive Dogs', 'Aggressive to Other Animals',
+      'Aggressive to People', 'Anxious Dogs',
+      'Big Dogs', 'Small Dogs'
+    ];
+
+    this.serviceOptions = ['Dog-Sitting', 'Dog-Walking', 'Dog-Boarding'];
+
+      this.userContext.getUserObservable().subscribe(currentUser => {
+      this.useremail = currentUser?.email ?? '';
+      this.username = currentUser?.username ?? '';
+      this.nickname = currentUser?.nickname ?? '';
+      this.sub = currentUser?.sub ?? '';
+      this.currentUserEmail = this.useremail;
+    });
   }
 
-  this.experienceWithOptions = [
-    'Elder Dogs', 'Young Dogs', 'Cubs',
-    'Reactive Dogs', 'Aggressive to Other Animals',
-    'Aggressive to People', 'Anxious Dogs',
-    'Big Dogs', 'Small Dogs'
-  ];
-
-  this.serviceOptions = ['Dog-Sitting', 'Dog-Walking', 'Dog-Boarding'];
-
-     this.userContext.getUserObservable().subscribe(currentUser => {
-    this.useremail = currentUser?.email ?? '';
-    this.username = currentUser?.username ?? '';
-    this.nickname = currentUser?.nickname ?? '';
-    this.sub = currentUser?.sub ?? '';
-    this.currentUserEmail = this.useremail || 'daniella@gmail.com';
-  });
-}
-
-getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
-  return new Promise((resolve, reject) => {
-    const email = this.userContext.getUserEmail();
-    if (!email) {
-      reject(new Error('No email for current user'));
-      return;
-    }
-    const url = SittersComponent.getSittersUrl;
-    this.http.post<{ lat: number; lng: number }>(
-      url,   
-      { action: 'getMyLocation', email }
-    ).subscribe({
-      next: (res) => resolve({ latitude: res.lat, longitude: res.lng }),
-      error: (err) => reject(err),
+  getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
+    return new Promise((resolve, reject) => {
+      const email = this.userContext.getUserEmail();
+      if (!email) {
+        reject(new Error('No email for current user'));
+        return;
+      }
+      const url = SittersComponent.getSittersUrl;
+      this.http.post<{ lat: number; lng: number }>(
+        url,
+        { action: 'getMyLocation', email }
+      ).subscribe({
+        next: (res) => resolve({ latitude: res.lat, longitude: res.lng }),
+        error: (err) => reject(err),
+      });
     });
-  });
-}
-
-//    getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
-//   return new Promise((resolve, reject) => {
-//     navigator.geolocation.getCurrentPosition(
-//       (position) => {
-//         resolve({
-//           latitude: position.coords.latitude,
-//           longitude: position.coords.longitude
-//         });
-//       },
-//       (error) => {
-//         console.error('Error getting location:', error);
-//         reject(error);
-//       },
-//     );
-//   });
-// }
+  }
 
   onSelectSitter(sitter: Sitter) {
     if (this.selectedSitter?.sitterId === sitter.sitterId) {
@@ -216,42 +198,42 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
   }
 
   async clearFilters(shouldReload: boolean = true): Promise<void> {
-  this.filters = {
-    servicesSelected: [],
-    gender: 'Any',
-    rateMax: 150,
-    experiencedWith: []
-  };
-  this.selectedServiceOptions = [];
-  this.selectedDogTypes = [];
-  this.selectedGender = 'any';
-  this.disableRadius = true;
-  this.minRate = 0;
-  this.maxRate = 150;
+    this.filters = {
+      servicesSelected: [],
+      gender: 'Any',
+      rateMax: 150,
+      experiencedWith: []
+    };
+    this.selectedServiceOptions = [];
+    this.selectedDogTypes = [];
+    this.selectedGender = 'any';
+    this.disableRadius = true;
+    this.minRate = 0;
+    this.maxRate = 150;
 
-  if (shouldReload) {
-    const coords = await this.getCurrentLocation();
-    this.userLocation.latitude = coords.latitude;
-    this.userLocation.longitude = coords.longitude;
-    this.center = { lat: this.userLocation.latitude, lng: this.userLocation.longitude };
-    this.zoom = this.defaultZoom;
-    this.loadSittersByLocation();
+    if (shouldReload) {
+      const coords = await this.getCurrentLocation();
+      this.userLocation.latitude = coords.latitude;
+      this.userLocation.longitude = coords.longitude;
+      this.center = { lat: this.userLocation.latitude, lng: this.userLocation.longitude };
+      this.zoom = this.defaultZoom;
+      this.loadSittersByLocation();
+    }
   }
-}
 
   applyFilters(): void {
-    const url = SittersComponent.getSittersUrl; 
-    const payload = this.buildFilterPayload(); 
+    const url = SittersComponent.getSittersUrl;
+    const payload = this.buildFilterPayload();
     console.log("Filter payload:", payload);
-    
+
     this.http.post<Sitter[]>(url, payload).subscribe({
-  next: (data) => {
-  this.sitters = data
-    .filter(s => s.email !== this.useremail)
-    .map(sitter => ({
-      ...sitter,
-    imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
-  }));
+      next: (data) => {
+      this.sitters = data
+        .filter(s => s.email !== this.useremail)
+        .map(sitter => ({
+          ...sitter,
+      imageUrl: sitter.profilePictureUrl ? encodeURI(sitter.profilePictureUrl) : 'assets/images/default-profile.png'
+    }));
 
     this.updateMarkers();
     this.getCurrentLocation().then(coords => {
@@ -267,7 +249,7 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
       error: (err) => console.error('Filter request failed', err)
     });
   }
-  
+
   getSmartEmailLink(userEmail: string, sitterEmail: string, sitterName: string): string {
     const subject = encodeURIComponent('Looking for a dog sitter');
     const body = encodeURIComponent(`Hi ${sitterName}, I saw your profile and would love to connect!`);
@@ -290,56 +272,53 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
   }
 
   loadSittersByLocation(): void {
-  const url = SittersComponent.getSittersUrl;
-  const payload = this.buildFilterPayload();
-  console.log("Loading sitters with payload:", payload);
+    const url = SittersComponent.getSittersUrl;
+    const payload = this.buildFilterPayload();
+    console.log("Loading sitters with payload:", payload);
 
-  this.http.post<Sitter[]>(url, payload).subscribe({
-    next: (data) => {
-      this.sitters = data
-  .filter(sitter => sitter.email !== this.useremail)
-  .map(sitter => {
-      const imageUrl = sitter.profilePictureUrl &&
-                      sitter.profilePictureUrl.trim() !== '' &&
-                      sitter.profilePictureUrl.startsWith('http')
-        ? encodeURI(sitter.profilePictureUrl)
-        : 'assets/images/default-profile.png';
+    this.http.post<Sitter[]>(url, payload).subscribe({
+      next: (data) => {
+        this.sitters = data
+        .filter(sitter => sitter.email !== this.useremail)
+        .map(sitter => {
+            const imageUrl = sitter.profilePictureUrl &&
+                            sitter.profilePictureUrl.trim() !== '' &&
+                            sitter.profilePictureUrl.startsWith('http')
+              ? encodeURI(sitter.profilePictureUrl)
+              : 'assets/images/default-profile.png';
 
-      return {
-        ...sitter,
-        imageUrl: imageUrl,
-        reviewCount: sitter.reviewCount ?? 0,        
-        averageRating: sitter.averageRating ?? 0
-      };
+        return {
+          ...sitter,
+          imageUrl: imageUrl,
+          reviewCount: sitter.reviewCount ?? 0,
+          averageRating: sitter.averageRating ?? 0
+        };
+      });
+        console.log("Sitters loaded:", this.sitters);
+        this.updateMarkers();
+      },
+      error: (err) => console.error('Failed to fetch sitters:', err)
     });
-      console.log("Sitters loaded:", this.sitters);
-      this.updateMarkers();
-    },
-    error: (err) => console.error('Failed to fetch sitters:', err)
-  });
-}
-
+  }
 
   updateMarkers() {
     this.markers = this.sitters
-      .filter(s => s.latitude !== 0 && s.longitude !== 0) 
+      .filter(s => s.latitude !== 0 && s.longitude !== 0)
       .map(s => ({
-        id: s.sitterId, 
+        id: s.sitterId,
         lat: s.latitude!,
         lng: s.longitude!,
         label: s.name
       }));
-    
+
     this.markers.push({
-      id: -1, // Unique ID
+      id: -1,
       lat: this.userLocation.latitude,
       lng: this.userLocation.longitude,
-      // lat: this.location.latitude,
-      // lng: this.location.longitude,
-      label: 'You' 
-  });
+      label: 'You'
+    });
 
-    console.log("Markers created:", this.markers); 
+    console.log("Markers created:", this.markers);
   }
 
   withinRadius(s: Sitter): boolean {
@@ -364,30 +343,27 @@ getCurrentLocation(): Promise<{ latitude: number; longitude: number }> {
   }
 
   onMarkerSelected(sitterId: number) {
-  const m = this.markers.find(x => x.id === sitterId);
-  if (!m) return;
+    const m = this.markers.find(x => x.id === sitterId);
+    if (!m) return;
 
-  this.setMapView(m.lat, m.lng, 16);
+    this.setMapView(m.lat, m.lng, 16);
 
-  const s = this.sitters.find(si => si.sitterId === sitterId);
-  if (s) this.selectedSitterId = s.sitterId;
+    const s = this.sitters.find(si => si.sitterId === sitterId);
+    if (s) this.selectedSitterId = s.sitterId;
 
-  this.selectedSitter = s || null;   
-}
+    this.selectedSitter = s || null;
+  }
 
-private setMapView(lat: number, lng: number, zoom: number) {
-  this.center = { lat, lng };  
-  this.zoom = zoom;
-}
-
+  private setMapView(lat: number, lng: number, zoom: number) {
+    this.center = { lat, lng };
+    this.zoom = zoom;
+  }
 
   buildFilterPayload() {
     return {
       action: 'filterByCriteria',
       latitude: this.userLocation.latitude,
       longitude: this.userLocation.longitude,
-      // latitude: this.location.latitude,
-      // longitude: this.location.longitude,
       radius: this.location.radius,
       noRadiusFilter: this.disableRadius,
       maxRate: this.filters.rateMax,
@@ -398,106 +374,78 @@ private setMapView(lat: number, lng: number, zoom: number) {
   }
 
   loadCities() {
-  if (this.allCities.length === 0) {
-    this.http.post<string[]>(SittersComponent.getSittersUrl, {
-      action: 'searchAvailableCitiesInDB'
-    }).subscribe({
-      next: (cities) => {
-        this.allCities = cities;
-        this.filteredCities = [...cities];
-        this.showSuggestions = true;
-      },
-      error: (err) => console.error('Failed to load cities', err)
-    });
-  } else {
-    this.filteredCities = [...this.allCities];
+    if (this.allCities.length === 0) {
+      this.http.post<string[]>(SittersComponent.getSittersUrl, {
+        action: 'searchAvailableCitiesInDB'
+      }).subscribe({
+        next: (cities) => {
+          this.allCities = cities;
+          this.filteredCities = [...cities];
+          this.showSuggestions = true;
+        },
+        error: (err) => console.error('Failed to load cities', err)
+      });
+    } else {
+      this.filteredCities = [...this.allCities];
+      this.showSuggestions = true;
+    }
+  }
+
+  filterCities(): void {
+    const query = this.searchCity.toLowerCase();
+    this.filteredCities = this.allCities.filter(city =>
+      city.toLowerCase().includes(query)
+    );
     this.showSuggestions = true;
   }
-}
 
-filterCities(): void {
-  const query = this.searchCity.toLowerCase();
-  this.filteredCities = this.allCities.filter(city =>
-    city.toLowerCase().includes(query)
-  );
-  this.showSuggestions = true;
-}
+  onCitySearch(): void {
+    const normalize = (s: string) =>
+      (s || '').toLowerCase().replace(/[,\s]+/g, ' ').trim();
 
-// onCitySearch(): void {
-//   const city = (this.searchCity || '').trim();
-//   if (!city) return;
+    const typed = normalize(this.searchCity);
+    if (!typed) return;
 
-//   this.http.post<any[]>(SittersComponent.getSittersUrl, {
-//     action: 'searchByCity',
-//     city,
-//     // latitude: this.location.latitude,
-//     // longitude: this.location.longitude
-//     latitude: this.userLocation.latitude,
-//     longitude: this.userLocation.longitude
-//   }).subscribe({
-//     next: (sittersRes) => {
-//       if (!sittersRes || sittersRes.length === 0) {
-//         this.cityError = `No sitters found in "${city}". Showing all nearby sitters.`;
-//         console.log('[CitySearch] no results -> show error');
+    let cityToSend = this.searchCity.trim();
+    const match = this.allCities.find(c => normalize(c).includes(typed));
+    if (match) cityToSend = match;
 
-//         setTimeout(() => {
-//           this.searchCity = '';
-//           this.filteredCities = [...this.allCities];
-//           this.showSuggestions = false;
-//           this.loadSittersByLocation(); 
-//           this.cityError = null;
-//         }, 2000);
-//         return;
-//       }
-
-//       this.cityError = null;
-//       this.clearFilters(false); 
-//       this.sitters = sittersRes.map(sitter => ({
-//         ...sitter,
-//         imageUrl: sitter.profilePictureUrl
-//           ? encodeURI(sitter.profilePictureUrl)
-//           : 'assets/images/default-profile.png'
-//       }));
-//       this.updateMarkers();
-//       this.selectedTab = 'map';
-//       this.showSuggestions = false;
-//     },
-//     error: (err) => {
-//       console.error('Failed to search sitters by city', err);
-//       this.cityError = 'Something went wrong searching that city. Showing all nearby sitters.';
-//       setTimeout(() => {
-//         this.searchCity = '';
-//         this.filteredCities = [...this.allCities];
-//         this.showSuggestions = false;
-//         this.loadSittersByLocation();
-//         this.cityError = null;
-//       }, 2000);
-//     }
-//   });
-// }
-
-onCitySearch(): void {
-  const normalize = (s: string) =>
-    (s || '').toLowerCase().replace(/[,\s]+/g, ' ').trim();
-
-  const typed = normalize(this.searchCity);
-  if (!typed) return;
-
-  let cityToSend = this.searchCity.trim();
-  const match = this.allCities.find(c => normalize(c).includes(typed));
-  if (match) cityToSend = match; 
-
-  this.http.post<any[]>(SittersComponent.getSittersUrl, {
-    action: 'searchByCity',
-    city: cityToSend,
-    latitude: this.userLocation.latitude,
-    longitude: this.userLocation.longitude,
-    excludeEmail: this.useremail || this.currentUserEmail 
-  }).subscribe({
-    next: (sittersRes) => {
-      if (!sittersRes || sittersRes.length === 0) {
-        this.cityError = `No sitters found in "${cityToSend}". Showing all nearby sitters.`;
-        console.log('[CitySearch] no results -> show error');
+    this.http.post<any[]>(SittersComponent.getSittersUrl, {
+      action: 'searchByCity',
+      city: cityToSend,
+      latitude: this.userLocation.latitude,
+      longitude: this.userLocation.longitude,
+      excludeEmail: this.useremail || this.currentUserEmail
+    }).subscribe({
+      next: (sittersRes) => {
+        if (!sittersRes || sittersRes.length === 0) {
+          this.cityError = `No sitters found in "${cityToSend}". Showing all nearby sitters.`;
+          console.log('[CitySearch] no results -> show error');
+          this.loadSittersByLocation();
+          setTimeout(() => {
+            this.searchCity = '';
+            this.filteredCities = [...this.allCities];
+            this.showSuggestions = false;
+            this.cityError = null;
+          }, 2000);
+          return;
+        }
+        console.log("Current user email:", this.currentUserEmail);
+        this.cityError = null;
+        this.clearFilters(false);
+        this.sitters = sittersRes.map(sitter => ({
+          ...sitter,
+          imageUrl: sitter.profilePictureUrl
+            ? encodeURI(sitter.profilePictureUrl)
+            : 'assets/images/default-profile.png'
+        }));
+        this.updateMarkers();
+        this.selectedTab = 'map';
+        this.showSuggestions = false;
+      },
+      error: (err) => {
+        console.error('Failed to search sitters by city', err);
+        this.cityError = `Something went wrong searching "${cityToSend}". Showing all nearby sitters.`;
         this.loadSittersByLocation();
         setTimeout(() => {
           this.searchCity = '';
@@ -505,160 +453,133 @@ onCitySearch(): void {
           this.showSuggestions = false;
           this.cityError = null;
         }, 2000);
-        return;
       }
-      console.log("Current user email:", this.currentUserEmail);
-      this.cityError = null;
-      this.clearFilters(false);
-      this.sitters = sittersRes.map(sitter => ({
-        ...sitter,
-        imageUrl: sitter.profilePictureUrl
-          ? encodeURI(sitter.profilePictureUrl)
-          : 'assets/images/default-profile.png'
-      }));
-      this.updateMarkers();
-      this.selectedTab = 'map';
-      this.showSuggestions = false;
-    },
-    error: (err) => {
-      console.error('Failed to search sitters by city', err);
-      this.cityError = `Something went wrong searching "${cityToSend}". Showing all nearby sitters.`;
-      this.loadSittersByLocation();
-      setTimeout(() => {
-        this.searchCity = '';
-        this.filteredCities = [...this.allCities];
-        this.showSuggestions = false;
-        this.cityError = null;
-      }, 2000);
-    }
-  });
-}
+    });
+  }
 
-selectCity(city: string): void {
-  this.searchCity = city;
-  this.showSuggestions = false;
-}
-
-hideSuggestionsWithDelay(): void {
-  setTimeout(() => {
+  selectCity(city: string): void {
+    this.searchCity = city;
     this.showSuggestions = false;
-  }, 150); 
-}
+  }
 
-clearCitySearch(): void {
-  this.searchCity = '';
-  this.filteredCities = [...this.allCities];
-  this.showSuggestions = false;
-  this.clearFilters(true); 
-}
+  hideSuggestionsWithDelay(): void {
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 150);
+  }
 
+  clearCitySearch(): void {
+    this.searchCity = '';
+    this.filteredCities = [...this.allCities];
+    this.showSuggestions = false;
+    this.clearFilters(true);
+  }
 
-openReviews(sitter: any) {
-  this.modalSitter = sitter;
-  this.showReviewModal = true;
-  this.loadReviews(sitter.sitterId);
-}
+  openReviews(sitter: any) {
+    this.modalSitter = sitter;
+    this.showReviewModal = true;
+    this.loadReviews(sitter.sitterId);
+  }
 
-closeReviews() {
-  this.showReviewModal = false;
-}
+  closeReviews() {
+    this.showReviewModal = false;
+  }
 
-openAddReview() {
-  this.showAddReviewModal = true;
-}
+  openAddReview() {
+    this.showAddReviewModal = true;
+  }
 
-closeAddReview() {
-  this.showAddReviewModal = false;
-}
+  closeAddReview() {
+    this.showAddReviewModal = false;
+  }
 
-loadReviews(sitterId: number) {
-  this.reviewsLoading = true;
+  loadReviews(sitterId: number) {
+    this.reviewsLoading = true;
 
-  this.http.post<any>(SittersComponent.getSittersUrl, {
-    action: 'getReviews',
-    sitterId: sitterId
-  }).subscribe({
-    next: (data) => {
-      this.reviews = data.reviews;
-      this.reviewsAverage = data.average;
-      this.reviewsCount = data.count;
+    this.http.post<any>(SittersComponent.getSittersUrl, {
+      action: 'getReviews',
+      sitterId: sitterId
+    }).subscribe({
+      next: (data) => {
+        this.reviews = data.reviews;
+        this.reviewsAverage = data.average;
+        this.reviewsCount = data.count;
 
-      if (this.modalSitter) {
-        this.modalSitter.reviewCount = data.count;
+        if (this.modalSitter) {
+          this.modalSitter.reviewCount = data.count;
+        }
+
+        this.reviewsLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to load reviews:', err);
+        this.reviewsLoading = false;
       }
+    });
+  }
 
-      this.reviewsLoading = false;
-    },
-    error: (err) => {
-      console.error('Failed to load reviews:', err);
-      this.reviewsLoading = false;
-    }
-  });
-}
+  submitReview() {
+    if (!this.modalSitter) return;
 
-submitReview() {
-  if (!this.modalSitter) return;
+    this.reviewSubmitting = true;
 
-  this.reviewSubmitting = true;
+    this.http.post<any>(SittersComponent.getSittersUrl, {
+      action: 'addReview',
+      sitterId: this.modalSitter.sitterId,
+      userEmail: this.currentUserEmail,
+      rating: this.newReview.rating,
+      comment: this.newReview.comment
+    }).subscribe({
+      next: (data) => {
+        this.reviews = data.reviews;
+        this.reviewsAverage = data.average;
+        this.reviewsCount = data.count;
 
-  this.http.post<any>(SittersComponent.getSittersUrl, {
-    action: 'addReview',
-    sitterId: this.modalSitter.sitterId,
-    userEmail: this.currentUserEmail,
-    rating: this.newReview.rating,
-    comment: this.newReview.comment
-  }).subscribe({
-    next: (data) => {
-      this.reviews = data.reviews;
-      this.reviewsAverage = data.average;
-      this.reviewsCount = data.count;
+        this.modalSitter.reviewCount = data.count;
+        this.modalSitter.averageRating = data.average;
 
-      this.modalSitter.reviewCount = data.count;
-      this.modalSitter.averageRating = data.average;
+        this.newReview = { rating: 5, comment: '' };
+        this.reviewSubmitting = false;
+        this.showAddReviewModal = false;
 
-      this.newReview = { rating: 5, comment: '' };
-      this.reviewSubmitting = false;
-      this.showAddReviewModal = false;
+        console.log("Review added successfully");
+      },
+      error: (err) => {
+        console.error('Failed to submit review:', err);
+        this.reviewSubmitting = false;
+      }
+    });
+  }
 
-      console.log("Review added successfully");
-    },
-    error: (err) => {
-      console.error('Failed to submit review:', err);
-      this.reviewSubmitting = false;
-    }
-  });
-}
-
- resetMapView(): void {
+  resetMapView(): void {
     this.center = { lat: this.userLocation.latitude, lng: this.userLocation.longitude };
-    // this.center = { lat: this.location.latitude, lng: this.location.longitude };
     this.zoom = this.defaultZoom;
   }
 
   focusOnSitter(sitter: Sitter): void {
-  let lat = sitter.latitude ?? sitter.latitude ?? null;
-  let lng = sitter.longitude ?? sitter.longitude ?? null;
+    let lat = sitter.latitude ?? sitter.latitude ?? null;
+    let lng = sitter.longitude ?? sitter.longitude ?? null;
 
-  if (lat == null || lng == null) {
-    const m = this.markers.find(mm => mm.id === sitter.sitterId);
-    if (m) { lat = m.lat; lng = m.lng; }
+    if (lat == null || lng == null) {
+      const m = this.markers.find(mm => mm.id === sitter.sitterId);
+      if (m) { lat = m.lat; lng = m.lng; }
+    }
+
+    if (lat == null || lng == null) return;
+
+    this.location = {
+      ...this.location,
+      latitude: lat,
+      longitude: lng
+    };
+
+    this.center = { lat, lng };
+    this.selectedTab = 'map';
+    this.zoom = 16;
+
+    setTimeout(() => {
+      document.getElementById('mapElement')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 0);
   }
-
-  if (lat == null || lng == null) return;
-
-  this.location = {
-    ...this.location,
-    latitude: lat,
-    longitude: lng
-  };
-
-  this.center = { lat, lng };
-  this.selectedTab = 'map';
-  this.zoom = 16;
-
-  setTimeout(() => {
-    document.getElementById('mapElement')
-      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 0);
-}
 }

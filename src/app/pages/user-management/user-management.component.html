@@ -116,14 +116,12 @@
       </div>
     </section>
 
-    <!-- Become-a-sitter CTA (shown only when no sitter record exists) -->
     <section class="card" *ngIf="!isSitter">
       <h3>Are you a dog sitter?</h3>
       <p class="muted">Create a sitter profile to appear in sitter searches and get bookings.</p>
       <button class="pill save" (click)="openBecomeSitterModal()">Become a sitter</button>
     </section>
 
-    <!-- Sitter Card -->
     <section class="card" *ngIf="isSitter">
       <div class="sitter-header">
         <h3>Sitter Profile</h3>
@@ -141,7 +139,7 @@
       </div>
 
        <div class="sitter-fields" [class.disabled]="!sitterActive" [attr.aria-disabled]="!sitterActive">
-         <div class="row">
+        <div class="row">
           <label>Photo</label>
           <div class="avatar-row">
             <img [src]="sitterProfilePic" class="avatar" alt="sitter" />
@@ -150,11 +148,11 @@
           </div>
         </div>
 
-       <div class="row">
-        <label>Gender</label>
-        <span *ngIf="!isEditing('sitter','gender')">{{ gender }}</span>
-        <input *ngIf="isEditing('sitter','gender')" [(ngModel)]="gender" />
-      </div>
+        <div class="row">
+          <label>Gender</label>
+          <span *ngIf="!isEditing('sitter','gender')">{{ gender }}</span>
+          <input *ngIf="isEditing('sitter','gender')" [(ngModel)]="gender" />
+        </div>
 
         <div class="row">
           <label>Rate</label>
@@ -228,7 +226,7 @@
        </div>
       </section>
 
-    <!-- Dogs (accordion list) -->
+    <!-- Dogs -->
     <section class="card dogs-card">
       <div class="dogs-card-header">
         <h3>Dogs</h3>
@@ -284,11 +282,6 @@
             <label>Age</label>
             <span *ngIf="!isEditingDog(i,'age')">{{ d.age || '—' }}</span>
             <input *ngIf="isEditingDog(i,'age')" [(ngModel)]="dogs[i].age" />
-            <!--<button class="icon-btn" (click)="toggleDogEdit(i,'age')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-            <button *ngIf="isEditingDog(i,'age')" class="pill save" (click)="saveDogField(i,'age')">Save</button>
-            <button *ngIf="isEditingDog(i,'age')" class="pill cancel" (click)="cancelDogField(i,'age')">Cancel</button>-->
           </div>
 
           <div class="row">
@@ -398,7 +391,6 @@
       <h4>Add a Dog</h4>
 
       <ng-container [ngSwitch]="addDogPage">
-        <!-- Page 0 -->
         <div *ngSwitchCase="0" class="wizard-page">
 
           <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.profilePictureUrl)">
@@ -429,12 +421,10 @@
             </small>
           </div>
 
-        <!-- NEW: Birth month + year (replaces the Age input) -->
             <div class="row simple"
                  [class.invalid]="addDogAttempted && (!newDog.birthMonth || !newDog.birthYear || isFutureBirth(newDog.birthYear, newDog.birthMonth))">
               <label>Dog's Birth</label>
               <div class="d-flex gap-2" style="width: 80%">
-                <!-- Use ngValue so the model holds numbers, not strings -->
                 <select [(ngModel)]="newDog.birthMonth">
                   <option [ngValue]="null" disabled>Month</option>
                   <option *ngFor="let m of months" [ngValue]="m.value"
@@ -450,7 +440,6 @@
                   <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
                 </select>
 
-
                 <small *ngIf="newDog.birthMonth && newDog.birthYear" class="age-hint text-muted">
                     ~ {{ getAgeString(newDog.birthYear, newDog.birthMonth) }}
                   </small>
@@ -465,7 +454,6 @@
             </div>
         </div>
 
-        <!-- Page 1 -->
         <div *ngSwitchCase="1" class="wizard-page">
 
           <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.gender)">
@@ -544,7 +532,6 @@
           </div>
         </div>
 
-        <!-- Page 3 -->
         <div *ngSwitchCase="3" class="wizard-page">
           <div class="options-list">
             <div class="options-title">Favorite Activities</div>
@@ -580,7 +567,6 @@
 
       <ng-container [ngSwitch]="sitterPage">
 
-        <!-- Page 0: basics -->
         <div *ngSwitchCase="0" class="wizard-page">
 
           <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.profilePictureUrl">
@@ -622,7 +608,6 @@
           </div>
         </div>
 
-        <!-- Page 1: copy -->
         <div *ngSwitchCase="1" class="wizard-page">
           <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.availability.trim()">
             <label>Availability</label>
@@ -637,7 +622,6 @@
           </div>
         </div>
 
-        <!-- Page 2: lists -->
         <div *ngSwitchCase="2" class="wizard-page">
         <div class="options-list">
           <h5 class="options-title"><strong>Experience With</strong></h5>
@@ -675,7 +659,6 @@
   </div>
 
 
-  <!-- Deactivate sitter confirmation -->
   <div class="mm-backdrop" *ngIf="confirmDeactivateOpen">
     <div class="mm-modal confirm-modal">
       <h4>Deactivate sitter?</h4>
@@ -702,5 +685,4 @@
       </div>
     </div>
   </div>
-
 </div>

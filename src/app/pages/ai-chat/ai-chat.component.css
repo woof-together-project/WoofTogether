@@ -4,13 +4,13 @@
 
 :host {
   display: block;
-  height: 100vh; /* ⬅️ Full screen height for this page only */
-  overflow: hidden; /* ⬅️ Prevent scrolling on the host element */
+  height: 100vh;
+  overflow: hidden;
 }
 
 .scroll-container {
   height: 100%;
-  overflow-y: hidden; /* this gets the scrollbar */
+  overflow-y: hidden;
   box-sizing: border-box;
 }
 
@@ -40,18 +40,18 @@
   padding: 2rem;
   max-width: 1400px;
   width: 100%;
-  height: 1000px; /* ✅ fixed height */
+  height: 1000px;
   box-shadow: 0 0 14px rgba(0, 0, 0, 0.15);
   position: relative;
   z-index: 1;
 
-  display: flex;           /* ✅ for vertical layout inside */
+  display: flex;
   flex-direction: column;
 }
 
 .messages {
   flex-grow: 1;
-  overflow-y: auto;       /* ✅ scrolls only inside the chat box */
+  overflow-y: auto;
   margin-bottom: 1rem;
   display: flex;
   flex-direction: column;

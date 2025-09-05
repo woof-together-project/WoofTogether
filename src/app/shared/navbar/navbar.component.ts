@@ -20,9 +20,6 @@ import { MatButtonModule } from '@angular/material/button';
 export class NavbarComponent {
   static readonly insertUserToDBURL =
     'https://n2wr2kxcun27zuws7zpkk5ujfy0btspl.lambda-url.us-east-1.on.aws/'; //final user
-    
-    // static readonly insertUserToDBURL =
-    // 'https://og3trfcczul4fjn5hsachnn7ma0lijfq.lambda-url.us-east-1.on.aws/'; 
 
   constructor(
     private router: Router,
@@ -37,84 +34,84 @@ export class NavbarComponent {
   isComplete = false;
 
   async ngOnInit() {
-  this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
-  this.userContext.getUserObservable().subscribe(u => {
-    this.username   = u?.nickname ?? null;
-    this.isComplete = !!u?.isComplete;
-  });
-  this.tokenSvc.loadFromStorage();
+    this.navigationService.homeRedirect$.subscribe(() => this.router.navigate(['/']));
+    this.userContext.getUserObservable().subscribe(u => {
+      this.username   = u?.nickname ?? null;
+      this.isComplete = !!u?.isComplete;
+    });
+    this.tokenSvc.loadFromStorage();
 
-  const url = new URL(window.location.href);
-  const code = url.searchParams.get('code');
-  const rawState = url.searchParams.get('state');
+    const url = new URL(window.location.href);
+    const code = url.searchParams.get('code');
+    const rawState = url.searchParams.get('state');
 
-  let returnTo = '/';
-  try {
-    if (rawState) {
-      const obj = JSON.parse(atob(rawState));
-      returnTo = obj.returnTo || '/';
-    }
-  } catch {}
-
-  if (code) {
+    let returnTo = '/';
     try {
-      const tokens = await this.exchangeCodeForTokens(code);
-      if (tokens?.id_token) {
-        this.tokenSvc.setTokens(tokens);
-        this.hydrateFromIdToken(tokens.id_token);   
-
-        try {
-          const status = await this.getUserStatus(); 
-          this.userContext.setUserCompleteStatus(status.isComplete);
-          this.isComplete = status.isComplete;
-
-          const shouldGoToSignup = !status.userExists || !status.isComplete;
-          await this.router.navigate([shouldGoToSignup ? '/signup' : (returnTo || '/')]);
-        } catch (e) {
-          console.warn('getUserStatus function failed on callback; keeping local flag.', e);
-        }
-
-        // Clean URL once
-        url.searchParams.delete('code');
-        url.searchParams.delete('state');
-        window.history.replaceState({}, '', url.toString());
+      if (rawState) {
+        const obj = JSON.parse(atob(rawState));
+        returnTo = obj.returnTo || '/';
       }
-    } catch (err) {
-      console.error('Error exchanging code for tokens:', err);
-    }
-    this.loading = false;
-    return; 
-  }
+    } catch {}
 
-  const tokenStatus = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
-  console.log('Token status on boot:', tokenStatus);
-
-  if (tokenStatus === 'VALID') {
-    const idToken = this.tokenSvc.getIdToken();
-    if (idToken) {
-      this.hydrateFromIdToken(idToken);          
+    if (code) {
       try {
-        const backend = await this.getUserStatus(); 
-        this.userContext.setUserCompleteStatus(backend.isComplete);
-        this.isComplete = backend.isComplete;
-      } catch (e) {
-        console.warn('getUserStatus function failed on boot; keeping local flag.', e);
+        const tokens = await this.exchangeCodeForTokens(code);
+        if (tokens?.id_token) {
+          this.tokenSvc.setTokens(tokens);
+          this.hydrateFromIdToken(tokens.id_token);
+
+          try {
+            const status = await this.getUserStatus();
+            this.userContext.setUserCompleteStatus(status.isComplete);
+            this.isComplete = status.isComplete;
+
+            const shouldGoToSignup = !status.userExists || !status.isComplete;
+            await this.router.navigate([shouldGoToSignup ? '/signup' : (returnTo || '/')]);
+          } catch (e) {
+            console.warn('getUserStatus function failed on callback; keeping local flag.', e);
+          }
+
+          // Clean URL once
+          url.searchParams.delete('code');
+          url.searchParams.delete('state');
+          window.history.replaceState({}, '', url.toString());
+        }
+      } catch (err) {
+        console.error('Error exchanging code for tokens:', err);
+      }
+      this.loading = false;
+      return;
+    }
+
+    const tokenStatus = this.tokenSvc.getStatus?.() ?? (this.tokenSvc.isExpired() ? 'EXPIRED' : 'VALID');
+    console.log('Token status on boot:', tokenStatus);
+
+    if (tokenStatus === 'VALID') {
+      const idToken = this.tokenSvc.getIdToken();
+      if (idToken) {
+        this.hydrateFromIdToken(idToken);
+        try {
+          const backend = await this.getUserStatus();
+          this.userContext.setUserCompleteStatus(backend.isComplete);
+          this.isComplete = backend.isComplete;
+        } catch (e) {
+          console.warn('getUserStatus function failed on boot; keeping local flag.', e);
+        }
+      } else {
+        this.username = null;
+        console.warn('VALID status but missing idToken; not setting user.');
       }
     } else {
       this.username = null;
-      console.warn('VALID status but missing idToken; not setting user.');
     }
-  } else {
-    this.username = null;
-  }
 
-  this.loading = false;
-}
+    this.loading = false;
+    }
 
   async exchangeCodeForTokens(code: string) {
     const tokenUrl = `${environment.cognitoDomain}/oauth2/token`;
     const body = new URLSearchParams({
-      grant_type: environment.grantType, // 'authorization_code'
+      grant_type: environment.grantType,
       client_id: environment.clientId,
       redirect_uri: environment.redirectUri,
       code
@@ -151,7 +148,6 @@ export class NavbarComponent {
   login(): void {
     this.redirectToLogin();
   }
-
 
   private hydrateFromIdToken(idToken: string | null) {
     if (!idToken) return;
@@ -224,21 +220,13 @@ export class NavbarComponent {
       });
 
       const result = await response.json().catch(() => ({}));
-      if (response.ok) {
-        // if (result.userExists === true) {
-        //   this.userContext.setUserCompleteStatus(true);
-        //   console.log('User already exists in the database.');
-        // } else {
-        //   console.log('User created successfully.');
-        // }
-      } else {
+      if (!response.ok) {
         console.error('Lambda responded with error:', result);
       }
     } catch (err) {
       console.error('Error sending request to Lambda:', err);
     }
   }
-
 
   handleProtectedRoute(event: Event, targetRoute: string): void {
     event.preventDefault();
@@ -255,12 +243,8 @@ export class NavbarComponent {
     this.router.navigate(['/']);
   }
 
-
-
   logout(): void {
     this.localSignOut();
-    //const logoutUrl = this.buildCognitoLogoutUrl();
-    // window.location.href = logoutUrl;
     this.router.navigate(['/']);
   }
 
@@ -273,65 +257,63 @@ export class NavbarComponent {
     this.username = null;
   }
 
-private buildCognitoLogoutUrl(): string {
-  const domain = environment.cognitoDomain.replace(/\/+$/, '');
-  const clientId = encodeURIComponent(environment.clientId);
-  const logoutUri = encodeURIComponent(environment.signOutRedirectUri || environment.redirectUri);
-  return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
-}
-
-  private buildHostedUiUrl(returnTo = '/'): string {
-  const domain = environment.cognitoDomain.replace(/\/+$/, '');
-  const clientId = encodeURIComponent(environment.clientId);
-  const redirectUri = encodeURIComponent(environment.redirectUri);
-  const scope = encodeURIComponent('openid email profile');
-  const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
-
-  return `${domain}/login?client_id=${clientId}` +
-         `&redirect_uri=${redirectUri}` +
-         `&response_type=code&scope=${scope}&state=${state}`;
+  private buildCognitoLogoutUrl(): string {
+    const domain = environment.cognitoDomain.replace(/\/+$/, '');
+    const clientId = encodeURIComponent(environment.clientId);
+    const logoutUri = encodeURIComponent(environment.signOutRedirectUri || environment.redirectUri);
+    return `${domain}/logout?client_id=${clientId}&logout_uri=${logoutUri}`;
   }
 
-private async getUserStatus(): Promise<{ userExists: boolean; isComplete: boolean }> {
-  const currentUser = this.userContext.getCurrentUserValue();
-  if (!currentUser) return { userExists: false, isComplete: false };
+  private buildHostedUiUrl(returnTo = '/'): string {
+    const domain = environment.cognitoDomain.replace(/\/+$/, '');
+    const clientId = encodeURIComponent(environment.clientId);
+    const redirectUri = encodeURIComponent(environment.redirectUri);
+    const scope = encodeURIComponent('openid email profile');
+    const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
 
-  const payload = {
-    user: {
-      name: currentUser.username,
-      email: currentUser.email,
-      nickname: currentUser.nickname,
-      provider: 'COGNITO',
-      providerId: currentUser.sub
-    }
-  };
-  console.log('[Auth] getUserStatus payload:', payload);
+    return `${domain}/login?client_id=${clientId}` +
+           `&redirect_uri=${redirectUri}` +
+           `&response_type=code&scope=${scope}&state=${state}`;
+  }
 
-  const res = await fetch(NavbarComponent.insertUserToDBURL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-  const data = await res.json().catch(() => ({}));
-  console.log('[Auth] getUserStatus response:', data);
-  return { userExists: !!data.userExists, isComplete: !!data.isComplete };
-}
+  private async getUserStatus(): Promise<{ userExists: boolean; isComplete: boolean }> {
+    const currentUser = this.userContext.getCurrentUserValue();
+    if (!currentUser) return { userExists: false, isComplete: false };
 
-private buildHostedUiLoginUrl(returnTo: string = '/'): string {
-  const domain = environment.cognitoDomain.replace(/\/+$/, '');
-  const clientId = encodeURIComponent(environment.clientId);
-  const redirectUri = encodeURIComponent(environment.redirectUri);
-  const scope = encodeURIComponent('openid email profile');
-  const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
-  return `${domain}/login?client_id=${clientId}`
-       + `&redirect_uri=${redirectUri}`
-       + `&response_type=code&scope=${scope}&state=${state}`;
-}
+    const payload = {
+      user: {
+        name: currentUser.username,
+        email: currentUser.email,
+        nickname: currentUser.nickname,
+        provider: 'COGNITO',
+        providerId: currentUser.sub
+      }
+    };
+    console.log('[Auth] getUserStatus payload:', payload);
 
+    const res = await fetch(NavbarComponent.insertUserToDBURL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    console.log('[Auth] getUserStatus response:', data);
+    return { userExists: !!data.userExists, isComplete: !!data.isComplete };
+  }
 
-goToLogin(returnTo: string = '/'): void {
-  window.location.href = this.buildHostedUiLoginUrl(returnTo);
-}
+  private buildHostedUiLoginUrl(returnTo: string = '/'): string {
+    const domain = environment.cognitoDomain.replace(/\/+$/, '');
+    const clientId = encodeURIComponent(environment.clientId);
+    const redirectUri = encodeURIComponent(environment.redirectUri);
+    const scope = encodeURIComponent('openid email profile');
+    const state = encodeURIComponent(btoa(JSON.stringify({ returnTo })));
+    return `${domain}/login?client_id=${clientId}`
+         + `&redirect_uri=${redirectUri}`
+         + `&response_type=code&scope=${scope}&state=${state}`;
+  }
 
+  goToLogin(returnTo: string = '/'): void {
+    window.location.href = this.buildHostedUiLoginUrl(returnTo);
+  }
 }
 

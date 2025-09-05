@@ -5,18 +5,18 @@
 body {
   margin: 0;
   font-family: 'Nunito', sans-serif;
-  background-color: rgba(204, 255, 204, 0.4); /* light green with transparency */
+  background-color: rgba(204, 255, 204, 0.4);
 }
 
 nav.navbar {
   position: fixed;
   background-color: transparent;
-  backdrop-filter: blur(3px);               /* subtle blur effect */
+  backdrop-filter: blur(3px);
   padding: 0.2rem 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: none; /* Remove shadow if not needed */
+  box-shadow: none;
   top: 0;
   left: 0;
   right: 0;
@@ -33,23 +33,20 @@ nav.navbar {
 
 
 .hello-btn {
-  background-color: #365020; /* your main green */
+  background-color: #365020;
   color: white;
   font-weight: bold;
   padding: 0.5rem 1.2rem;
   border: none;
-  border-radius: 50px; 
+  border-radius: 50px;
   cursor: pointer;
   font-family: 'Comfortaa', sans-serif;
   transition: background-color 0.2s ease;
 }
 
 .hello-btn:hover {
-  background-color: #608f39; /* hover green */
+  background-color: #608f39;
 }
-
-
-
 
 .logo {
   font-size: 1.5rem;
@@ -75,7 +72,6 @@ nav.navbar {
 }
 
 .nav-links li a:hover {
-  /* background-color: rgba(102, 187, 106, 0.2); */
   background-color: #90b774b9;
 }
 
@@ -125,7 +121,7 @@ nav.navbar {
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  width:48px; height:48px;          /* bigger */
+  width:48px; height:48px;
   color:#365020;
   border-radius:9999px;
 }

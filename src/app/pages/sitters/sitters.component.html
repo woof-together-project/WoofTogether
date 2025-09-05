@@ -71,8 +71,6 @@
                       Message Me!
                     </a>
                   </div>
-
-
                 </div>
               </div>
 
@@ -100,7 +98,7 @@
         </li>
       </ul>
 
-  <!-- Small toolbar above the map -->
+      <!-- Small toolbar above the map -->
       <div class="map-toolbar d-flex align-items-center gap-2 mb-2">
         <button class="btn btn-outline-dark btn-sm" (click)="resetMapView()">
           Return to Default View In Map
@@ -122,214 +120,212 @@
           </div>
         </ng-container>
 
+        <ng-container *ngIf="selectedTab === 'criteria'">
+          <div class="sitter-scrollable">
+            <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
 
-<ng-container *ngIf="selectedTab === 'criteria'">
-  <div class="sitter-scrollable">
-    <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
+              <div class="criteria-header">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-funnel-fill"></i>
+                  <span class="criteria-title">Refine your search</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                </div>
+              </div>
 
-    <div class="criteria-header">
-      <div class="d-flex align-items-center gap-2">
-        <i class="bi bi-funnel-fill"></i>
-        <span class="criteria-title">Refine your search</span>
-      </div>
-      <div class="d-flex align-items-center gap-2">
+              <!-- Grid -->
+              <div class="criteria-grid">
+                <section class="crit-section">
+                  <h6 class="crit-label"><i class="bi bi-briefcase me-1"></i>Service Options</h6>
+                  <div class="chip-group">
+                    <label class="chip" *ngFor="let option of serviceOptions">
+                      <input
+                        type="checkbox"
+                        [value]="option"
+                        [checked]="selectedServiceOptions.includes(option)"
+                        (change)="onServiceOptionChange($event)"
+                        name="serviceOptions"
+                      />
+                      <span>{{ option }}</span>
+                    </label>
+                  </div>
+                </section>
+
+                <section class="crit-section">
+                  <h6 class="crit-label"><i class="bi bi-gender-ambiguous me-1"></i>Sitter Gender</h6>
+                  <div class="segmented">
+                    <label class="segment" *ngFor="let gender of ['any', 'female', 'male']">
+                      <input
+                        type="radio"
+                        [value]="gender"
+                        [(ngModel)]="selectedGender"
+                        name="gender"
+                        [id]="'gender-' + gender"
+                      />
+                      <span>{{ gender | titlecase }}</span>
+                    </label>
+                  </div>
+                </section>
+
+                <section class="crit-section">
+                  <h6 class="crit-label"><i class="bi bi-dog me-1"></i>Experienced With</h6>
+                  <div class="chip-group scrollable">
+                    <label class="chip" *ngFor="let type of experienceWithOptions">
+                      <input
+                        type="checkbox"
+                        [value]="type"
+                        [checked]="filters.experiencedWith.includes(type)"
+                        (change)="onExperienceChange($event)"
+                        [id]="'exp-' + type"
+                      />
+                      <span>{{ type }}</span>
+                    </label>
+                  </div>
+                </section>
+
+                <section class="crit-section rate-section">
+                  <h6 class="crit-label"><i class="bi bi-cash-stack me-1"></i>Max Rate</h6>
+                  <div class="range-wrap">
+                    <input
+                      type="range"
+                      class="form-range stylish-range"
+                      min="0"
+                      max="150"
+                      step="5"
+                      [(ngModel)]="filters.rateMax"
+                      name="rateMax"
+                      aria-label="Maximum hourly rate"
+                    />
+                    <div class="range-labels">
+                      <span class="min">₪0</span>
+                      <span class="range-badge">Max ₪{{ filters.rateMax }}</span>
+                      <span class="max">₪150</span>
+                    </div>
+                    <small class="range-helper text-muted small d-block">
+                      Includes sitters charging ≤ ₪{{ filters.rateMax }}.
+                    </small>
+                  </div>
+                </section>
+
+                <section class="crit-section radius-section">
+                  <h6 class="crit-label">
+                    <i class="bi bi-geo-alt me-1"></i>Radius (km)
+                  </h6>
+                  <div class="radius-row">
+                    <label class="visually-hidden" for="radiusKmInput">Search radius in kilometers</label>
+                    <div class="input-with-suffix">
+                      <input
+                        id="radiusKmInput"
+                        type="number"
+                        class="radius-input"
+                        [min]="radiusMin"
+                        [max]="radiusMax"
+                        step="1"
+                        [(ngModel)]="location.radius"
+                        name="radiusKm"
+                        [disabled]="disableRadius"
+                        placeholder="e.g. 10"
+                      />
+                      <span class="suffix">km</span>
+                    </div>
+
+                    <label class="form-check ms-3 dont-radius">
+                      <input
+                        type="checkbox"
+                        class="form-check-input me-2"
+                        [(ngModel)]="disableRadius"
+                        name="ignoreRadius"
+                      />
+                      <span>Don't filter by radius</span>
+                    </label>
+                  </div>
+
+                  <div class="radius-presets" *ngIf="!disableRadius">
+                    <button type="button" class="btn btn-chip" (click)="location.radius = 2">2</button>
+                    <button type="button" class="btn btn-chip" (click)="location.radius = 5">5</button>
+                    <button type="button" class="btn btn-chip" (click)="location.radius = 10">10</button>
+                    <button type="button" class="btn btn-chip" (click)="location.radius = 20">20</button>
+                  </div>
+                </section>
+              </div>
+
+              <!-- Footer -->
+              <div class="criteria-footer">
+                <div class="small text-muted">
+                  Tip: You can combine multiple “Experienced with” chips.
+                </div>
+                <div class="ms-auto d-flex gap-2">
+                  <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
+                  <button type="submit" class="btn btn-success">Apply Filters</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </ng-container>
+
+        <!-- REVIEWS MODAL -->
+        <div class="modal-backdrop-custom" *ngIf="showReviewModal" (click)="closeReviews()"></div>
+        <div class="modal-custom" *ngIf="showReviewModal">
+          <div class="modal-header">
+            <h5 class="modal-title">Reviews for {{ modalSitter?.name }}</h5>
+            <button type="button" class="btn-close" (click)="closeReviews()"></button>
+          </div>
+          <div class="modal-body">
+            <div *ngIf="reviewsLoading">Loading…</div>
+            <ng-container *ngIf="!reviewsLoading">
+              <div class="mb-2">
+                <strong>Average:</strong> {{ reviewsAverage | number:'1.1-2' }} ⭐
+                <span class="text-muted">({{ reviewsCount }} review{{ reviewsCount === 1 ? '' : 's' }})</span>
+              </div>
+
+              <!-- Reviews List -->
+              <div *ngFor="let r of reviews" class="review-item">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ r.userName }}</strong>
+                  <span class="ms-2">★ {{ r.rating }}</span>
+                </div>
+                <small>{{ r.reviewDate | date:'MMM d, y, h:mm a' }}</small>
+              </div>
+                <div class="text-muted">{{ r.comment }}</div>
+              </div>
+              <ng-template #none>
+                <div class="text-muted">No reviews yet.</div>
+              </ng-template>
+
+              <!-- Add Review Button -->
+              <div class="text-end mt-3">
+                <button class="btn btn-outline-primary" (click)="openAddReview()">Add Review</button>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- ADD REVIEW -->
+        <div class="modal-backdrop-custom" *ngIf="showAddReviewModal" (click)="closeAddReview()"></div>
+        <div class="modal-custom" *ngIf="showAddReviewModal">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Review for {{ modalSitter?.name }}</h5>
+            <button type="button" class="btn-close" (click)="closeAddReview()"></button>
+          </div>
+          <div class="modal-body">
+            <form (ngSubmit)="submitReview()" #f="ngForm">
+              <label class="form-label">Your rating</label>
+              <input type="number" class="form-control mb-2" style="max-width:100px"
+                    [(ngModel)]="newReview.rating" name="rating" min="1" max="5" required>
+              <label class="form-label">Comment (optional)</label>
+              <textarea class="form-control mb-3" rows="3"
+                        [(ngModel)]="newReview.comment" name="comment" maxlength="1000"></textarea>
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary" (click)="closeAddReview()">Cancel</button>
+                <button class="btn btn-success" [disabled]="reviewSubmitting || f.invalid">
+                  {{ reviewSubmitting ? 'Saving…' : 'Submit Review' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
-
-    <!-- Grid -->
-    <div class="criteria-grid">
-      <!-- Service Options -->
-      <section class="crit-section">
-        <h6 class="crit-label"><i class="bi bi-briefcase me-1"></i>Service Options</h6>
-        <div class="chip-group">
-          <label class="chip" *ngFor="let option of serviceOptions">
-            <input
-              type="checkbox"
-              [value]="option"
-              [checked]="selectedServiceOptions.includes(option)"
-              (change)="onServiceOptionChange($event)"
-              name="serviceOptions"
-            />
-            <span>{{ option }}</span>
-          </label>
-        </div>
-      </section>
-
-      <!-- Sitter Gender -->
-      <section class="crit-section">
-        <h6 class="crit-label"><i class="bi bi-gender-ambiguous me-1"></i>Sitter Gender</h6>
-        <div class="segmented">
-          <label class="segment" *ngFor="let gender of ['any', 'female', 'male']">
-            <input
-              type="radio"
-              [value]="gender"
-              [(ngModel)]="selectedGender"
-              name="gender"
-              [id]="'gender-' + gender"
-            />
-            <span>{{ gender | titlecase }}</span>
-          </label>
-        </div>
-      </section>
-
-      <!-- Experienced With -->
-      <section class="crit-section">
-        <h6 class="crit-label"><i class="bi bi-dog me-1"></i>Experienced With</h6>
-        <div class="chip-group scrollable">
-          <label class="chip" *ngFor="let type of experienceWithOptions">
-            <input
-              type="checkbox"
-              [value]="type"
-              [checked]="filters.experiencedWith.includes(type)"
-              (change)="onExperienceChange($event)"
-              [id]="'exp-' + type"
-            />
-            <span>{{ type }}</span>
-          </label>
-        </div>
-      </section>
-
-      <section class="crit-section rate-section">
-      <h6 class="crit-label"><i class="bi bi-cash-stack me-1"></i>Max Rate</h6>
-      <div class="range-wrap">
-        <input
-          type="range"
-          class="form-range stylish-range"
-          min="0"
-          max="150"
-          step="5"
-          [(ngModel)]="filters.rateMax"
-          name="rateMax"
-          aria-label="Maximum hourly rate"
-        />
-      <div class="range-labels">
-        <span class="min">₪0</span>
-        <span class="range-badge">Max ₪{{ filters.rateMax }}</span>
-        <span class="max">₪150</span>
-      </div>
-     <small class="range-helper text-muted small d-block">
-  Includes sitters charging ≤ ₪{{ filters.rateMax }}.
-</small>
-  </div>
-</section>
-
-<section class="crit-section radius-section">
-  <h6 class="crit-label">
-    <i class="bi bi-geo-alt me-1"></i>Radius (km)
-  </h6>
-
-  <div class="radius-row">
-    <label class="visually-hidden" for="radiusKmInput">Search radius in kilometers</label>
-    <div class="input-with-suffix">
-      <input
-        id="radiusKmInput"
-        type="number"
-        class="radius-input"
-        [min]="radiusMin"
-        [max]="radiusMax"
-        step="1"
-        [(ngModel)]="location.radius"    
-        name="radiusKm"
-        [disabled]="disableRadius"      
-        placeholder="e.g. 10"
-      />
-      <span class="suffix">km</span>
-    </div>
-
-    <label class="form-check ms-3 dont-radius">
-      <input
-        type="checkbox"
-        class="form-check-input me-2"
-        [(ngModel)]="disableRadius"       
-        name="ignoreRadius"
-      />
-      <span>Don't filter by radius</span>
-    </label>
-  </div>
-
-  <div class="radius-presets" *ngIf="!disableRadius">
-    <button type="button" class="btn btn-chip" (click)="location.radius = 2">2</button>
-    <button type="button" class="btn btn-chip" (click)="location.radius = 5">5</button>
-    <button type="button" class="btn btn-chip" (click)="location.radius = 10">10</button>
-    <button type="button" class="btn btn-chip" (click)="location.radius = 20">20</button>
-  </div>
-</section>
-
-    </div>
-
-    <!-- Footer -->
-    <div class="criteria-footer">
-      <div class="small text-muted">
-        Tip: You can combine multiple “Experienced with” chips.
-      </div>
-      <div class="ms-auto d-flex gap-2">
-        <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
-        <button type="submit" class="btn btn-success">Apply Filters</button>
-      </div>
-      </div>
-    </form>
-  </div>
-</ng-container>
-
-<!-- REVIEWS MODAL -->
-<div class="modal-backdrop-custom" *ngIf="showReviewModal" (click)="closeReviews()"></div>
-<div class="modal-custom" *ngIf="showReviewModal">
-  <div class="modal-header">
-    <h5 class="modal-title">Reviews for {{ modalSitter?.name }}</h5>
-    <button type="button" class="btn-close" (click)="closeReviews()"></button>
-  </div>
-  <div class="modal-body">
-    <div *ngIf="reviewsLoading">Loading…</div>
-    <ng-container *ngIf="!reviewsLoading">
-      <div class="mb-2">
-        <strong>Average:</strong> {{ reviewsAverage | number:'1.1-2' }} ⭐
-        <span class="text-muted">({{ reviewsCount }} review{{ reviewsCount === 1 ? '' : 's' }})</span>
-      </div>
-
-      <!-- Reviews List -->
-      <div *ngFor="let r of reviews" class="review-item">
-      <div class="d-flex justify-content-between align-items-center">
-        <div>
-          <strong>{{ r.userName }}</strong>
-          <span class="ms-2">★ {{ r.rating }}</span>
-        </div>
-        <small>{{ r.reviewDate | date:'MMM d, y, h:mm a' }}</small>
-      </div>
-        <div class="text-muted">{{ r.comment }}</div>
-      </div>
-      <ng-template #none>
-        <div class="text-muted">No reviews yet.</div>
-      </ng-template>
-
-      <!-- Add Review Button -->
-      <div class="text-end mt-3">
-        <button class="btn btn-outline-primary" (click)="openAddReview()">Add Review</button>
-      </div>
-    </ng-container>
-  </div>
-</div>
-
-<!-- ADD REVIEW -->
-<div class="modal-backdrop-custom" *ngIf="showAddReviewModal" (click)="closeAddReview()"></div>
-<div class="modal-custom" *ngIf="showAddReviewModal">
-  <div class="modal-header">
-    <h5 class="modal-title">Add Review for {{ modalSitter?.name }}</h5>
-    <button type="button" class="btn-close" (click)="closeAddReview()"></button>
-  </div>
-  <div class="modal-body">
-    <form (ngSubmit)="submitReview()" #f="ngForm">
-      <label class="form-label">Your rating</label>
-      <input type="number" class="form-control mb-2" style="max-width:100px"
-            [(ngModel)]="newReview.rating" name="rating" min="1" max="5" required>
-      <label class="form-label">Comment (optional)</label>
-      <textarea class="form-control mb-3" rows="3"
-                [(ngModel)]="newReview.comment" name="comment" maxlength="1000"></textarea>
-      <div class="d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-outline-secondary" (click)="closeAddReview()">Cancel</button>
-        <button class="btn btn-success" [disabled]="reviewSubmitting || f.invalid">
-          {{ reviewSubmitting ? 'Saving…' : 'Submit Review' }}
-        </button>
-      </div>
-    </form>
   </div>
 </div>

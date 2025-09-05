@@ -3,7 +3,7 @@
 }
 
 .scrollable-card {
-  max-height: 500px;  /* adjust how "tall" your notebook page is */
+  max-height: 500px;
   overflow-y: auto;
   border: 1px solid #dee2e6;
   border-radius: 12px;
@@ -11,10 +11,9 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* === Scrollbar Styling for Form and Card Scroll Areas === */
 .form-scroll-area::-webkit-scrollbar,
 .scrollable-card::-webkit-scrollbar {
-  width: 8px; /* or 6px if you want a slimmer scroll */
+  width: 8px;
 }
 
 .form-scroll-area::-webkit-scrollbar-track,
@@ -85,35 +84,30 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 75% center; /* shift dog to the left */
+  object-position: 75% center;
   display: block;
 }
 
-/* let flex children scroll */
 .container-fluid.vh-100.d-flex { min-height: 0; }
 
-/* one scrollbar for the left column */
 .form-scroll-area{
-  height: calc(100dvh - 64px);   /* adjust 64px to your navbar height if needed */
+  height: calc(100dvh - 64px);
   overflow-y: auto;
-  overflow-x: hidden;             /* prevents tiny horizontal bar */
+  overflow-x: hidden;
   padding-right: .5rem;
   min-height: 0;
 }
 
-/* the form itself must NOT scroll */
 .form-scroll-area > form{
   overflow: visible;
 }
 
-/* cards never create their own scrollbars */
 .notebook-card,
 .notebook-card .card-body{
   max-height: none !important;
   overflow: visible !important;
 }
 
-/* action bar stays INSIDE the card */
 .card-footer.actions{
   display:flex;
   justify-content:flex-end;
@@ -123,7 +117,6 @@
   padding:.75rem 1rem;
 }
 
-/* keep inputs from pushing past the card */
 .form-scroll-area .card,
 .form-scroll-area .card-header,
 .form-scroll-area .card-body,
@@ -132,7 +125,6 @@
   box-sizing:border-box;
 }
 
-/* photo row */
 .file-row{
   display:flex;
   align-items:center;
@@ -166,20 +158,16 @@
 .autocomplete-list li { padding: .5rem .75rem; cursor: pointer; }
 .autocomplete-list li:hover { background: #f5f5f5; }
 
-
-/* Base list item */
 .autocomplete-list li {
   padding: .5rem .75rem;
   cursor: pointer;
   transition: background-color .12s ease, color .12s ease;
 }
 
-
 .autocomplete-list li.active {
-  font-weight: 700;          /* ← bold */
+  font-weight: 700;
 }
 
-/* Optional: subtle left bar for the active row */
 .autocomplete-list li.active {
   position: relative;
 }
@@ -188,7 +176,7 @@
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 3px;
-  background: #0d6efd;       /* Bootstrap primary */
+  background: #0d6efd;
   opacity: .9;
 }
 

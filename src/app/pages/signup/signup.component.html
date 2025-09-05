@@ -19,7 +19,6 @@
         </div>
 
         <div class="card-body" *ngIf="showGeneralInfo">
-          <!-- Phone -->
           <div class="mb-3">
             <label for="phone" class="form-label">Phone number</label>
             <input type="text"
@@ -35,84 +34,79 @@
             </div>
           </div>
 
-         <!-- City -->
-<div class="mb-3 position-relative">
-  <label for="city" class="form-label">City</label>
-  <input
-    type="text"
-    id="city"
-    class="form-control"
-    name="city"
-    [ngModel]="city"
-    (ngModelChange)="onCityInput($event)"
-    (keydown.arrowdown)="onCityArrow(1, $any($event))"
-    (keydown.arrowup)="onCityArrow(-1, $any($event))"
-    (keydown.enter)="onCityEnter($any($event))"
-    (keydown.escape)="citySuggestions=[]"
-    required
-    #cityModel="ngModel"
-    autocomplete="off"
-    role="combobox"
-    [attr.aria-expanded]="citySuggestions.length>0"
-    [attr.aria-activedescendant]="'city-opt-' + cityActiveIndex" />
+          <div class="mb-3 position-relative">
+            <label for="city" class="form-label">City</label>
+            <input
+              type="text"
+              id="city"
+              class="form-control"
+              name="city"
+              [ngModel]="city"
+              (ngModelChange)="onCityInput($event)"
+              (keydown.arrowdown)="onCityArrow(1, $any($event))"
+              (keydown.arrowup)="onCityArrow(-1, $any($event))"
+              (keydown.enter)="onCityEnter($any($event))"
+              (keydown.escape)="citySuggestions=[]"
+              required
+              #cityModel="ngModel"
+              autocomplete="off"
+              role="combobox"
+              [attr.aria-expanded]="citySuggestions.length>0"
+              [attr.aria-activedescendant]="'city-opt-' + cityActiveIndex" />
 
-      <ul class="autocomplete-list" *ngIf="citySuggestions.length" role="listbox" aria-label="City suggestions">
-      <li *ngFor="let s of citySuggestions; let i = index"
-          [id]="'city-opt-' + i"
-          [class.active]="i === cityActiveIndex"
-          (mouseenter)="cityActiveIndex = i"
-          (mousedown)="pickCity(s)"
-          role="option"
-          [attr.aria-selected]="i === cityActiveIndex">
-        {{ s.description }}
-      </li>
-    </ul>
+            <ul class="autocomplete-list" *ngIf="citySuggestions.length" role="listbox" aria-label="City suggestions">
+              <li *ngFor="let s of citySuggestions; let i = index"
+                  [id]="'city-opt-' + i"
+                  [class.active]="i === cityActiveIndex"
+                  (mouseenter)="cityActiveIndex = i"
+                  (mousedown)="pickCity(s)"
+                  role="option"
+                  [attr.aria-selected]="i === cityActiveIndex">
+                {{ s.description }}
+              </li>
+            </ul>
 
+            <div *ngIf="signupForm.submitted && cityModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+              City is required
+            </div>
+          </div>
 
-  <div *ngIf="signupForm.submitted && cityModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-    City is required
-  </div>
-</div>
+          <div class="mb-3 position-relative">
+            <label for="street" class="form-label">Street</label>
+            <input
+              type="text"
+              id="street"
+              class="form-control"
+              name="street"
+              [ngModel]="street"
+              (ngModelChange)="onStreetInput($event)"
+              (keydown.arrowdown)="onStreetArrow(1, $any($event))"
+              (keydown.arrowup)="onStreetArrow(-1, $any($event))"
+              (keydown.enter)="onStreetEnter($any($event))"
+              (keydown.escape)="addressSuggestions=[]"
+              required
+              #streetModel="ngModel"
+              autocomplete="off"
+              role="combobox"
+              [attr.aria-expanded]="addressSuggestions.length>0"
+              [attr.aria-activedescendant]="'addr-opt-' + addressActiveIndex" />
 
-<!-- Street -->
-<div class="mb-3 position-relative">
-  <label for="street" class="form-label">Street</label>
-  <input
-    type="text"
-    id="street"
-    class="form-control"
-    name="street"
-    [ngModel]="street"
-    (ngModelChange)="onStreetInput($event)"
-    (keydown.arrowdown)="onStreetArrow(1, $any($event))"
-    (keydown.arrowup)="onStreetArrow(-1, $any($event))"
-    (keydown.enter)="onStreetEnter($any($event))"
-    (keydown.escape)="addressSuggestions=[]"
-    required
-    #streetModel="ngModel"
-    autocomplete="off"
-    role="combobox"
-    [attr.aria-expanded]="addressSuggestions.length>0"
-    [attr.aria-activedescendant]="'addr-opt-' + addressActiveIndex" />
+              <ul class="autocomplete-list" *ngIf="addressSuggestions.length" role="listbox" aria-label="Street suggestions">
+                <li *ngFor="let s of addressSuggestions; let i = index"
+                    [id]="'addr-opt-' + i"
+                    [class.active]="i === addressActiveIndex"
+                    (mouseenter)="addressActiveIndex = i"
+                    (mousedown)="pickAddress(s)"
+                    role="option"
+                    [attr.aria-selected]="i === addressActiveIndex">
+                  {{ s.description }}
+                </li>
+              </ul>
 
-      <ul class="autocomplete-list" *ngIf="addressSuggestions.length" role="listbox" aria-label="Street suggestions">
-      <li *ngFor="let s of addressSuggestions; let i = index"
-          [id]="'addr-opt-' + i"
-          [class.active]="i === addressActiveIndex"
-          (mouseenter)="addressActiveIndex = i"
-          (mousedown)="pickAddress(s)"
-          role="option"
-          [attr.aria-selected]="i === addressActiveIndex">
-        {{ s.description }}
-      </li>
-    </ul>
-
-
-  <div *ngIf="signupForm.submitted && streetModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-    Street is required
-  </div>
-</div>
-
+            <div *ngIf="signupForm.submitted && streetModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+              Street is required
+            </div>
+          </div>
         </div>
       </div>
 
@@ -138,7 +132,6 @@
       </div>
 
        <!-- Sitter Section -->
-        <!-- Sitter Card Header -->
         <div *ngIf="isSitter && showSitterSection" class="card p-0 mb-4 notebook-card">
           <div class="card-header d-flex justify-content-between align-items-center"
                (click)="showSitterSection = false" style="cursor: pointer;">
@@ -151,40 +144,36 @@
           <ng-container [ngSwitch]="currentSitterPage">
             <div *ngSwitchCase="0" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 0">
               <div class="flex-grow-1">
-                 <!-- NEW: Sitter Photo -->
-                    <div class="mb-3">
-                      <label class="form-label">Sitter Photo</label>
-                      <div class="d-flex align-items-center gap-3">
-                        <input type="file" class="form-control" (change)="onSitterPicSelected($event)" accept="image/*" style="max-width: 320px;">
-                        <img *ngIf="sitterImageUrl" [src]="sitterImageUrl" alt="sitter preview" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
-                      </div>
-                      <div *ngIf="sitterAttempted[0] && !sitterImageUrl" class="text-danger small mb-1 text-end fade-in-error">
-                        Sitter photo is required
-                      </div>
-                    </div>
-              <div class="mb-3">
-                <label for="gender" class="form-label">Gender</label>
-                <select id="gender" class="form-select" name="gender" [(ngModel)]="gender" required>
-                  <option value="" disabled selected>Select your gender</option>
-                  <option value="female">Female</option>
-                  <option value="male">Male</option>
-                </select>
-                <div *ngIf="sitterAttempted[0] && !gender" class="text-danger small mb-1 text-end fade-in-error">
-                  Please select your gender, some dogs might be picky!
+                <div class="mb-3">
+                  <label class="form-label">Sitter Photo</label>
+                  <div class="d-flex align-items-center gap-3">
+                    <input type="file" class="form-control" (change)="onSitterPicSelected($event)" accept="image/*" style="max-width: 320px;">
+                    <img *ngIf="sitterImageUrl" [src]="sitterImageUrl" alt="sitter preview" style="width:56px;height:56px;border-radius:50%;object-fit:cover;">
+                  </div>
+                  <div *ngIf="sitterAttempted[0] && !sitterImageUrl" class="text-danger small mb-1 text-end fade-in-error">
+                    Sitter photo is required
+                  </div>
                 </div>
-              </div>
-              <!--<div class="mb-2">
-                <label for="sitterBio" class="form-label">About Me</label>
-                <textarea class="form-control" id="sitterBio" rows="3" placeholder="Let us know about yourself and your experience.." name="sitterBio" ngModel #sitterBioModel="ngModel"></textarea>
-              </div>-->
+                <div class="mb-3">
+                  <label for="gender" class="form-label">Gender</label>
+                  <select id="gender" class="form-select" name="gender" [(ngModel)]="gender" required>
+                    <option value="" disabled selected>Select your gender</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                  </select>
+                  <div *ngIf="sitterAttempted[0] && !gender" class="text-danger small mb-1 text-end fade-in-error">
+                    Please select your gender, some dogs might be picky!
+                  </div>
+                </div>
+
                 <textarea class="form-control"
                   id="sitterBio"
                   rows="3"
                   placeholder="Let us know about yourself and your experience.."
                   name="sitterBio"
                   [(ngModel)]="sitterBio"
-                  [ngModelOptions]="{standalone:true}"></textarea>
-
+                  [ngModelOptions]="{standalone:true}">
+                </textarea>
               </div>
               <div class="d-flex justify-content-end pt-3 border-top">
                 <button class="btn btn-primary" type="button" (click)="tryNextSitterPage()">Next ➡️</button>
@@ -222,20 +211,6 @@
             </div>
 
             <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentSitterPage === 2">
-              <!--<div class="mb-3">
-                <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
-                <div class="border p-2 rounded" style="max-height: 175px; overflow-y: auto;">
-                  <div *ngFor="let type of experienceWithOptions">
-                    <input
-                      type="checkbox"
-                      [value]="type"
-                      (change)="onSitterExperienceChange($event)"
-                      class="form-check-input me-1">
-                    {{ type }}
-                  </div>
-                </div>
-              </div>-->
-
               <div class="mb-3">
                 <label class="form-label fw-bold">What Dogs Are You Experienced With?</label>
                 <div class="border p-2 rounded" style="max-height: 175px; overflow-y: auto;">
@@ -253,39 +228,22 @@
                 </div>
               </div>
 
-
-            <!--<div class="flex-grow-1">
               <div class="mb-3">
                 <label class="form-label fw-bold">Service Options</label>
                 <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
-                  <div *ngFor="let service of serviceOptions">
+                  <div class="form-check" *ngFor="let service of serviceOptions; let k = index">
                     <input
+                      class="form-check-input"
                       type="checkbox"
-                      [value]="service"
-                      (change)="onSitterServiceChange($event)"
-                      class="form-check-input me-1">
-                    {{ service }}
+                      [id]="'sit-srv-' + k"
+                      name="srv-{{k}}"
+                      [ngModel]="selectedSitterServices.includes(service)"
+                      (ngModelChange)="selectedSitterServices = toggleIn(selectedSitterServices, service, $event)"
+                      [ngModelOptions]="{standalone:true}">
+                    <label class="form-check-label" [for]="'sit-srv-' + k">{{ service }}</label>
                   </div>
                 </div>
               </div>
-            </div>-->
-
-            <div class="mb-3">
-              <label class="form-label fw-bold">Service Options</label>
-              <div class="border p-2 rounded" style="max-height: 200px; overflow-y: auto;">
-                <div class="form-check" *ngFor="let service of serviceOptions; let k = index">
-                  <input
-                    class="form-check-input"
-                    type="checkbox"
-                    [id]="'sit-srv-' + k"
-                    name="srv-{{k}}"
-                    [ngModel]="selectedSitterServices.includes(service)"
-                    (ngModelChange)="selectedSitterServices = toggleIn(selectedSitterServices, service, $event)"
-                    [ngModelOptions]="{standalone:true}">
-                  <label class="form-check-label" [for]="'sit-srv-' + k">{{ service }}</label>
-                </div>
-              </div>
-            </div>
 
               <div class="d-flex justify-content-between pt-3 border-top">
                 <button class="btn btn-secondary" type="button" (click)="previousSitterPage()">⬅️ Back</button>
@@ -305,11 +263,10 @@
         </div>
       </div>
 
-        <!-- Dog Section -->
-        <div *ngIf="addDog">
-          <ng-container *ngFor="let dog of dogs; let i = index">
+      <!-- Dog Section -->
+      <div *ngIf="addDog">
+        <ng-container *ngFor="let dog of dogs; let i = index">
 
-        <!-- Collapsed View (only header visible) -->
         <div *ngIf="!showDogSections[i]" class="card mb-4">
           <div class="card-header d-flex justify-content-between align-items-center"
                (click)="showDogSections[i] = true" style="cursor: pointer;">
@@ -320,7 +277,6 @@
           </div>
         </div>
 
-        <!-- Expanded View (full form visible) -->
         <div *ngIf="showDogSections[i]" class="card p-0 mb-4 notebook-card">
           <div class="card-header d-flex justify-content-between align-items-center"
                (click)="showDogSections[i] = false" style="cursor: pointer;">
@@ -334,7 +290,6 @@
             <ng-container [ngSwitch]="currentDogPage[i]">
               <div *ngSwitchCase="0" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 0">
                 <div class="flex-grow-1">
-                  <!-- NEW: Dog Photo -->
                   <div class="mb-3">
                     <label class="form-label">Dog Photo</label>
                     <div class="d-flex align-items-center gap-3">
@@ -346,41 +301,42 @@
                       Dog photo is required
                     </div>
                   </div>
-                <div class="mb-2">
-                  <label class="form-label">Dog's Name</label>
-                  <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required #dogNameModel="ngModel">
-                  <div *ngIf="dogAttempted[i]?.[0] && dogNameModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                  Dog name is required
-                  </div>
-                </div>
 
-                <div class="mb-2">
-                  <label class="form-label">Gender</label>
-                  <select class="form-select" [(ngModel)]="dog.gender" name="dogGender-{{i}}" required #dogGenderModel="ngModel">
-                    <option value="" disabled selected>Select Gender</option>
-                    <option value="female">Female</option>
-                    <option value="male">Male</option>
-                  </select>
-                  <div *ngIf="dogAttempted[i]?.[0] && dogGenderModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                  Dog gender is required
-                  </div>
-                </div>
-
-                <div *ngIf="dog.gender">
                   <div class="mb-2">
-                    <label class="form-label">
-                      {{ dog.gender === 'male' ? 'Is your dog Castrated?' : 'Is your dog Sterilized?' }}
-                    </label>
-                    <select class="form-select" [(ngModel)]="dog.fixed" name="dogFixed-{{i}}" required #dogFixedModel="ngModel">
-                      <option value="" disabled selected>Select</option>
-                      <option value="yes">Yes</option>
-                      <option value="no">No</option>
-                    </select>
-                    <div *ngIf="dogAttempted[i]?.[0] && dogFixedModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                    Dog sterilization info is required
+                    <label class="form-label">Dog's Name</label>
+                    <input type="text" class="form-control" [(ngModel)]="dog.name" name="dogName-{{i}}" required #dogNameModel="ngModel">
+                    <div *ngIf="dogAttempted[i]?.[0] && dogNameModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog name is required
                     </div>
                   </div>
-                </div>
+
+                  <div class="mb-2">
+                    <label class="form-label">Gender</label>
+                    <select class="form-select" [(ngModel)]="dog.gender" name="dogGender-{{i}}" required #dogGenderModel="ngModel">
+                      <option value="" disabled selected>Select Gender</option>
+                      <option value="female">Female</option>
+                      <option value="male">Male</option>
+                    </select>
+                    <div *ngIf="dogAttempted[i]?.[0] && dogGenderModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                    Dog gender is required
+                    </div>
+                  </div>
+
+                  <div *ngIf="dog.gender">
+                    <div class="mb-2">
+                      <label class="form-label">
+                        {{ dog.gender === 'male' ? 'Is your dog Castrated?' : 'Is your dog Sterilized?' }}
+                      </label>
+                      <select class="form-select" [(ngModel)]="dog.fixed" name="dogFixed-{{i}}" required #dogFixedModel="ngModel">
+                        <option value="" disabled selected>Select</option>
+                        <option value="yes">Yes</option>
+                        <option value="no">No</option>
+                      </select>
+                      <div *ngIf="dogAttempted[i]?.[0] && dogFixedModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                      Dog sterilization info is required
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div class="d-flex justify-content-end pt-3 border-top">
@@ -390,74 +346,68 @@
 
               <div *ngSwitchCase="1" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 1">
                 <div class="flex-grow-1">
+                  <div class="mb-2">
+                    <label class="form-label">Dog's Breed</label>
+                    <input type="text" class="form-control" [(ngModel)]="dog.breed" name="dogBreed-{{i}}">
+                  </div>
 
                   <div class="mb-2">
-                  <label class="form-label">Dog's Breed</label>
-                  <input type="text" class="form-control" [(ngModel)]="dog.breed" name="dogBreed-{{i}}">
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label">Dog's Size</label>
-                  <select class="form-select" [(ngModel)]="dog.size" name="dogSize-{{i}}" required #dogSizeModel="ngModel">
-                    <option value="" disabled selected>Select Size</option>
-                    <option value="small">Small</option>
-                    <option value="medium">Medium</option>
-                    <option value="large">Large</option>
-                    <option value="giant">Giant</option>
-                  </select>
-                  <div *ngIf="dogAttempted[i]?.[1] && dogSizeModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                    Dog size is required
-                  </div>
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label">Weight (kg)</label>
-                  <input type="number" class="form-control" [(ngModel)]="dog.weight" name="dogWeight-{{i}}" required #dogWeightModel="ngModel">
-                  <div *ngIf="dogAttempted[i]?.[1] && dogWeightModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
-                    Dog weight is required
-                  </div>
-                </div>
-
-                <div class="mb-2">
-                  <label class="form-label">Dog's Birth</label>
-                  <div class="d-flex gap-2">
-                    <!-- Month -->
-                    <select class="form-select"
-                            [(ngModel)]="dog.birthMonth"
-                            name="dogBirthMonth-{{i}}"
-                            required
-                            #dogBirthMonth="ngModel"
-                            (ngModelChange)="onDogMonthChange(i)">
-                      <option [ngValue]="null" disabled>Month</option>
-                      <option *ngFor="let m of months"
-                              [ngValue]="m.value"
-                              [disabled]="isMonthDisabledForDog(i, m.value)">{{ m.label }}</option>
+                    <label class="form-label">Dog's Size</label>
+                    <select class="form-select" [(ngModel)]="dog.size" name="dogSize-{{i}}" required #dogSizeModel="ngModel">
+                      <option value="" disabled selected>Select Size</option>
+                      <option value="small">Small</option>
+                      <option value="medium">Medium</option>
+                      <option value="large">Large</option>
+                      <option value="giant">Giant</option>
                     </select>
-
-                    <!-- Year -->
-                    <select class="form-select"
-                            [(ngModel)]="dog.birthYear"
-                            name="dogBirthYear-{{i}}"
-                            required
-                            #dogBirthYear="ngModel"
-                            (ngModelChange)="onDogYearChange(i)">
-                      <option [ngValue]="null" disabled>Year</option>
-                      <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
-                    </select>
-
+                    <div *ngIf="dogAttempted[i]?.[1] && dogSizeModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                      Dog size is required
+                    </div>
                   </div>
 
-                  <!-- Optional live preview -->
-                  <small *ngIf="dog.birthMonth && dog.birthYear" class="text-muted">
-                    ~ {{ formatAgeDecimal(ageDecimal(dog.birthYear, dog.birthMonth)) }} years
-                  </small>
-
-                  <div *ngIf="dogAttempted[i]?.[1] && (dogBirthMonth.invalid || dogBirthYear.invalid)"
-                       class="text-danger small mb-1 text-end fade-in-error">
-                    Birth month & year are required
+                  <div class="mb-2">
+                    <label class="form-label">Weight (kg)</label>
+                    <input type="number" class="form-control" [(ngModel)]="dog.weight" name="dogWeight-{{i}}" required #dogWeightModel="ngModel">
+                    <div *ngIf="dogAttempted[i]?.[1] && dogWeightModel.invalid" class="text-danger small mb-1 text-end fade-in-error">
+                      Dog weight is required
+                    </div>
                   </div>
-                </div>
 
+                  <div class="mb-2">
+                    <label class="form-label">Dog's Birth</label>
+                    <div class="d-flex gap-2">
+                      <select class="form-select"
+                              [(ngModel)]="dog.birthMonth"
+                              name="dogBirthMonth-{{i}}"
+                              required
+                              #dogBirthMonth="ngModel"
+                              (ngModelChange)="onDogMonthChange(i)">
+                        <option [ngValue]="null" disabled>Month</option>
+                        <option *ngFor="let m of months"
+                                [ngValue]="m.value"
+                                [disabled]="isMonthDisabledForDog(i, m.value)">{{ m.label }}</option>
+                      </select>
+
+                      <select class="form-select"
+                              [(ngModel)]="dog.birthYear"
+                              name="dogBirthYear-{{i}}"
+                              required
+                              #dogBirthYear="ngModel"
+                              (ngModelChange)="onDogYearChange(i)">
+                        <option [ngValue]="null" disabled>Year</option>
+                        <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+                      </select>
+                    </div>
+
+                    <small *ngIf="dog.birthMonth && dog.birthYear" class="text-muted">
+                      ~ {{ formatAgeDecimal(ageDecimal(dog.birthYear, dog.birthMonth)) }} years
+                    </small>
+
+                    <div *ngIf="dogAttempted[i]?.[1] && (dogBirthMonth.invalid || dogBirthYear.invalid)"
+                         class="text-danger small mb-1 text-end fade-in-error">
+                      Birth month & year are required
+                    </div>
+                  </div>
                 </div>
 
                 <div class="d-flex justify-content-between pt-3 border-top">
@@ -465,7 +415,6 @@
                     <button class="btn btn-primary" type="button" (click)="tryNextDogPage(i)">Next ➡️</button>
                 </div>
               </div>
-
 
               <div *ngSwitchCase="2" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 2">
                 <div class="flex-grow-1">
@@ -481,18 +430,6 @@
                     Dog vaccination info is required
                     </div>
                 </div>
-
-                <!-- Behavioral Traits -->
-                <!--<div class="mb-3">
-                  <label class="form-label fw-bold">Behavioral Traits</label>
-                  <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
-                    <div *ngFor="let trait of behavioralTraitsList">
-                      <input type="checkbox" class="form-check-input me-1" [value]="trait" (change)="onBehavioralTraitChange($event, i)">
-                      {{ trait }}
-                    </div>
-                  </div>
-                </div>-->
-
 
                 <div class="mb-3">
                   <label class="form-label fw-bold">Behavioral Traits</label>
@@ -520,43 +457,32 @@
 
                 <div *ngSwitchCase="3" class="page d-flex flex-column h-100" [class.active]="currentDogPage[i] === 3">
                   <div class="flex-grow-1">
-                  <!--<div class="mb-3">
-                    <label class="form-label fw-bold">Favorite Activities</label>
-                    <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
-                      <div *ngFor="let activity of favoriteActivitiesList">
-                        <input type="checkbox" class="form-check-input me-1" [value]="activity" (change)="onFavoriteActivityChange($event, i)">
-                        {{ activity }}
+                    <div class="mb-3">
+                      <label class="form-label fw-bold">Favorite Activities</label>
+                      <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
+                        <div class="form-check" *ngFor="let activity of favoriteActivitiesList; let a = index">
+                          <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [id]="'dog-' + i + '-act-' + a"
+                            name="dog{{i}}-act-{{a}}"
+                            [ngModel]="(dog.favoriteActivities || []).includes(activity)"
+                            (ngModelChange)="dog.favoriteActivities = toggleIn(dog.favoriteActivities, activity, $event)"
+                            [ngModelOptions]="{standalone:true}">
+                          <label class="form-check-label" [for]="'dog-' + i + '-act-' + a">{{ activity }}</label>
+                        </div>
                       </div>
                     </div>
-                  </div>-->
 
-                <div class="mb-3">
-                  <label class="form-label fw-bold">Favorite Activities</label>
-                  <div class="border p-2 rounded" style="max-height: 165px; overflow-y: auto;">
-                    <div class="form-check" *ngFor="let activity of favoriteActivitiesList; let a = index">
-                      <input
-                        class="form-check-input"
-                        type="checkbox"
-                        [id]="'dog-' + i + '-act-' + a"
-                        name="dog{{i}}-act-{{a}}"
-                        [ngModel]="(dog.favoriteActivities || []).includes(activity)"
-                        (ngModelChange)="dog.favoriteActivities = toggleIn(dog.favoriteActivities, activity, $event)"
-                        [ngModelOptions]="{standalone:true}">
-                      <label class="form-check-label" [for]="'dog-' + i + '-act-' + a">{{ activity }}</label>
+                    <div class="mb-2">
+                      <label class="form-label">Health Conditions</label>
+                      <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
                     </div>
-                  </div>
-                </div>
 
-
-                  <div class="mb-2">
-                    <label class="form-label">Health Conditions</label>
-                    <input type="text" class="form-control" placeholder="Any important data for dog-sitters or walking partners.." [(ngModel)]="dog.healthConditions" name="dogHealth-{{i}}">
-                  </div>
-
-                  <div class="mb-2">
-                    <label class="form-label">Anything Else?</label>
-                    <input type="text" class="form-control" [(ngModel)]="dog.moreDetails" name="dogMoreDetails-{{i}}">
-                  </div>
+                    <div class="mb-2">
+                      <label class="form-label">Anything Else?</label>
+                      <input type="text" class="form-control" [(ngModel)]="dog.moreDetails" name="dogMoreDetails-{{i}}">
+                    </div>
                   </div>
                   <div class="d-flex justify-content-between pt-3 border-top">
                     <button class="btn btn-secondary" type="button" (click)="previousDogPage(i)">⬅️ Back</button>
@@ -567,23 +493,21 @@
         </div>
         </ng-container>
 
-          <!-- Add Another Dog Button -->
-          <div class="text-center mb-4">
-            <button type="button" class="btn btn-outline-primary" (click)="addAnotherDog()">➕ Add Another Dog</button>
-          </div>
+        <!-- Add Another Dog Button -->
+        <div class="text-center mb-4">
+          <button type="button" class="btn btn-outline-primary" (click)="addAnotherDog()">➕ Add Another Dog</button>
         </div>
+      </div>
 
-        <!-- Submit Button -->
-        <button class="btn btn-success" type="submit" [disabled]="!isAllValid()">
-          Join us!
-        </button>
-
+      <!-- Submit Button -->
+      <button class="btn btn-success" type="submit" [disabled]="!isAllValid()">
+        Join us!
+      </button>
 
       </form>
     </div>
 
-    <!-- Right Image Section -->
   <div class="col-6 d-none d-md-block p-0 dog-image-container">
     <img src="assets/images/signupDog.jpg" alt="WoofTogether welcome image" />
   </div>
-
+</div>
