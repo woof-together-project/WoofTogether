@@ -33,7 +33,7 @@ export class AiChatComponent implements OnInit{
 
     this.userInput = '';
 
-    this.http.post<any>('https://3nqz6vpnmyozrnqr7o3zqgwu540sewcy.lambda-url.us-east-1.on.aws/', body).subscribe({
+    this.http.post<any>('https://njh75xi63rgzweic7ywnlyx2f40htjgw.lambda-url.us-east-1.on.aws/', body).subscribe({
       next: (res) => {
         this.messages.push({ role: 'assistant', content: res.response });
       },
@@ -51,7 +51,7 @@ export class AiChatComponent implements OnInit{
 
       // Only fetch chat history ONCE when sub is ready
       if (this.sub && this.messages.length === 0) {
-        this.http.get<any>(`https://3nqz6vpnmyozrnqr7o3zqgwu540sewcy.lambda-url.us-east-1.on.aws/?sub=${this.sub}`).subscribe({
+        this.http.get<any>(`https://njh75xi63rgzweic7ywnlyx2f40htjgw.lambda-url.us-east-1.on.aws/?sub=${this.sub}`).subscribe({
           next: (res) => {
             this.messages = Array.isArray(res.messages) ? res.messages : [];
           },
