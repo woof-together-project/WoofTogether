@@ -3,9 +3,9 @@
 
   <div class="cards-grid">
     <!-- General Info -->
-    <section class="card">
+    <section class="card general-card">
       <h3>General Info</h3>
-
+      <div class="card-scroll">
       <div class="row">
         <label>Email</label>
         <span>{{ email }}</span>
@@ -114,6 +114,7 @@
         <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
         <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
       </div>
+      </div>
     </section>
 
     <section class="card" *ngIf="!isSitter">
@@ -122,7 +123,7 @@
       <button class="pill save" (click)="openBecomeSitterModal()">Become a sitter</button>
     </section>
 
-    <section class="card" *ngIf="isSitter">
+    <section class="card sitter-card" *ngIf="isSitter">
       <div class="sitter-header">
         <h3>Sitter Profile</h3>
         <div class="sitter-tools">
