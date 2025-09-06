@@ -164,6 +164,9 @@
       <div class="flex-grow-1">
         <!-- MAP TAB -->
         <ng-container *ngIf="selectedTab === 'map'">
+          <div class="floating-map-info" *ngIf="selectedTab === 'map'">
+            Zoom: {{ zoomLevel }} | Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
+          </div>
           <div class="map-area">
             <app-map
               id="mapElement"
@@ -333,9 +336,9 @@
   </div>
 </div>
 
-<div class="floating-map-info">
+<!-- <div class="floating-map-info">
   Zoom: {{ zoomLevel }} |
   Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
-</div>
+</div> -->
 
 

@@ -1,46 +1,55 @@
-<!-- SITTERS LIST + MAP -->
 <div class="container-fluid px-4 py-3 dogsitter-container">
   <div class="text-center mb-3">
     <h1 class="fw-bold text">FIND ME A DOGSITTER</h1>
   </div>
 
   <div class="row h-100 gx-4">
-    <!-- LEFT: Sitter list -->
     <div class="col-lg-4 d-flex flex-column h-100">
-      <!-- Search Bar -->
       <div class="position-relative mb-3">
         <div class="input-group">
           <span class="input-group-text">📍</span>
-          <input type="text" class="form-control" placeholder="Search by city..."
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search by city..."
             [(ngModel)]="searchCity"
-            (focus)="loadCities()" (input)="filterCities()" (blur)="hideSuggestionsWithDelay()" />
+            (focus)="loadCities()"
+            (input)="filterCities()"
+            (blur)="hideSuggestionsWithDelay()"
+          />
           <button class="btn btn-success" (click)="onCitySearch()">Search</button>
           <button class="btn btn-outline-secondary" type="button" (click)="clearCitySearch()">Clear</button>
         </div>
 
-        <!-- Suggestions -->
-        <ul *ngIf="filteredCities.length && showSuggestions"
+        <ul
+          *ngIf="filteredCities.length && showSuggestions"
           class="list-group position-absolute w-100 z-3 bg-white shadow-sm"
-          style="top: 100%; max-height: 200px; overflow-y: auto;">
-          <li class="list-group-item list-group-item-action"
-              *ngFor="let city of filteredCities"
-              (mousedown)="selectCity(city)">
+          style="top: 100%; max-height: 200px; overflow-y: auto;"
+        >
+          <li
+            class="list-group-item list-group-item-action"
+            *ngFor="let city of filteredCities"
+            (mousedown)="selectCity(city)"
+          >
             {{ city }}
           </li>
         </ul>
 
-        <!-- Error -->
-        <div *ngIf="cityError"
-             class="alert alert-warning py-2 px-3 mt-2 mb-0"
-             style="position: relative; z-index: 1100;">
+        <div
+          *ngIf="cityError"
+          class="alert alert-warning py-2 px-3 mt-2 mb-0"
+          style="position: relative; z-index: 1100;"
+        >
           {{ cityError }}
         </div>
       </div>
 
-      <!-- Sitter Cards -->
       <div class="sitter-list flex-grow-1 overflow-auto">
-        <div class="sitter-card" *ngFor="let sitter of sitters" (click)="toggleSitterDetails(sitter.sitterId); focusOnSitter(sitter)">
-          <!-- Summary -->
+        <div
+          class="sitter-card"
+          *ngFor="let sitter of sitters"
+          (click)="toggleSitterDetails(sitter.sitterId); focusOnSitter(sitter)"
+        >
           <ng-container *ngIf="selectedSitterId !== sitter.sitterId; else expandedCard">
             <div class="d-flex gap-3">
               <img [src]="sitter.imageUrl" class="sitter-img" />
@@ -52,7 +61,6 @@
             </div>
           </ng-container>
 
-          <!-- Expanded -->
           <ng-template #expandedCard>
             <div class="sitter-summary position-relative">
               <div class="d-flex align-items-start gap-3 mb-2">
@@ -60,14 +68,15 @@
                 <div class="flex-grow-1">
                   <h5 class="mb-1">{{ sitter.name }}</h5>
                   <div class="d-flex justify-content-end gap-2 sitter-card-buttons">
-                    <button class="btn btn-secondary btn-sm"
-                            (click)="openReviews(sitter); $event.stopPropagation()">
+                    <button class="btn btn-secondary btn-sm" (click)="openReviews(sitter); $event.stopPropagation()">
                       Reviews ({{ sitter.reviewCount || 0 }})
                     </button>
-                    <a [href]="getSmartEmailLink(currentUserEmail, sitter.email, sitter.name)"
+                    <a
+                      [href]="getSmartEmailLink(currentUserEmail, sitter.email, sitter.name)"
                       target="_blank"
                       rel="noopener"
-                      class="btn btn-sm">
+                      class="btn btn-sm"
+                    >
                       Message Me!
                     </a>
                   </div>
@@ -87,7 +96,6 @@
       </div>
     </div>
 
-    <!-- RIGHT: Map / Filters -->
     <div class="col-lg-8 d-flex flex-column">
       <ul class="nav nav-tabs justify-content-end mb-2">
         <li class="nav-item">
@@ -98,12 +106,9 @@
         </li>
       </ul>
 
-      <!-- Small toolbar above the map -->
       <div class="map-toolbar d-flex align-items-center gap-2 mb-2">
-        <button class="btn btn-outline-dark btn-sm" (click)="resetMapView()">
-          Return to Default View In Map
-        </button>
-        <div class="ms-auto small text-muted">
+        <button class="btn btn-outline-dark btn-sm" (click)="resetMapView()">Return to Default View In Map</button>
+        <div class="ms-auto small text-muted" *ngIf="selectedTab === 'map'">
           Zoom: {{ zoom }} | Center: {{ center.lat | number:'1.4-4' }}, {{ center.lng | number:'1.4-4' }}
         </div>
       </div>
@@ -111,34 +116,33 @@
       <div class="flex-grow-1">
         <ng-container *ngIf="selectedTab === 'map'">
           <div class="h-100">
-            <app-map id="mapElement"
-                     [center]="{ lat: location.latitude, lng: location.longitude }"
-                     [zoom]="zoom"
-                     [markers]="markers"
-                     (markerClicked)="onMarkerSelected($event)">
+            <app-map
+              id="mapElement"
+              [center]="{ lat: location.latitude, lng: location.longitude }"
+              [zoom]="zoom"
+              [markers]="markers"
+              (markerClicked)="onMarkerSelected($event)"
+            >
             </app-map>
           </div>
         </ng-container>
 
-        <ng-container *ngIf="selectedTab === 'criteria'">
-          <div class="sitter-scrollable">
+        <ng-container *ngIf="criteriaReady">
+          <div class="sitter-scrollable" [hidden]="selectedTab !== 'criteria'">
             <form (ngSubmit)="applyFilters()" #filterForm="ngForm" class="criteria-card w-100">
-
               <div class="criteria-header">
                 <div class="d-flex align-items-center gap-2">
                   <i class="bi bi-funnel-fill"></i>
                   <span class="criteria-title">Refine your search</span>
                 </div>
-                <div class="d-flex align-items-center gap-2">
-                </div>
+                <div class="d-flex align-items-center gap-2"></div>
               </div>
 
-              <!-- Grid -->
               <div class="criteria-grid">
                 <section class="crit-section">
                   <h6 class="crit-label"><i class="bi bi-briefcase me-1"></i>Service Options</h6>
                   <div class="chip-group">
-                    <label class="chip" *ngFor="let option of serviceOptions">
+                    <label class="chip" *ngFor="let option of serviceOptions; trackBy: trackByIndex">
                       <input
                         type="checkbox"
                         [value]="option"
@@ -154,7 +158,7 @@
                 <section class="crit-section">
                   <h6 class="crit-label"><i class="bi bi-gender-ambiguous me-1"></i>Sitter Gender</h6>
                   <div class="segmented">
-                    <label class="segment" *ngFor="let gender of ['any', 'female', 'male']">
+                    <label class="segment" *ngFor="let gender of ['any', 'female', 'male']; trackBy: trackByIndex">
                       <input
                         type="radio"
                         [value]="gender"
@@ -170,7 +174,7 @@
                 <section class="crit-section">
                   <h6 class="crit-label"><i class="bi bi-dog me-1"></i>Experienced With</h6>
                   <div class="chip-group scrollable">
-                    <label class="chip" *ngFor="let type of experienceWithOptions">
+                    <label class="chip" *ngFor="let type of experienceWithOptions; trackBy: trackByIndex">
                       <input
                         type="checkbox"
                         [value]="type"
@@ -208,9 +212,7 @@
                 </section>
 
                 <section class="crit-section radius-section">
-                  <h6 class="crit-label">
-                    <i class="bi bi-geo-alt me-1"></i>Radius (km)
-                  </h6>
+                  <h6 class="crit-label"><i class="bi bi-geo-alt me-1"></i>Radius (km)</h6>
                   <div class="radius-row">
                     <label class="visually-hidden" for="radiusKmInput">Search radius in kilometers</label>
                     <div class="input-with-suffix">
@@ -249,11 +251,8 @@
                 </section>
               </div>
 
-              <!-- Footer -->
               <div class="criteria-footer">
-                <div class="small text-muted">
-                  Tip: You can combine multiple “Experienced with” chips.
-                </div>
+                <div class="small text-muted">Tip: You can combine multiple “Experienced with” chips.</div>
                 <div class="ms-auto d-flex gap-2">
                   <button type="button" class="btn btn-outline-secondary" (click)="clearFilters()">Clear Filters</button>
                   <button type="submit" class="btn btn-success">Apply Filters</button>
@@ -263,7 +262,6 @@
           </div>
         </ng-container>
 
-        <!-- REVIEWS MODAL -->
         <div class="modal-backdrop-custom" *ngIf="showReviewModal" (click)="closeReviews()"></div>
         <div class="modal-custom" *ngIf="showReviewModal">
           <div class="modal-header">
@@ -277,23 +275,19 @@
                 <strong>Average:</strong> {{ reviewsAverage | number:'1.1-2' }} ⭐
                 <span class="text-muted">({{ reviewsCount }} review{{ reviewsCount === 1 ? '' : 's' }})</span>
               </div>
-
-              <!-- Reviews List -->
               <div *ngFor="let r of reviews" class="review-item">
-              <div class="d-flex justify-content-between align-items-center">
-                <div>
-                  <strong>{{ r.userName }}</strong>
-                  <span class="ms-2">★ {{ r.rating }}</span>
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <strong>{{ r.userName }}</strong>
+                    <span class="ms-2">★ {{ r.rating }}</span>
+                  </div>
+                  <small>{{ r.reviewDate | date:'MMM d, y, h:mm a' }}</small>
                 </div>
-                <small>{{ r.reviewDate | date:'MMM d, y, h:mm a' }}</small>
-              </div>
                 <div class="text-muted">{{ r.comment }}</div>
               </div>
               <ng-template #none>
                 <div class="text-muted">No reviews yet.</div>
               </ng-template>
-
-              <!-- Add Review Button -->
               <div class="text-end mt-3">
                 <button class="btn btn-outline-primary" (click)="openAddReview()">Add Review</button>
               </div>
@@ -301,7 +295,6 @@
           </div>
         </div>
 
-        <!-- ADD REVIEW -->
         <div class="modal-backdrop-custom" *ngIf="showAddReviewModal" (click)="closeAddReview()"></div>
         <div class="modal-custom" *ngIf="showAddReviewModal">
           <div class="modal-header">
@@ -311,11 +304,24 @@
           <div class="modal-body">
             <form (ngSubmit)="submitReview()" #f="ngForm">
               <label class="form-label">Your rating</label>
-              <input type="number" class="form-control mb-2" style="max-width:100px"
-                    [(ngModel)]="newReview.rating" name="rating" min="1" max="5" required>
+              <input
+                type="number"
+                class="form-control mb-2"
+                style="max-width:100px"
+                [(ngModel)]="newReview.rating"
+                name="rating"
+                min="1"
+                max="5"
+                required
+              />
               <label class="form-label">Comment (optional)</label>
-              <textarea class="form-control mb-3" rows="3"
-                        [(ngModel)]="newReview.comment" name="comment" maxlength="1000"></textarea>
+              <textarea
+                class="form-control mb-3"
+                rows="3"
+                [(ngModel)]="newReview.comment"
+                name="comment"
+                maxlength="1000"
+              ></textarea>
               <div class="d-flex justify-content-end gap-2">
                 <button type="button" class="btn btn-outline-secondary" (click)="closeAddReview()">Cancel</button>
                 <button class="btn btn-success" [disabled]="reviewSubmitting || f.invalid">

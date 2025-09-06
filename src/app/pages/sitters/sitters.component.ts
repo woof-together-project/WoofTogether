@@ -21,6 +21,7 @@ export class SittersComponent implements OnInit {
   constructor(private http: HttpClient, private userContext: UserContextService) {}
 
   selectedTab: 'map' | 'criteria' | null = 'map';
+  criteriaReady = false;
   sitters: Sitter[] = [];
   loading = false;
 
@@ -112,6 +113,10 @@ export class SittersComponent implements OnInit {
       this.zoom = this.defaultZoom;
       this.loadSittersByLocation();
 
+      if (this.selectedTab === 'criteria') {
+      this.criteriaReady = true;
+    }
+
     } catch (err) {
       console.error('Could not get user location, falling back to default');
       this.loadSittersByLocation();
@@ -171,8 +176,14 @@ export class SittersComponent implements OnInit {
 
   selectTab(tab: 'map' | 'criteria') {
     this.selectedTab = tab;
+    if (tab === 'criteria') {
+      this.criteriaReady = true;   
+    }
   }
 
+  trackByIndex(index: number): number {
+  return index;
+}
   onServiceOptionChange(event: any) {
     const value = event.target.value;
     if (event.target.checked) {

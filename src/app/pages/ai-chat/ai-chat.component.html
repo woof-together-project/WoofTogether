@@ -13,28 +13,26 @@
     <img src="assets/images/dogPaw.png" class="paw p9" />
     <img src="assets/images/dogPaw.png" class="paw p10" />
 
-    <h2 class="welcome">
-    {{ nickname ? 'Hey ' + nickname + ', how can I help you?' : 'Hey there, how can I help you?' }}
-    </h2>
-
-    <!-- Chat Messages -->
     <div class="chat-box">
+      <h2 class="welcome">
+        {{ nickname ? 'Hey ' + nickname + ', how can I help you?' : 'Hey there, how can I help you?' }}
+      </h2>
+
       <div class="messages" #messagesContainer>
-        <div *ngFor="let msg of messages" [class.user]="msg.role === 'user'" [class.bot]="msg.role === 'assistant'">
+        <div *ngFor="let msg of messages"
+             [class.user]="msg.role === 'user'"
+             [class.bot]="msg.role === 'assistant'">
           {{ msg.content }}
         </div>
       </div>
 
-      <!-- Input -->
       <form (ngSubmit)="sendMessage()" class="input-area">
-        <input
-          type="text"
-          [(ngModel)]="userInput"
-          name="chatInput"
-          placeholder="Type your message..."
-          required
-          (keydown.enter)="sendMessage()"
-        />
+        <input type="text"
+               [(ngModel)]="userInput"
+               name="chatInput"
+               placeholder="Type your message..."
+               required
+               (keydown.enter)="sendMessage()" />
         <button type="submit">Send</button>
       </form>
     </div>

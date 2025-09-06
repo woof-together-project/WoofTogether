@@ -148,3 +148,98 @@ button:hover {
 .p8  { bottom: 15%; right: 15%; width: 55px; transform: rotate(-15deg); }
 .p9  { top: 5%; right: 30%; width: 65px; transform: rotate(10deg); }
 .p10 { bottom: 5%; left: 40%; width: 70px; transform: rotate(-5deg); }
+
+/* 1) If any welcome is outside the white box, hide it (safety net) */
+.chat-page > .welcome { display: none !important; }
+
+/* 2) Keep the greeting INSIDE the white box — no sticky */
+.chat-box > .welcome {
+  position: static !important;       /* was sticky from earlier suggestion */
+  margin: 0 0 1rem 0;
+  padding: .25rem 0 .5rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  background: transparent;           /* no overlay outside the card */
+  z-index: auto;
+}
+
+/* 3) Make the messages area the only scroller */
+.chat-box {
+  /* ensure the card itself isn't the scroll container */
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+}
+
+.messages {
+  flex: 1 1 auto;
+  min-height: 0;                     /* critical in flex columns */
+  overflow-y: auto;                  /* scroll ONLY here */
+}
+
+/* 4) Optional: reduce huge top padding so the card sits higher */
+.chat-page { padding-top: 1.25rem; } /* was large; adjust to taste */
+
+/* === Ask-Us: paste at end of ai-chat.component.css === */
+
+:host { min-height: 100dvh; height: auto; overflow: clip; }
+
+/* Reduce big top padding so the white card sits higher and adapts better */
+.chat-page {
+  min-height: 100dvh;
+  padding: 1.5rem 1rem; /* was 6rem */
+  overflow: visible;
+}
+
+/* The white card adapts to viewport; remove fixed 1000px height */
+.chat-box {
+  max-width: 1400px;
+  width: 100%;
+  height: clamp(520px, calc(100dvh - 220px), 900px);
+  display: flex;
+  flex-direction: column;
+  overflow: visible;  /* scroller is .messages */
+}
+
+/* Title inside card, not sticky */
+.chat-box > .welcome {
+  margin: 0 0 1rem 0;
+  padding: .25rem 0 .5rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+}
+
+/* Make only the messages area scroll */
+.messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Safety: if a .welcome exists outside the card, hide it */
+.chat-page > .welcome { display: none !important; }
+
+.chat-page {
+  padding-top: calc(var(--nav-h) + 16px) !important; /* under navbar */
+  padding-bottom: 16px;
+  min-height: 100dvh;
+  overflow: visible; /* allow the white card to sit naturally */
+}
+
+/* Make the white box responsive instead of fixed height */
+.chat-box {
+  margin-top: 0; /* we’re using chat-page padding now */
+  height: clamp(560px, calc(100dvh - (var(--nav-h) + 160px)), 900px) !important;
+  max-width: 1400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Only messages scroll */
+.messages { flex: 1 1 auto; min-height: 0; overflow-y: auto; }
+
+/* Safety: if any stray welcome exists outside, hide it */
+.chat-page > .welcome { display: none !important; }
