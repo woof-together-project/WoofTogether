@@ -1,128 +1,101 @@
-<div class="profile-shell" *ngIf="loaded" xmlns="http://www.w3.org/1999/html">
+<div class="profile-shell" *ngIf="loaded">
   <h2 class="page-title"></h2>
-
   <div class="cards-grid">
     <!-- General Info -->
     <section class="card general-card">
       <h3>General Info</h3>
       <div class="card-scroll">
-      <div class="row">
-        <label>Email</label>
-        <span>{{ email }}</span>
-      </div>
-
-      <div class="row">
-        <label>Phone</label>
-        <span *ngIf="!isEditing('general','phone')">{{ phone || '—' }}</span>
-        <input *ngIf="isEditing('general','phone')" [(ngModel)]="phone" />
-        <button class="icon-btn" (click)="toggleEdit('general','phone')">
-          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        </button>
-        <button *ngIf="isEditing('general','phone')" class="pill save" (click)="saveField('general','phone')">Save</button>
-        <button *ngIf="isEditing('general','phone')" class="pill cancel" (click)="cancelField('general','phone')">Cancel</button>
-      </div>
-
-      <div class="row">
-        <label>City</label>
-
-        <span *ngIf="!isEditing('general','city')">{{ city || '—' }}</span>
-
-        <div *ngIf="isEditing('general','city')" class="position-relative w-100">
-          <input
-            type="text"
-            class="form-control"
-            name="city"
-            [ngModel]="city"
-            (ngModelChange)="onCityInput($event)"
-            (keydown.arrowdown)="onCityArrow(1, $any($event))"
-            (keydown.arrowup)="onCityArrow(-1, $any($event))"
-            (keydown.enter)="onCityEnter($any($event))"
-            (keydown.escape)="citySuggestions=[]"
-            autocomplete="off"
-            role="combobox"
-            [attr.aria-expanded]="citySuggestions.length>0"
-            [attr.aria-activedescendant]="'city-opt-' + cityActiveIndex" />
-
-          <ul class="autocomplete-list" *ngIf="citySuggestions.length" role="listbox" aria-label="City suggestions">
-            <li *ngFor="let s of citySuggestions; let i = index"
-                [id]="'city-opt-' + i"
-                [class.active]="i === cityActiveIndex"
-                (mouseenter)="cityActiveIndex = i"
-                (mousedown)="pickCity(s)"
-                role="option"
-                [attr.aria-selected]="i === cityActiveIndex">
-              {{ s.description }}
-            </li>
-          </ul>
+        <div class="row">
+          <label>Email</label>
+          <span>{{ email }}</span>
         </div>
-
-        <button class="icon-btn" (click)="toggleEdit('general','city')">
-          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        </button>
-        <button *ngIf="isEditing('general','city')" class="pill save" (click)="saveField('general','city')">Save</button>
-        <button *ngIf="isEditing('general','city')" class="pill cancel" (click)="cancelField('general','city')">Cancel</button>
-      </div>
-
-      <div class="row">
-        <label>Street</label>
-
-        <span *ngIf="!isEditing('general','street')">{{ street || '—' }}</span>
-
-        <div *ngIf="isEditing('general','street')" class="position-relative w-100">
-          <input
-            id="street-input"
-            #streetInput
-            type="text"
-            class="form-control"
-            name="street"
-            [ngModel]="street"
-            (ngModelChange)="onStreetInput($event)"
-            (keydown.arrowdown)="onStreetArrow(1, $any($event))"
-            (keydown.arrowup)="onStreetArrow(-1, $any($event))"
-            (keydown.enter)="onStreetEnter($any($event))"
-            (keydown.escape)="addressSuggestions=[]"
-            autocomplete="off"
-            role="combobox"
-            [attr.aria-expanded]="addressSuggestions.length>0"
-            [attr.aria-activedescendant]="'addr-opt-' + addressActiveIndex"
-            [attr.aria-controls]="'addr-listbox'"
-          />
-
-          <ul
-            id="addr-listbox"
-            class="autocomplete-list"
-            *ngIf="addressSuggestions.length"
-            role="listbox"
-            aria-label="Street suggestions"
-          >
-            <li *ngFor="let s of addressSuggestions; let i = index"
-                [id]="'addr-opt-' + i"
-                [class.active]="i === addressActiveIndex"
-                (mouseenter)="addressActiveIndex = i"
-                (mousedown)="pickAddress(s)"
-                role="option"
-                [attr.aria-selected]="i === addressActiveIndex">
-              {{ s.description }}
-            </li>
-          </ul>
+        <div class="row">
+          <label>Phone</label>
+          <span *ngIf="!isEditing('general','phone')">{{ phone || '—' }}</span>
+          <input *ngIf="isEditing('general','phone')" [(ngModel)]="phone" />
+          <button class="icon-btn" (click)="toggleEdit('general','phone')">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+          <button *ngIf="isEditing('general','phone')" class="pill save" (click)="saveField('general','phone')">Save</button>
+          <button *ngIf="isEditing('general','phone')" class="pill cancel" (click)="cancelField('general','phone')">Cancel</button>
         </div>
-
-
-        <button class="icon-btn" (click)="toggleEdit('general','street')">
-          <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-        </button>
-        <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
-        <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
-      </div>
+        <div class="row">
+          <label>City</label>
+          <span *ngIf="!isEditing('general','city')">{{ city || '—' }}</span>
+          <div *ngIf="isEditing('general','city')" class="position-relative w-100">
+            <input type="text" class="form-control" name="city" [ngModel]="city"
+              (ngModelChange)="onCityInput($event)"
+              (keydown.arrowdown)="onCityArrow(1, $any($event))"
+              (keydown.arrowup)="onCityArrow(-1, $any($event))"
+              (keydown.enter)="onCityEnter($any($event))"
+              (keydown.escape)="citySuggestions=[]"
+              autocomplete="off" role="combobox"
+              [attr.aria-expanded]="citySuggestions.length>0"
+              [attr.aria-activedescendant]="'city-opt-' + cityActiveIndex" />
+            <ul class="autocomplete-list" *ngIf="citySuggestions.length" role="listbox" aria-label="City suggestions">
+              <li *ngFor="let s of citySuggestions; let i = index"
+                  [id]="'city-opt-' + i"
+                  [class.active]="i === cityActiveIndex"
+                  (mouseenter)="cityActiveIndex = i"
+                  (mousedown)="pickCity(s)"
+                  role="option"
+                  [attr.aria-selected]="i === cityActiveIndex">
+                {{ s.description }}
+              </li>
+            </ul>
+          </div>
+          <button class="icon-btn" (click)="toggleEdit('general','city')">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+          <button *ngIf="isEditing('general','city')" class="pill save" (click)="saveField('general','city')">Save</button>
+          <button *ngIf="isEditing('general','city')" class="pill cancel" (click)="cancelField('general','city')">Cancel</button>
+        </div>
+        <div class="row">
+          <label>Street</label>
+          <span *ngIf="!isEditing('general','street')">{{ street || '—' }}</span>
+          <div *ngIf="isEditing('general','street')" class="position-relative w-100">
+            <input id="street-input" #streetInput type="text" class="form-control" name="street" [ngModel]="street"
+              (ngModelChange)="onStreetInput($event)"
+              (keydown.arrowdown)="onStreetArrow(1, $any($event))"
+              (keydown.arrowup)="onStreetArrow(-1, $any($event))"
+              (keydown.enter)="onStreetEnter($any($event))"
+              (keydown.escape)="addressSuggestions=[]"
+              autocomplete="off" role="combobox"
+              [attr.aria-expanded]="addressSuggestions.length>0"
+              [attr.aria-activedescendant]="'addr-opt-' + addressActiveIndex"
+              [attr.aria-controls]="'addr-listbox'" />
+            <ul id="addr-listbox" class="autocomplete-list" *ngIf="addressSuggestions.length" role="listbox"
+                aria-label="Street suggestions">
+              <li *ngFor="let s of addressSuggestions; let i = index"
+                  [id]="'addr-opt-' + i"
+                  [class.active]="i === addressActiveIndex"
+                  (mouseenter)="addressActiveIndex = i"
+                  (mousedown)="pickAddress(s)"
+                  role="option"
+                  [attr.aria-selected]="i === addressActiveIndex">
+                {{ s.description }}
+              </li>
+            </ul>
+          </div>
+          <button class="icon-btn" (click)="toggleEdit('general','street')">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+          </button>
+          <button *ngIf="isEditing('general','street')" class="pill save" (click)="saveField('general','street')">Save</button>
+          <button *ngIf="isEditing('general','street')" class="pill cancel" (click)="cancelField('general','street')">Cancel</button>
+        </div>
       </div>
     </section>
 
-    <section class="card" *ngIf="!isSitter">
-      <h3>Are you a dog sitter?</h3>
-      <p class="muted">Create a sitter profile to appear in sitter searches and get bookings.</p>
-      <button class="pill save" (click)="openBecomeSitterModal()">Become a sitter</button>
+    <!-- Become Sitter (always up) -->
+    <section class="card become-sitter-card" *ngIf="!isSitter">
+      <div class="become-sitter-content">
+        <h3>Are you a dog sitter?</h3>
+        <p class="muted">Create a sitter profile to appear in sitter searches and get bookings.</p>
+        <button class="pill save become-sitter-btn" (click)="openBecomeSitterModal()">Become a sitter</button>
+      </div>
     </section>
 
+    <!-- Sitter card (if isSitter) -->
     <section class="card sitter-card" *ngIf="isSitter">
       <div class="sitter-header">
         <h3>Sitter Profile</h3>
@@ -138,8 +111,7 @@
           </button>
         </div>
       </div>
-
-       <div class="sitter-fields" [class.disabled]="!sitterActive" [attr.aria-disabled]="!sitterActive">
+      <div class="sitter-fields" [class.disabled]="!sitterActive" [attr.aria-disabled]="!sitterActive">
         <div class="row">
           <label>Photo</label>
           <div class="avatar-row">
@@ -148,13 +120,11 @@
             <button class="pill btn-change" (click)="startSitterPicEdit(sitterPicInput)" [disabled]="!sitterActive">Change</button>
           </div>
         </div>
-
         <div class="row">
           <label>Gender</label>
           <span *ngIf="!isEditing('sitter','gender')">{{ gender }}</span>
           <input *ngIf="isEditing('sitter','gender')" [(ngModel)]="gender" />
         </div>
-
         <div class="row">
           <label>Rate</label>
           <span *ngIf="!isEditing('sitter','rate')">{{ rate ?? '—' }}</span>
@@ -165,7 +135,6 @@
           <button *ngIf="isEditing('sitter','rate')" class="pill save" (click)="saveField('sitter','rate')">Save</button>
           <button *ngIf="isEditing('sitter','rate')" class="pill cancel" (click)="cancelField('sitter','rate')">Cancel</button>
         </div>
-
         <div class="row">
           <label>Availability</label>
           <span *ngIf="!isEditing('sitter','availability')">{{ availability || '—' }}</span>
@@ -180,7 +149,6 @@
           <button *ngIf="isEditing('sitter','availability')" class="pill save" (click)="saveField('sitter','availability')">Save</button>
           <button *ngIf="isEditing('sitter','availability')" class="pill cancel" (click)="cancelField('sitter','availability')">Cancel</button>
         </div>
-
         <div class="row">
           <label>Bio</label>
           <span *ngIf="!isEditing('sitter','sitterBio')">{{ sitterBio || '—' }}</span>
@@ -195,7 +163,6 @@
           <button *ngIf="isEditing('sitter','sitterBio')" class="pill save" (click)="saveField('sitter','sitterBio')">Save</button>
           <button *ngIf="isEditing('sitter','sitterBio')" class="pill cancel" (click)="cancelField('sitter','sitterBio')">Cancel</button>
         </div>
-
         <div class="row">
           <label>Number of Experience Years</label>
           <span *ngIf="!isEditing('sitter','experienceYears')">{{ experienceYears || '—' }}</span>
@@ -206,7 +173,6 @@
           <button *ngIf="isEditing('sitter','experienceYears')" class="pill save" (click)="saveField('sitter','experienceYears')">Save</button>
           <button *ngIf="isEditing('sitter','experienceYears')" class="pill cancel" (click)="cancelField('sitter','experienceYears')">Cancel</button>
         </div>
-
         <div class="row">
           <label>Experience With</label>
           <span>{{ displayList(experienceDetails) }}</span>
@@ -215,7 +181,6 @@
             <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
           </button>
         </div>
-
         <div class="row">
           <label>Services</label>
           <span>{{ displayList(serviceOptions) }}</span>
@@ -224,8 +189,8 @@
             <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
           </button>
         </div>
-       </div>
-      </section>
+      </div>
+    </section>
 
     <!-- Dogs -->
     <section class="card dogs-card">
@@ -237,129 +202,113 @@
           </svg>
         </button>
       </div>
-
       <div class="dogs-scroll">
-      <div *ngIf="!dogs?.length" class="empty-hint">No dogs yet.</div>
-
-      <div *ngFor="let d of dogs; let i = index" class="dog-accordion">
-        <div class="dog-accordion-header">
-          <button class="toggle" (click)="dogOpen[i] = !dogOpen[i]">
-            <span class="chev" [class.open]="dogOpen[i]">›</span>
-            <span class="dog-name" [class.is-empty]="!d.name">
-              {{ d.name || ('Dog #' + (i + 1)) }}</span>
-          </button>
-          <button
-            class="trash-btn"
-            title="Delete dog?"
-            (click)="openDeleteDogConfirm(i)">
-            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-              <path d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-3h6l1 1h4v2H4V5h4l1-1z"/>
-            </svg>
-          </button>
-        </div>
-
-        <div class="dog-accordion-body" *ngIf="dogOpen[i]">
-          <div class="row">
-            <label>Dog Photo</label>
-            <div class="avatar-row">
-              <img [src]="d.profilePictureUrl" class="avatar" alt="dog" />
-              <input #dogPicInput type="file" accept="image/*" hidden (change)="onDogPicSelected($event, i)" />
-              <button class="pill btn-change" (click)="startDogPicEdit(i, dogPicInput)">Change</button>
+        <div *ngIf="!dogs?.length" class="empty-hint">No dogs yet.</div>
+        <div *ngFor="let d of dogs; let i = index" class="dog-accordion">
+          <div class="dog-accordion-header">
+            <button class="toggle" (click)="dogOpen[i] = !dogOpen[i]">
+              <span class="chev" [class.open]="dogOpen[i]">›</span>
+              <span class="dog-name" [class.is-empty]="!d.name">
+                {{ d.name || ('Dog #' + (i + 1)) }}</span>
+            </button>
+            <button class="trash-btn" title="Delete dog?" (click)="openDeleteDogConfirm(i)">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                <path d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-3h6l1 1h4v2H4V5h4l1-1z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="dog-accordion-body" *ngIf="dogOpen[i]">
+            <div class="row">
+              <label>Dog Photo</label>
+              <div class="avatar-row">
+                <img [src]="d.profilePictureUrl" class="avatar" alt="dog" />
+                <input #dogPicInput type="file" accept="image/*" hidden (change)="onDogPicSelected($event, i)" />
+                <button class="pill btn-change" (click)="startDogPicEdit(i, dogPicInput)">Change</button>
+              </div>
+            </div>
+            <div class="row">
+              <label>Name</label>
+              <span *ngIf="!isEditingDog(i,'name')">{{ d.name || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'name')" [(ngModel)]="dogs[i].name" />
+              <button class="icon-btn" (click)="toggleDogEdit(i,'name')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+              <button *ngIf="isEditingDog(i,'name')" class="pill save" (click)="saveDogField(i,'name')">Save</button>
+              <button *ngIf="isEditingDog(i,'name')" class="pill cancel" (click)="cancelDogField(i,'name')">Cancel</button>
+            </div>
+            <div class="row">
+              <label>Age</label>
+              <span *ngIf="!isEditingDog(i,'age')">{{ d.age || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'age')" [(ngModel)]="dogs[i].age" />
+            </div>
+            <div class="row">
+              <label>Gender</label>
+              <span *ngIf="!isEditingDog(i,'gender')">{{ d.gender || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'gender')" [(ngModel)]="dogs[i].gender" />
+            </div>
+            <div class="row">
+              <label>Size</label>
+              <span *ngIf="!isEditingDog(i,'size')">{{ d.size || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'size')" [(ngModel)]="dogs[i].size" />
+            </div>
+            <div class="row">
+              <label>Weight</label>
+              <span *ngIf="!isEditingDog(i,'weight')">{{ d.weight || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'weight')" [(ngModel)]="dogs[i].weight" />
+              <button class="icon-btn" (click)="toggleDogEdit(i,'weight')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+              <button *ngIf="isEditingDog(i,'weight')" class="pill save" (click)="saveDogField(i,'weight')">Save</button>
+              <button *ngIf="isEditingDog(i,'weight')" class="pill cancel" (click)="cancelDogField(i,'weight')">Cancel</button>
+            </div>
+            <div class="row">
+              <label>Breed</label>
+              <span *ngIf="!isEditingDog(i,'breed')">{{ d.breed || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'breed')" [(ngModel)]="dogs[i].breed" />
+              <button class="icon-btn" (click)="toggleDogEdit(i,'breed')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+              <button *ngIf="isEditingDog(i,'breed')" class="pill save" (click)="saveDogField(i,'breed')">Save</button>
+              <button *ngIf="isEditingDog(i,'breed')" class="pill cancel" (click)="cancelDogField(i,'breed')">Cancel</button>
+            </div>
+            <div class="row">
+              <label>Behavioral Traits</label>
+              <span>{{ displayList(dogs[i].behavioralTraits) }}</span>
+              <button class="icon-btn"
+                (click)="openMultiEdit('dog','behavioralTraits',behavioralTraitsList,dogs[i].behavioralTraits,i,'Edit Behavioral Traits')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+            </div>
+            <div class="row">
+              <label>Favorite Activities</label>
+              <span>{{ displayList(dogs[i].favoriteActivities) }}</span>
+              <button class="icon-btn"
+                (click)="openMultiEdit('dog','favoriteActivities',favoriteActivitiesList,dogs[i].favoriteActivities,i,'Edit Favorite Activities')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+            </div>
+            <div class="row">
+              <label>Health Conditions</label>
+              <span *ngIf="!isEditingDog(i,'healthConditions')">{{ d.healthConditions || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'healthConditions')" [(ngModel)]="dogs[i].healthConditions" />
+              <button class="icon-btn" (click)="toggleDogEdit(i,'healthConditions')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+              <button *ngIf="isEditingDog(i,'healthConditions')" class="pill save" (click)="saveDogField(i,'healthConditions')">Save</button>
+              <button *ngIf="isEditingDog(i,'healthConditions')" class="pill cancel" (click)="cancelDogField(i,'healthConditions')">Cancel</button>
+            </div>
+            <div class="row">
+              <label>More Details</label>
+              <span *ngIf="!isEditingDog(i,'moreDetails')">{{ d.moreDetails || '—' }}</span>
+              <input *ngIf="isEditingDog(i,'moreDetails')" [(ngModel)]="dogs[i].moreDetails" />
+              <button class="icon-btn" (click)="toggleDogEdit(i,'moreDetails')">
+                <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+              </button>
+              <button *ngIf="isEditingDog(i,'moreDetails')" class="pill save" (click)="saveDogField(i,'moreDetails')">Save</button>
+              <button *ngIf="isEditingDog(i,'moreDetails')" class="pill cancel" (click)="cancelDogField(i,'moreDetails')">Cancel</button>
             </div>
           </div>
-
-          <div class="row">
-            <label>Name</label>
-            <span *ngIf="!isEditingDog(i,'name')">{{ d.name || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'name')" [(ngModel)]="dogs[i].name" />
-            <button class="icon-btn" (click)="toggleDogEdit(i,'name')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-            <button *ngIf="isEditingDog(i,'name')" class="pill save" (click)="saveDogField(i,'name')">Save</button>
-            <button *ngIf="isEditingDog(i,'name')" class="pill cancel" (click)="cancelDogField(i,'name')">Cancel</button>
-          </div>
-
-          <div class="row">
-            <label>Age</label>
-            <span *ngIf="!isEditingDog(i,'age')">{{ d.age || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'age')" [(ngModel)]="dogs[i].age" />
-          </div>
-
-          <div class="row">
-            <label>Gender</label>
-            <span *ngIf="!isEditingDog(i,'gender')">{{ d.gender || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'gender')" [(ngModel)]="dogs[i].gender" />
-          </div>
-
-          <div class="row">
-            <label>Size</label>
-            <span *ngIf="!isEditingDog(i,'size')">{{ d.size || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'size')" [(ngModel)]="dogs[i].size" />
-          </div>
-
-          <div class="row">
-            <label>Weight</label>
-            <span *ngIf="!isEditingDog(i,'weight')">{{ d.weight || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'weight')" [(ngModel)]="dogs[i].weight" />
-            <button class="icon-btn" (click)="toggleDogEdit(i,'weight')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-            <button *ngIf="isEditingDog(i,'weight')" class="pill save" (click)="saveDogField(i,'weight')">Save</button>
-            <button *ngIf="isEditingDog(i,'weight')" class="pill cancel" (click)="cancelDogField(i,'weight')">Cancel</button>
-          </div>
-
-          <div class="row">
-            <label>Breed</label>
-            <span *ngIf="!isEditingDog(i,'breed')">{{ d.breed || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'breed')" [(ngModel)]="dogs[i].breed" />
-            <button class="icon-btn" (click)="toggleDogEdit(i,'breed')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-            <button *ngIf="isEditingDog(i,'breed')" class="pill save" (click)="saveDogField(i,'breed')">Save</button>
-            <button *ngIf="isEditingDog(i,'breed')" class="pill cancel" (click)="cancelDogField(i,'breed')">Cancel</button>
-          </div>
-
-          <div class="row">
-            <label>Behavioral Traits</label>
-            <span>{{ displayList(dogs[i].behavioralTraits) }}</span>
-            <button class="icon-btn"
-              (click)="openMultiEdit('dog','behavioralTraits',behavioralTraitsList,dogs[i].behavioralTraits,i,'Edit Behavioral Traits')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-          </div>
-
-          <div class="row">
-            <label>Favorite Activities</label>
-            <span>{{ displayList(dogs[i].favoriteActivities) }}</span>
-            <button class="icon-btn"
-              (click)="openMultiEdit('dog','favoriteActivities',favoriteActivitiesList,dogs[i].favoriteActivities,i,'Edit Favorite Activities')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-          </div>
-
-          <div class="row">
-            <label>Health Conditions</label>
-            <span *ngIf="!isEditingDog(i,'healthConditions')">{{ d.healthConditions || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'healthConditions')" [(ngModel)]="dogs[i].healthConditions" />
-            <button class="icon-btn" (click)="toggleDogEdit(i,'healthConditions')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-            <button *ngIf="isEditingDog(i,'healthConditions')" class="pill save" (click)="saveDogField(i,'healthConditions')">Save</button>
-            <button *ngIf="isEditingDog(i,'healthConditions')" class="pill cancel" (click)="cancelDogField(i,'healthConditions')">Cancel</button>
-          </div>
-
-          <div class="row">
-            <label>More Details</label>
-            <span *ngIf="!isEditingDog(i,'moreDetails')">{{ d.moreDetails || '—' }}</span>
-            <input *ngIf="isEditingDog(i,'moreDetails')" [(ngModel)]="dogs[i].moreDetails" />
-            <button class="icon-btn" (click)="toggleDogEdit(i,'moreDetails')">
-              <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
-            </button>
-            <button *ngIf="isEditingDog(i,'moreDetails')" class="pill save" (click)="saveDogField(i,'moreDetails')">Save</button>
-            <button *ngIf="isEditingDog(i,'moreDetails')" class="pill cancel" (click)="cancelDogField(i,'moreDetails')">Cancel</button>
-          </div>
         </div>
-      </div>
       </div>
     </section>
   </div>
@@ -368,7 +317,6 @@
   <div class="mm-backdrop" *ngIf="modal.open">
     <div class="mm-modal">
       <h4>{{ modal.title }}</h4>
-
       <div class="options">
         <label class="check-row" *ngFor="let opt of modal.options">
           <input
@@ -378,7 +326,6 @@
           <span>{{ opt }}</span>
         </label>
       </div>
-
       <div class="modal-actions">
         <button class="pill cancel" (click)="closeMultiEdit()">Cancel</button>
         <button class="pill save" (click)="saveMultiEdit()">Save</button>
@@ -386,6 +333,297 @@
     </div>
   </div>
 
+  
+
+  <!-- Add Dog Wizard Modal -->
+  <div class="mm-backdrop" *ngIf="addDogModalOpen">
+    <div class="mm-modal add-dog-modal">
+      <h4>Add a Dog</h4>
+
+      <ng-container [ngSwitch]="addDogPage">
+        <div *ngSwitchCase="0" class="wizard-page">
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.profilePictureUrl)">
+            <label>Dog Photo</label>
+            <div class="avatar-row">
+              <img *ngIf="newDog.profilePictureUrl" [src]="newDog.profilePictureUrl" class="avatar" alt="dog" />
+              <input #newDogPicInput type="file" accept="image/*" hidden (change)="onNewDogPicSelected($event)" />
+              <button class="pill btn-change" (click)="newDogPicInput.click()">Upload</button>
+            </div>
+            <small class="field-error" *ngIf="addDogAttempted && isBlank(newDog.profilePictureUrl)">
+              Photo is required
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.name)">
+            <label>Dog's Name</label>
+            <input [(ngModel)]="newDog.name" />
+            <small class="field-error" *ngIf="addDogAttempted && isBlank(newDog.name)">
+              Name is required
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.breed)">
+            <label>Dog's Breed</label>
+            <input [(ngModel)]="newDog.breed" />
+            <small class="field-error" *ngIf="addDogAttempted && isBlank(newDog.breed)">
+              Breed is required
+            </small>
+          </div>
+
+            <div class="row simple"
+                 [class.invalid]="addDogAttempted && (!newDog.birthMonth || !newDog.birthYear || isFutureBirth(newDog.birthYear, newDog.birthMonth))">
+              <label>Dog's Birth</label>
+              <div class="d-flex gap-2" style="width: 80%">
+                <select [(ngModel)]="newDog.birthMonth">
+                  <option [ngValue]="null" disabled>Month</option>
+                  <option *ngFor="let m of months" [ngValue]="m.value"
+                  [disabled]="isMonthDisabledForNewDog(m.value)">{{ m.label }}</option>
+                </select>
+
+                <select class="form-select"
+                        [(ngModel)]="newDog.birthYear"
+                        (ngModelChange)="onNewDogYearChange($event)"
+                        name="newDogBirthYear"
+                        required>
+                  <option [ngValue]="null" disabled>Year</option>
+                  <option *ngFor="let y of years" [ngValue]="y">{{ y }}</option>
+                </select>
+
+                <small *ngIf="newDog.birthMonth && newDog.birthYear" class="age-hint text-muted">
+                    ~ {{ getAgeString(newDog.birthYear, newDog.birthMonth) }}
+                  </small>
+              </div>
+
+              <small class="field-error" *ngIf="addDogAttempted && (!newDog.birthMonth || !newDog.birthYear)">
+                Birth month & year are required
+              </small>
+              <small class="field-error" *ngIf="addDogAttempted && isFutureBirth(newDog.birthYear, newDog.birthMonth)">
+                Birth cannot be in the future
+              </small>
+            </div>
+        </div>
+
+        <div *ngSwitchCase="1" class="wizard-page">
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.gender)">
+            <label>Gender</label>
+            <select [(ngModel)]="newDog.gender">
+              <option value="" disabled>Select Gender</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+            <small class="field-error" *ngIf="addDogAttempted && isBlank(newDog.gender)">
+              Gender is required
+            </small>
+          </div>
+
+          <div class="row simple"
+               *ngIf="newDog.gender"
+               [class.invalid]="addDogAttempted && isBlank(newDog.fixed)">
+            <label>{{ newDog.gender === 'male' ? 'Castrated?' : 'Sterilized?' }}</label>
+            <select [(ngModel)]="newDog.fixed">
+              <option value="" disabled>Select</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+            <small class="field-error" *ngIf="addDogAttempted && isBlank(newDog.fixed)">
+              This field is required
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.size)">
+            <label>Size</label>
+            <select [(ngModel)]="newDog.size">
+              <option value="" disabled>Select Size</option>
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="giant">Giant</option>
+            </select>
+            <small class="field-error"
+                   *ngIf="addDogAttempted && isBlank(newDog.size)">Size is required</small>
+          </div>
+
+          <div class="row simple" [class.invalid]="addDogAttempted && (newDog.weight == null)">
+            <label>Weight (kg)</label>
+            <input type="number" min="0" [(ngModel)]="newDog.weight" />
+            <small class="field-error"
+                   *ngIf="addDogAttempted && (newDog.weight == null)">Weight is required</small>
+          </div>
+
+          <div class="row simple" [class.invalid]="addDogAttempted && isBlank(newDog.rabiesVaccinated)">
+            <label>Vaccinated Against Rabies?</label>
+            <select [(ngModel)]="newDog.rabiesVaccinated">
+              <option value="" disabled>Select</option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+            <small class="field-error"
+                   *ngIf="addDogAttempted && isBlank(newDog.rabiesVaccinated)">This field is required</small>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="2" class="wizard-page">
+          <div class="row simple">
+            <label>Health Conditions</label>
+            <input [(ngModel)]="newDog.healthConditions" placeholder="Any important notes..." />
+          </div>
+
+          <div class="options-list">
+            <div class="options-title">Behavioral Traits</div>
+            <label class="check-row" *ngFor="let trait of behavioralTraitsList">
+              <input
+                type="checkbox"
+                [checked]="newDog.behavioralTraits.includes(trait)"
+                (change)="onWizardCheckChange('behavioralTraits', trait, $event)" />
+              <span>{{ trait }}</span>
+            </label>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="3" class="wizard-page">
+          <div class="options-list">
+            <div class="options-title">Favorite Activities</div>
+            <label class="check-row" *ngFor="let act of favoriteActivitiesList">
+              <input
+                type="checkbox"
+                [checked]="newDog.favoriteActivities.includes(act)"
+                (change)="onWizardCheckChange('favoriteActivities', act, $event)" />
+              <span>{{ act }}</span>
+            </label>
+          </div>
+
+          <div class="row simple">
+            <label>Anything Else?</label>
+            <input [(ngModel)]="newDog.moreDetails" />
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="modal-actions">
+        <button class="pill cancel" (click)="closeAddDogModal()">Cancel</button>
+        <button class="pill" *ngIf="addDogPage > 0" (click)="prevAddDogPage()">Back</button>
+        <button class="pill save" *ngIf="addDogPage < 3" (click)="nextAddDogPage()">Next</button>
+        <button class="pill save" *ngIf="addDogPage === 3" (click)="saveNewDog()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Become Sitter Modal -->
+  <div class="mm-backdrop" *ngIf="becomeSitterOpen">
+    <div class="mm-modal add-dog-modal">
+      <h4>Create your sitter profile</h4>
+
+      <ng-container [ngSwitch]="sitterPage">
+
+        <div *ngSwitchCase="0" class="wizard-page">
+
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.profilePictureUrl">
+            <label>Photo</label>
+            <div class="avatar-row">
+              <img *ngIf="sitterWizard.profilePictureUrl" [src]="sitterWizard.profilePictureUrl" class="avatar" alt="sitter" />
+              <input #wizSitterPic type="file" accept="image/*" hidden (change)="onSitterWizardPicSelected($event)" />
+              <button class="pill btn-change" (click)="wizSitterPic.click()">Upload</button>
+            </div>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.profilePictureUrl">
+              Photo is required
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.gender">
+            <label>Gender</label>
+            <select [(ngModel)]="sitterWizard.gender">
+              <option value="" disabled>Select Gender</option>
+              <option value="female">Female</option>
+              <option value="male">Male</option>
+            </select>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.gender">Gender is required</small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && (sitterWizard.experienceYears == null || sitterWizard.experienceYears < 0)">
+            <label>Experience Years</label>
+            <input type="number" min="0" [(ngModel)]="sitterWizard.experienceYears" />
+            <small class="field-error" *ngIf="sitterAttempted && (sitterWizard.experienceYears == null || sitterWizard.experienceYears < 0)">
+              Enter a non-negative whole number
+            </small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && (sitterWizard.rate == null || sitterWizard.rate < 0)">
+            <label>Rate</label>
+            <input type="number" min="0" [(ngModel)]="sitterWizard.rate" />
+            <small class="field-error" *ngIf="sitterAttempted && (sitterWizard.rate == null || sitterWizard.rate < 0)">
+              Rate is required
+            </small>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="1" class="wizard-page">
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.availability.trim()">
+            <label>Availability</label>
+            <textarea class="input-ta ta-medium" rows="5" [(ngModel)]="sitterWizard.availability"></textarea>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.availability.trim()">Availability is required</small>
+          </div>
+
+          <div class="row simple" [class.invalid]="sitterAttempted && !sitterWizard.sitterBio.trim()">
+            <label>Bio</label>
+            <textarea class="input-ta ta-large" rows="8" [(ngModel)]="sitterWizard.sitterBio"></textarea>
+            <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.sitterBio.trim()">Bio is required</small>
+          </div>
+        </div>
+
+        <div *ngSwitchCase="2" class="wizard-page">
+        <div class="options-list">
+          <h5 class="options-title"><strong>Experience With</strong></h5>
+            <label class="check-row" *ngFor="let opt of experienceWithOptions">
+              <input
+                type="checkbox"
+                [checked]="sitterWizard.experienceDetails.includes(opt)"
+                (change)="onSitterWizardListToggle('experienceDetails', opt, $any($event.target).checked)" />
+              <span>{{ opt }}</span>
+            </label>
+          </div>
+
+        <div class="options-list" [class.invalid]="sitterAttempted && !sitterWizard.serviceOptions.length">
+          <h5 class="options-title"><strong>Services</strong></h5>
+            <label class="check-row" *ngFor="let opt of serviceOptionsMaster">
+              <input
+                type="checkbox"
+                [checked]="sitterWizard.serviceOptions.includes(opt)"
+                (change)="onSitterWizardListToggle('serviceOptions', opt, $any($event.target).checked)" />
+              <span>{{ opt }}</span>
+            </label>
+          <small class="field-error" *ngIf="sitterAttempted && !sitterWizard.serviceOptions.length">Pick at least one service</small>
+        </div>
+      </div>
+
+      </ng-container>
+
+      <div class="modal-actions">
+        <button class="pill cancel" (click)="closeBecomeSitterModal()">Cancel</button>
+        <button class="pill" *ngIf="sitterPage > 0" (click)="prevSitterPage()">Back</button>
+        <button class="pill save" *ngIf="sitterPage < 2" (click)="nextSitterPage()">Next</button>
+        <button class="pill save" *ngIf="sitterPage === 2" (click)="saveNewSitter()">Save</button>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="mm-backdrop" *ngIf="confirmDeactivateOpen">
+    <div class="mm-modal confirm-modal">
+      <h4>Deactivate sitter?</h4>
+      <p class="muted">
+        Deactivating the sitter options means you won’t appear in sitter searches.
+        Your sitter data will be kept so you can reactivate anytime.
+      </p>
+      <div class="modal-actions">
+        <button class="pill cancel" (click)="confirmDeactivateOpen = false">Cancel</button>
+        <button class="pill danger" (click)="confirmDeactivate()">Yes, deactivate</button>
+      </div>
+    </div>
+  </div>
+
+ 
   <!-- Add Dog Wizard Modal -->
   <div class="mm-backdrop" *ngIf="addDogModalOpen">
     <div class="mm-modal add-dog-modal">

@@ -452,7 +452,8 @@ export class SignupComponent {
   }
 
   pickAddress(s: { description: string; place_id: string }) {
-    this.street = s.description;
+    const parts = s.description.split(',');
+    this.street = parts[0].trim();  
     this.addressSuggestions = [];
   }
 
